@@ -12,6 +12,7 @@ export default function Home() {
   const gifUrl = `https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif`;
 
   async function downloadGif() {
+    /*
       const container = document.getElementById('gif');
 
       // Ensure the GIF image is fully loaded before capturing
@@ -52,6 +53,7 @@ export default function Home() {
 
           gif.render();
       });
+      */
   }
 
   return (
