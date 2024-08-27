@@ -1,3 +1,5 @@
+@use "pico";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,15 +10,9 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
 
 body {
+  height: 100vh;
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -30,4 +26,24 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+}
+
+#gifContainer {
+    position: relative;
+    display: inline-block;
+}
+
+#overlayContainer {
+    position: absolute;
+    top: 0;
+    left: 240px;
+    pointer-events: none;
 }
