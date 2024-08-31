@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Chimpers Reactions Generator",
+  title: "chimp.fun - Chimpers Reactions Generator",
 };
 
 export default function RootLayout({
