@@ -82,7 +82,7 @@ export default function Home() {
       </div>
 
       <div>
-        <button onClick={downloadGif} disabled={!ffmpegReady}>Download as GIF</button>
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={downloadGif} disabled={!ffmpegReady}>Download as GIF</button>
       </div>
 
       {loadedGifUrl && (
