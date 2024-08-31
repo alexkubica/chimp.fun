@@ -1,93 +1,96 @@
 'use client';
-import Head from "next/head";
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import html2canvas from "html2canvas";
-import GIF from "gif.js";
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { fetchFile } from "@ffmpeg/util";
+
+const ffmpeg = new FFmpeg();
+ffmpeg.on('log', ({ message }) => {
+  console.log(message);
+});
 
 export default function Home() {
   const [gifNumber, setGifNumber] = useState(2956);
   const [overlayNumber, setOverlayNumber] = useState(1);
+  const [ffmpegReady, setFfmpegReady] = useState(false);
+  const [loadedGifUrl, setLoadedGifUrl] = useState('');
 
-  const gifUrl = `https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif`;
+  useEffect(() => {
+
+    const loadFfmpeg = async () => {
+
+      await ffmpeg.load();
+      setFfmpegReady(true);
+    }
+
+    loadFfmpeg();
+  }, [])
+
+  const imageUrl = encodeURIComponent(`https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif`);
+  const gifUrl = `/proxy?url=${imageUrl}`;
 
   async function downloadGif() {
-    /*
-      const container = document.getElementById('gif');
+    await ffmpeg.writeFile('reaction.png', await fetchFile(`/reactions/${overlayNumber}.png`));
+    await ffmpeg.writeFile('input.gif', await fetchFile(gifUrl));
+    await ffmpeg.exec([
+      '-i', 'input.gif',
+      '-i', 'reaction.png',
+      '-filter_complex', '[1:v]scale=iw/4:ih/4[overlay];[0:v][overlay]overlay=320:0',
+      '-f', 'gif', 'output.gif']);
+    const data = await ffmpeg.readFile('output.gif');
+    const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
+    // setLoadedGifUrl(url)
 
-      // Ensure the GIF image is fully loaded before capturing
-      const gifImage = document.getElementById('gif');
-      if (!gifImage.complete) {
-          await new Promise(resolve => gifImage.onload = resolve);
-      }
+    // Create a download link and trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'output.gif';
+    a.click();
 
-      html2canvas(container).then(async canvas => {
-
-              document.body.appendChild(canvas)
-
-
-          const workerBlob = await fetch('https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js')
-              .then(response => {
-                  if (!response.ok) throw new Error("Network response was not OK");
-                  return response.blob();
-              });
-
-          const gif = new GIF({
-              workers: 4,
-              workerScript: URL.createObjectURL(workerBlob),
-              quality: 10,
-              width: container.clientWidth,
-              height: container.clientHeight
-          });
-
-
-
-          gif.addFrame(canvas, { delay: 200 });
-
-          gif.on('finished', function (blob) {
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(blob);
-              link.download = 'image.gif';
-              link.click();
-          });
-
-          gif.render();
-      });
-      */
+    // Clean up
+    URL.revokeObjectURL(url);
   }
 
   return (
     <div>
-       <h1>Chimpers Reactions Generator</h1>
+      <h1>Chimpers Reactions Generator</h1>
       <div>
-          <label >Chimper #(1-5555): </label>
-          <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
+        <label >Chimper #(1-5555): </label>
+        <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
           onChange={(e => {
-              const normalized = Number(e.target.value)
-              setGifNumber(normalized);
+            const normalized = Number(e.target.value)
+            setGifNumber(normalized);
           })} />
       </div>
 
-<div>
-      <label>Select reaction (1-22): </label>
-      <input type="number" id="overlayNumber" min="1" max="22" value={overlayNumber}
+      <div>
+        <label>Select reaction (1-22): </label>
+        <input type="number" id="overlayNumber" min="1" max="22" value={overlayNumber}
           onChange={(e => {
-              const normalized = Number(e.target.value)
-              setOverlayNumber(normalized);
-          })} 
-      
-      />
+            const normalized = Number(e.target.value)
+            setOverlayNumber(normalized);
+          })}
+
+        />
       </div>
 
-      {/* <h2>Download Result</h2>
-      <div>
-          <button onClick={downloadGif}>Download as GIF</button>
-      </div> */}
 
       <div id="gifContainer">
-          <Image id="gif" src={gifUrl} alt="chimp will be displayed here" height={400} width={400}/>
-          <Image id="overlayContainer" src={`/reactions/${overlayNumber}.png`} alt="overlay will be displayed here" height={150} width={150} />
+        <Image id="gif" src={gifUrl} alt="chimp will be displayed here" height={400} width={400} />
+        <Image id="overlayContainer" src={`/reactions/${overlayNumber}.png`} alt="overlay will be displayed here" height={150} width={150} />
       </div>
+
+      <div>
+        <button onClick={downloadGif} disabled={!ffmpegReady}>Download as GIF</button>
+      </div>
+
+      {loadedGifUrl && (
+        <div>
+          <h1>Result</h1>
+          <Image src={loadedGifUrl} alt="generated gif" height={400} width={400} />
+        </div>
+      )}
     </div>
 
   );
