@@ -17,9 +17,9 @@ export async function GET(
   }
 
   try {
-    console.log('Fetching the resource:', url);
+    // console.log('Fetching the resource:', url);
     const response = await axios.get(url as string, { responseType: 'arraybuffer' });
-    console.log('Fetched:', response);
+    // console.log('Fetched:', response);
     return new Response(response.data, {
       headers: {
         'Content-Type': response.headers['content-type']

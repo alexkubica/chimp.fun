@@ -53,45 +53,45 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <h1>Chimpers Reactions Generator</h1>
       <div>
-        <label >Chimper #(1-5555): </label>
-        <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
-          onChange={(e => {
-            const normalized = Number(e.target.value)
-            setGifNumber(normalized);
-          })} />
-      </div>
-
-      <div>
-        <label>Select reaction (1-22): </label>
-        <input type="number" id="overlayNumber" min="1" max="22" value={overlayNumber}
-          onChange={(e => {
-            const normalized = Number(e.target.value)
-            setOverlayNumber(normalized);
-          })}
-
-        />
-      </div>
-
-
-      <div id="gifContainer">
-        <Image id="gif" src={gifUrl} alt="chimp will be displayed here" height={400} width={400} />
-        <Image id="overlayContainer" src={`/reactions/${overlayNumber}.png`} alt="overlay will be displayed here" height={150} width={150} />
-      </div>
-
-      <div>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={downloadGif} disabled={!ffmpegReady}>Download as GIF</button>
-      </div>
-
-      {loadedGifUrl && (
+        <h1>Chimpers Reactions Generator</h1>
         <div>
-          <h1>Result</h1>
-          <Image src={loadedGifUrl} alt="generated gif" height={400} width={400} />
+          <label >Chimper #(1-5555): </label>
+          <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
+            onChange={(e => {
+              const normalized = Number(e.target.value)
+              setGifNumber(normalized);
+            })} />
         </div>
-      )}
-    </div>
+
+        <div>
+          <label>Select reaction (1-22): </label>
+          <input type="number" id="overlayNumber" min="1" max="22" value={overlayNumber}
+            onChange={(e => {
+              const normalized = Number(e.target.value)
+              setOverlayNumber(normalized);
+            })}
+
+          />
+        </div>
+
+
+        <div id="gifContainer">
+          <Image id="gif" src={gifUrl} alt="chimp will be displayed here" height={400} width={400} />
+          <Image id="overlayContainer" src={`/reactions/${overlayNumber}.png`} alt="overlay will be displayed here" height={150} width={150} />
+        </div>
+
+        <div>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={downloadGif} disabled={!ffmpegReady}>Download as GIF</button>
+        </div>
+
+        {loadedGifUrl && (
+          <div>
+            <h1>Result</h1>
+            <Image src={loadedGifUrl} alt="generated gif" height={400} width={400} />
+          </div>
+        )}
+      </div>
 
   );
 }
