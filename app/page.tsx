@@ -18,7 +18,7 @@ const fileToDataUri = (file: File) => new Promise((resolve, reject) => {
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [gifNumber, setGifNumber] = useState(Math.floor(Math.random() * 5555) + 1);
-  const [overlayNumber, setOverlayNumber] = useState(1);
+  const [overlayNumber, setOverlayNumber] = useState(Math.floor(Math.random() * 22) + 1);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
@@ -119,6 +119,7 @@ export default function Home() {
       <div>
         <button className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" onClick={() => {
           setGifNumber(Math.floor(Math.random() * 5555) + 1)
+          setOverlayNumber(Math.floor(Math.random() * 22) + 1)
         }} >RANDOM !CHIMP</button>
       </div>
 
