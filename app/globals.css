@@ -35,15 +35,3 @@ body {
     text-align: center;
     padding: 20px;
 }
-
-#gifContainer {
-    position: relative;
-    display: inline-block;
-}
-
-#overlayContainer {
-    position: absolute;
-    top: 0;
-    left: 240px;
-    pointer-events: none;
-}
