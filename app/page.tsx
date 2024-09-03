@@ -13,12 +13,36 @@ const fileToDataUri = (file: File) => new Promise((resolve, reject) => {
   reader.readAsDataURL(file);
 })
 
-
+const reactionsMap = {
+  1: 'OK!',
+  2: 'YES!',
+  3: 'NO!',
+  4: 'COOL!',
+  5: 'LOL!',
+  6: 'NICE!',
+  7: 'WHAT?',
+  8: 'WHY?',
+  9: 'GREAT!',
+  10: 'LOL!',
+  11: 'SURE!',
+  12: 'LFC!',
+  13: '!CHIMP',
+  14: '?',
+  15: 'WOW!',
+  16: 'XD',
+  17: '<3',
+  18: 'GM!',
+  19: 'GN!',
+  20: 'F4F',
+  21: 'WLTC!',
+  22: 'G(Y)M!',
+  23: 'HAPPY CHUESDAY',
+}
 
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [gifNumber, setGifNumber] = useState(Math.floor(Math.random() * 5555) + 1);
-  const [overlayNumber, setOverlayNumber] = useState(Math.floor(Math.random() * 22) + 1);
+  const [overlayNumber, setOverlayNumber] = useState(Math.floor(Math.random() * 23) + 1);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
@@ -119,7 +143,7 @@ export default function Home() {
       <div>
         <button className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" onClick={() => {
           setGifNumber(Math.floor(Math.random() * 5555) + 1)
-          setOverlayNumber(Math.floor(Math.random() * 22) + 1)
+          setOverlayNumber(Math.floor(Math.random() * 23) + 1)
         }} >RANDOM !CHIMP</button>
       </div>
 
@@ -127,38 +151,35 @@ export default function Home() {
         <input className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" id="file" type="file" onChange={handleFileChange} />
       </div>
 
-<div className="grid grid-cols-2 gap-2">
 
-      <div className="flex flex-col gap-1">
-        <label >Chimp #(1-5555): </label>
-        <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
-          onChange={(e => {
+        <div className="flex flex-col gap-1">
+          <label >Chimp #(1-5555): </label>
+          <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
+            onChange={(e => {
+              const normalized = Number(e.target.value)
+              setGifNumber(normalized);
+              setFile(null)
+            })} />
+          <input type="range" min="1" max="5555" value={gifNumber} onChange={e => {
             const normalized = Number(e.target.value)
             setGifNumber(normalized);
-            setFile(null)
-          })} />
-        <input type="range" min="1" max="5555" value={gifNumber} onChange={e => {
-          const normalized = Number(e.target.value)
-          setGifNumber(normalized);
-        }}/>
-      </div>
+          }} />
+        </div>
 
-      <div className="flex flex-col gap-1">
-        <label>Select reaction (1-22): </label>
-        <input type="number" id="overlayNumber" min="1" max="22" value={overlayNumber}
-          onChange={(e => {
-            const normalized = Number(e.target.value)
-            setOverlayNumber(normalized);
+        <div className="flex flex-col gap-1">
+          <label>Select a reaction: </label>
+
+        <div className="grid grid-cols-3 lg:grid-cols-6 md:grid-cols-4 gap-1">
+          {Object.entries(reactionsMap).map(([key, value]) => {
+            return (
+              <button key={key} className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" onClick={() => {
+                setOverlayNumber(Number(key))
+              }}>{value}</button>
+            )
           })}
+          </div>
 
-        />
-        <input type="range" min="1" max="22" value={overlayNumber} onChange={e => {
-          const normalized = Number(e.target.value)
-          setOverlayNumber(normalized);
-        }}/>
-      </div></div>
-
-
+        </div>
 
       <div id="gifContainer">
         {finalResult &&
