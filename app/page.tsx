@@ -50,6 +50,7 @@ export default function Home() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      console.log('upload file')
       setFile(e.target.files[0]);
     }
   };
@@ -125,7 +126,10 @@ export default function Home() {
 
 
   async function downloadGif() {
+    console.log('downloading gif')
+
     if (!finalResult) {
+      console.warn("can't download gif, no final result")
       return
     }
 
@@ -142,6 +146,7 @@ export default function Home() {
       <h1 >CHIMP.FUN 🐒</h1>
       <div>
         <button className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" onClick={() => {
+          console.log('clicked random')
           setGifNumber(Math.floor(Math.random() * 5555) + 1)
           setOverlayNumber(Math.floor(Math.random() * 23) + 1)
         }} >RANDOM !CHIMP</button>
@@ -157,11 +162,13 @@ export default function Home() {
           <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
             onChange={(e => {
               const normalized = Number(e.target.value)
+              console.log('change chimp to', normalized)
               setGifNumber(normalized);
               setFile(null)
             })} />
           <input type="range" min="1" max="5555" value={gifNumber} onChange={e => {
             const normalized = Number(e.target.value)
+            console.log('change chimp to', normalized)
             setGifNumber(normalized);
           }} />
         </div>
@@ -173,6 +180,7 @@ export default function Home() {
           {Object.entries(reactionsMap).map(([key, value]) => {
             return (
               <button key={key} className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" onClick={() => {
+                console.log('change reaction to', key)
                 setOverlayNumber(Number(key))
               }}>{value}</button>
             )
