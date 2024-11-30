@@ -201,7 +201,7 @@ export default function Home() {
       </div>
 
       <div>
-        Made with ❤️ by <a href="https://linktr.ee/chimpdev">chimpdev</a> 🐒
+        Made with ❤️ by <a href="https://linktr.ee/alexkueth">Alex !CHIMP 🐒</a>
       </div>
 
     </div>
