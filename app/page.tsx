@@ -13,7 +13,17 @@ const fileToDataUri = (file: File) => new Promise((resolve, reject) => {
   reader.readAsDataURL(file);
 })
 
-const reactionsMap = {
+type ReactionMetadata = {
+    title: string;
+    iw: number;
+    ih: number;
+    x: number;
+    y: number;
+    filename: string;
+
+}
+
+const reactionsMap: { [key: number]: string | ReactionMetadata} = {
   1: 'OK!',
   2: 'YES!',
   3: 'NO!',
@@ -37,12 +47,20 @@ const reactionsMap = {
   21: 'WLTC!',
   22: 'G(Y)M!',
   23: 'HAPPY CHUESDAY',
+  24: {
+    title: 'I AM !CHIMP AND !CHIMP IS ME',
+    iw: 1.7,
+    ih: 1.7,
+    x: 270,
+    y: 50,
+    filename: 'I AM !CHIMP AND !CHIMP IS ME.png',
+}
 }
 
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
-  const [gifNumber, setGifNumber] = useState(Math.floor(Math.random() * 5555) + 1);
-  const [overlayNumber, setOverlayNumber] = useState(Math.floor(Math.random() * 23) + 1);
+  const [gifNumber, setGifNumber] = useState(2956);
+  const [overlayNumber, setOverlayNumber] = useState(24);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
@@ -88,7 +106,21 @@ export default function Home() {
   const currentChimpGif = `/proxy?url=${imageUrl}`;
 
   const renderImageUrl = useCallback(async () => {
-    await ffmpegRef.current.writeFile('reaction.png', await fetchFile(`/reactions/${overlayNumber}.png`));
+    let overlaySettings: ReactionMetadata= {
+      title: '',
+      iw: 4,
+      ih: 4,
+      x: 320,
+      y: 0,
+      filename: '',
+    }
+
+    if (typeof reactionsMap[overlayNumber] === 'string') {
+      overlaySettings.filename = overlayNumber + '.png';
+    } else {
+      overlaySettings = reactionsMap[overlayNumber];
+    }
+    await ffmpegRef.current.writeFile('reaction.png', await fetchFile(`/reactions/${overlaySettings.filename}`));
     let filedata;
     if (uploadedImageUri) {
       filedata = await fetchFile(uploadedImageUri);
@@ -99,7 +131,8 @@ export default function Home() {
     await ffmpegRef.current.exec([
       '-i', 'input.gif',
       '-i', 'reaction.png',
-      '-filter_complex', '[1:v]scale=iw/4:ih/4[overlay];[0:v][overlay]overlay=320:0',
+      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[overlay];
+                          [0:v][overlay]overlay=${overlaySettings.x}:${overlaySettings.y}`,
       '-f', 'gif', 'output.gif']);
     const data = await ffmpegRef.current.readFile('output.gif');
     const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
@@ -182,7 +215,7 @@ export default function Home() {
               <button key={key} className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" onClick={() => {
                 console.log('change reaction to', key)
                 setOverlayNumber(Number(key))
-              }}>{value}</button>
+              }}>{typeof value === 'string' ? value : value.title}</button>
             )
           })}
           </div>
