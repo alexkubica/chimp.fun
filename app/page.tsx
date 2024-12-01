@@ -105,43 +105,58 @@ export default function Home() {
   const imageUrl = encodeURIComponent(`https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif`);
   const currentChimpGif = `/proxy?url=${imageUrl}`;
 
-  const renderImageUrl = useCallback(async () => {
-    let overlaySettings: ReactionMetadata = {
-      title: '',
-      iw: 4,
-      ih: 4,
-      x: 320,
-      y: 0,
-      filename: '',
-    }
+const renderImageUrl = useCallback(async () => {
+  let overlaySettings: ReactionMetadata = {
+    title: '',
+    iw: 4,
+    ih: 4,
+    x: 320,
+    y: 0,
+    filename: '',
+  };
 
-    if (typeof reactionsMap[overlayNumber] === 'string') {
-      overlaySettings.filename = overlayNumber + '.png';
-    } else {
-      overlaySettings = reactionsMap[overlayNumber];
-    }
-    await ffmpegRef.current.writeFile('reaction.png', await fetchFile(`/reactions/${overlaySettings.filename}`));
-    await ffmpegRef.current.writeFile('credit.png', await fetchFile(`/credit.png`));
-    let filedata;
-    if (uploadedImageUri) {
-      filedata = await fetchFile(uploadedImageUri);
-    } else {
-      filedata = await fetchFile(currentChimpGif);
-    }
-    await ffmpegRef.current.writeFile('input.gif', filedata);
-    await ffmpegRef.current.exec([
-      '-i', 'input.gif',
-      '-i', 'reaction.png',
-      '-i', 'credit.png',
-      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[scaled1]; \
-                   [0:v][scaled1]overlay=${overlaySettings.x}:${overlaySettings.y}[video1]; \
-                   [2:v]scale=iw/2.5:-1[scaled2]; \
-                   [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
-      '-f', 'gif', 'output.gif']);
-    const data = await ffmpegRef.current.readFile('output.gif');
-    const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
-    setFinalResult(url);
-  }, [currentChimpGif, overlayNumber, uploadedImageUri]);
+  if (typeof reactionsMap[overlayNumber] === 'string') {
+    overlaySettings.filename = overlayNumber + '.png';
+  } else {
+    overlaySettings = reactionsMap[overlayNumber];
+  }
+
+  // Write files to ffmpeg FS
+  await ffmpegRef.current.writeFile('reaction.png', await fetchFile(`/reactions/${overlaySettings.filename}`));
+  await ffmpegRef.current.writeFile('credit.png', await fetchFile(`/credit.png`));
+  
+  let filedata;
+  if (uploadedImageUri) {
+    filedata = await fetchFile(uploadedImageUri);
+  } else {
+    filedata = await fetchFile(currentChimpGif);
+  }
+  await ffmpegRef.current.writeFile('input.gif', filedata);
+
+  // Scale the input image to 600x600 first
+  await ffmpegRef.current.exec([
+    '-i', 'input.gif',
+    '-vf', 'scale=600:600', 
+    '-f', 'gif', 'scaled_input.gif'
+  ]);
+
+  // Apply overlays
+  await ffmpegRef.current.exec([
+    '-i', 'scaled_input.gif',
+    '-i', 'reaction.png',
+    '-i', 'credit.png',
+    '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[scaled1]; \
+                         [0:v][scaled1]overlay=${overlaySettings.x}:${overlaySettings.y}[video1]; \
+                         [2:v]scale=iw/2.5:-1[scaled2]; \
+                         [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
+    '-f', 'gif', 'output.gif'
+  ]);
+
+  // Read the output and set final result
+  const data = await ffmpegRef.current.readFile('output.gif');
+  const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
+  setFinalResult(url);
+}, [currentChimpGif, overlayNumber, uploadedImageUri]);
 
   useEffect(() => {
     if (file) {
