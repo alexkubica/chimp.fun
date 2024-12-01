@@ -121,6 +121,7 @@ export default function Home() {
       overlaySettings = reactionsMap[overlayNumber];
     }
     await ffmpegRef.current.writeFile('reaction.png', await fetchFile(`/reactions/${overlaySettings.filename}`));
+    await ffmpegRef.current.writeFile('credit.png', await fetchFile(`/credit.png`));
     let filedata;
     if (uploadedImageUri) {
       filedata = await fetchFile(uploadedImageUri);
@@ -131,7 +132,11 @@ export default function Home() {
     await ffmpegRef.current.exec([
       '-i', 'input.gif',
       '-i', 'reaction.png',
-      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[overlay];[0:v][overlay]overlay=${overlaySettings.x}:${overlaySettings.y}`,
+      '-i', 'credit.png',
+      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[scaled1]; \
+                   [0:v][scaled1]overlay=${overlaySettings.x}:${overlaySettings.y}[video1]; \
+                   [2:v]scale=iw/2.5:-1[scaled2]; \
+                   [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
       '-f', 'gif', 'output.gif']);
     const data = await ffmpegRef.current.readFile('output.gif');
     const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
