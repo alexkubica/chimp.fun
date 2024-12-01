@@ -14,16 +14,16 @@ const fileToDataUri = (file: File) => new Promise((resolve, reject) => {
 })
 
 type ReactionMetadata = {
-    title: string;
-    iw: number;
-    ih: number;
-    x: number;
-    y: number;
-    filename: string;
+  title: string;
+  iw: number;
+  ih: number;
+  x: number;
+  y: number;
+  filename: string;
 
 }
 
-const reactionsMap: { [key: number]: string | ReactionMetadata} = {
+const reactionsMap: { [key: number]: string | ReactionMetadata } = {
   1: 'OK!',
   2: 'YES!',
   3: 'NO!',
@@ -54,7 +54,7 @@ const reactionsMap: { [key: number]: string | ReactionMetadata} = {
     x: 270,
     y: 50,
     filename: 'I AM !CHIMP AND !CHIMP IS ME.png',
-}
+  }
 }
 
 export default function Home() {
@@ -106,7 +106,7 @@ export default function Home() {
   const currentChimpGif = `/proxy?url=${imageUrl}`;
 
   const renderImageUrl = useCallback(async () => {
-    let overlaySettings: ReactionMetadata= {
+    let overlaySettings: ReactionMetadata = {
       title: '',
       iw: 4,
       ih: 4,
@@ -131,8 +131,7 @@ export default function Home() {
     await ffmpegRef.current.exec([
       '-i', 'input.gif',
       '-i', 'reaction.png',
-      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[overlay];
-                          [0:v][overlay]overlay=${overlaySettings.x}:${overlaySettings.y}`,
+      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[overlay];[0:v][overlay]overlay=${overlaySettings.x}:${overlaySettings.y}`,
       '-f', 'gif', 'output.gif']);
     const data = await ffmpegRef.current.readFile('output.gif');
     const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
@@ -190,24 +189,24 @@ export default function Home() {
       </div>
 
 
-        <div className="flex flex-col gap-1">
-          <label >Chimp #(1-5555): </label>
-          <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
-            onChange={(e => {
-              const normalized = Number(e.target.value)
-              console.log('change chimp to', normalized)
-              setGifNumber(normalized);
-              setFile(null)
-            })} />
-          <input type="range" min="1" max="5555" value={gifNumber} onChange={e => {
+      <div className="flex flex-col gap-1">
+        <label >Chimp #(1-5555): </label>
+        <input type="number" id="gifNumber" min="1" max="5555" value={gifNumber}
+          onChange={(e => {
             const normalized = Number(e.target.value)
             console.log('change chimp to', normalized)
             setGifNumber(normalized);
-          }} />
-        </div>
+            setFile(null)
+          })} />
+        <input type="range" min="1" max="5555" value={gifNumber} onChange={e => {
+          const normalized = Number(e.target.value)
+          console.log('change chimp to', normalized)
+          setGifNumber(normalized);
+        }} />
+      </div>
 
-        <div className="flex flex-col gap-1">
-          <label>Select a reaction: </label>
+      <div className="flex flex-col gap-1">
+        <label>Select a reaction: </label>
 
         <div className="grid grid-cols-3 lg:grid-cols-6 md:grid-cols-4 gap-1">
           {Object.entries(reactionsMap).map(([key, value]) => {
@@ -218,9 +217,9 @@ export default function Home() {
               }}>{typeof value === 'string' ? value : value.title}</button>
             )
           })}
-          </div>
-
         </div>
+
+      </div>
 
       <div id="gifContainer">
         {finalResult &&
