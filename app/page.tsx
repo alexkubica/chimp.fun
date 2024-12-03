@@ -68,7 +68,7 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [gifNumber, setGifNumber] = useState(2956);
-  const [overlayNumber, setOverlayNumber] = useState(24);
+  const [overlayNumber, setOverlayNumber] = useState(13);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
