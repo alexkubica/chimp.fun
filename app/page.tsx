@@ -62,6 +62,14 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     x: 270,
     y: 50,
     filename: 'CHOOSECUTE.png',
+  },
+  26: {
+    title: 'HAPPY 100K!',
+    iw: 1.5,
+    ih: 1.5,
+    x: 270,
+    y: 50,
+    filename: 'happy 100k.png',
   }
 }
 
