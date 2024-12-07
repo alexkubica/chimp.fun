@@ -15,8 +15,7 @@ const fileToDataUri = (file: File) => new Promise((resolve, reject) => {
 
 type ReactionMetadata = {
   title: string;
-  iw: number;
-  ih: number;
+  scale: number;
   x: number;
   y: number;
   filename: string;
@@ -49,24 +48,21 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
   23: 'HAPPY CHUESDAY',
   24: {
     title: 'I AM !CHIMP AND !CHIMP IS ME',
-    iw: 1.7,
-    ih: 1.7,
+    scale: 1.7,
     x: 270,
     y: 50,
     filename: 'I AM !CHIMP AND !CHIMP IS ME.png',
   },
   25: {
     title: '#CHOOSECUTE',
-    iw: 1.5,
-    ih: 1.5,
+    scale: 1.5,
     x: 270,
     y: 50,
     filename: 'CHOOSECUTE.png',
   },
   26: {
     title: 'HAPPY 100K!',
-    iw: 1.5,
-    ih: 1.5,
+    scale: 1.5,
     x: 270,
     y: 50,
     filename: 'happy 100k.png',
@@ -76,6 +72,9 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [gifNumber, setGifNumber] = useState(2956);
+  const [x, setX] = useState(270);
+  const [y, setY] = useState(50);
+  const [scale, setScale] = useState(1.5);
   const [overlayNumber, setOverlayNumber] = useState(13);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -122,12 +121,8 @@ export default function Home() {
   const currentChimpGif = `/proxy?url=${imageUrl}`;
 
   const renderImageUrl = useCallback(async () => {
-    let overlaySettings: ReactionMetadata = {
+    let overlaySettings: Partial<ReactionMetadata> = {
       title: '',
-      iw: 4,
-      ih: 4,
-      x: 320,
-      y: 0,
       filename: '',
     }
 
@@ -149,15 +144,15 @@ export default function Home() {
       '-i', 'input.gif',
       '-i', 'reaction.png',
       '-i', 'credit.png',
-      '-filter_complex', `[1:v]scale=iw/${overlaySettings.iw}:ih/${overlaySettings.ih}[scaled1]; \
-                   [0:v][scaled1]overlay=${overlaySettings.x}:${overlaySettings.y}[video1]; \
+      '-filter_complex', `[1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
+                   [0:v][scaled1]overlay=${x}:${y}[video1]; \
                    [2:v]scale=iw/2.5:-1[scaled2]; \
                    [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
       '-f', 'gif', 'output.gif']);
     const data = await ffmpegRef.current.readFile('output.gif');
     const url = URL.createObjectURL(new Blob([data], { type: 'image/gif' }));
     setFinalResult(url);
-  }, [currentChimpGif, overlayNumber, uploadedImageUri]);
+  }, [currentChimpGif, overlayNumber, scale, uploadedImageUri, x, y]);
 
   useEffect(() => {
     if (file) {
@@ -176,6 +171,20 @@ export default function Home() {
       renderImageUrl();
     }
   }, [ffmpegReady, currentChimpGif, renderImageUrl, uploadedImageUri])
+
+  useEffect(() => {
+    let overlaySettings = reactionsMap[overlayNumber]
+
+    if (typeof overlaySettings !== 'string') {
+      setX(overlaySettings.x);
+      setY(overlaySettings.y);
+      setScale(overlaySettings.scale);
+    } else {
+      setX(320);
+      setY(0);
+      setScale(4);
+    }
+  }, [gifNumber, overlayNumber])
 
 
   async function downloadGif() {
@@ -223,6 +232,49 @@ export default function Home() {
           console.log('change chimp to', normalized)
           setGifNumber(normalized);
         }} />
+      </div>
+
+      <div className="flex flex-row gap-1">
+        <div className="flex flex-col gap-1">
+          <label >X: </label>
+          <input type="number" id="x" value={x}
+            onChange={(e => {
+              const normalized = Number(e.target.value)
+              setX(normalized);
+            })} />
+          <input type="range" value={x} min="0" max="1000" onChange={e => {
+            const normalized = Number(e.target.value)
+            setX(normalized);
+          }} />
+        </div>
+
+
+        <div className="flex flex-col gap-1">
+          <label >Y: </label>
+          <input type="number" id="y" value={y}
+            onChange={(e => {
+              const normalized = Number(e.target.value)
+              setY(normalized);
+            })} />
+          <input type="range" value={y} min="0" max="1000" onChange={e => {
+            const normalized = Number(e.target.value)
+            setY(normalized);
+          }} />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label >Scale: </label>
+          <input type="number" id="scale" value={scale}
+            onChange={(e => {
+              const normalized = Number(e.target.value)
+              setScale(normalized);
+            })} />
+          <input type="range" value={scale} min="0" max="1000" onChange={e => {
+            const normalized = Number(e.target.value)
+            setScale(normalized);
+          }} />
+        </div>
+
       </div>
 
       <div className="flex flex-col gap-1">
