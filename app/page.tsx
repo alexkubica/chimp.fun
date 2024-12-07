@@ -75,6 +75,7 @@ export default function Home() {
   const [x, setX] = useState(270);
   const [y, setY] = useState(50);
   const [scale, setScale] = useState(1.5);
+  const [customReaction, setCustomReaction] = useState('');
   const [overlayNumber, setOverlayNumber] = useState(13);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -187,6 +188,36 @@ export default function Home() {
   }, [gifNumber, overlayNumber])
 
 
+  useEffect(() => {
+    if (customReaction) {
+      // kubica deploy server
+      fetch("https://pixelspeechbubble.com/make-bubble", {
+  "headers": {
+    "accept": "application/json, text/javascript, */*; q=0.01",
+    "accept-language": "en-US,en;q=0.9,he;q=0.8",
+    "cache-control": "no-cache",
+    "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "pragma": "no-cache",
+    "sec-ch-ua": "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"macOS\"",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "x-requested-with": "XMLHttpRequest"
+  },
+  "referrer": "https://pixelspeechbubble.com/",
+  "referrerPolicy": "strict-origin-when-cross-origin",
+  "body": "text=dd&animated=false&orientation=left&xxx=speech",
+  "method": "POST",
+  "mode": "cors",
+  "credentials": "omit"
+});
+    }
+
+  }, [customReaction])
+
+
   async function downloadGif() {
     console.log('downloading gif')
 
@@ -242,7 +273,7 @@ export default function Home() {
               const normalized = Number(e.target.value)
               setX(normalized);
             })} />
-          <input type="range" value={x} min="0" max="1000" onChange={e => {
+          <input type="range" value={x} min="-1000" max="1000" onChange={e => {
             const normalized = Number(e.target.value)
             setX(normalized);
           }} />
@@ -256,7 +287,7 @@ export default function Home() {
               const normalized = Number(e.target.value)
               setY(normalized);
             })} />
-          <input type="range" value={y} min="0" max="1000" onChange={e => {
+          <input type="range" value={y} min="-1000" max="1000" onChange={e => {
             const normalized = Number(e.target.value)
             setY(normalized);
           }} />
@@ -269,7 +300,7 @@ export default function Home() {
               const normalized = Number(e.target.value)
               setScale(normalized);
             })} />
-          <input type="range" value={scale} min="0" max="1000" onChange={e => {
+          <input type="range" value={scale} min="-1000" max="1000" onChange={e => {
             const normalized = Number(e.target.value)
             setScale(normalized);
           }} />
@@ -277,7 +308,7 @@ export default function Home() {
 
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 ">
         <label>Select a reaction: </label>
 
         <div className="grid grid-cols-3 lg:grid-cols-6 md:grid-cols-4 gap-1">
@@ -291,7 +322,16 @@ export default function Home() {
           })}
         </div>
 
+
+
       </div>
+      {/* <div className="flex flex-col gap-1">
+        <label >Or type your input: </label>
+        <input className='w-fit' type="text" id="customReaction" value={customReaction}
+          onChange={(e => {
+            setCustomReaction(e.target.value);
+          })} />
+      </div> */}
 
       <div id="gifContainer">
         {finalResult &&
