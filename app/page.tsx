@@ -410,10 +410,10 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 ">
+      <div className="flex flex-col gap-1">
         <label>Select a reaction: </label>
 
-        <div className="grid grid-cols-3 lg:grid-cols-6 md:grid-cols-4 gap-1">
+        <div className="grid grid-cols-4 gap-1 max-w-md">
           {Object.entries(reactionsMap).map(([key, value]) => {
             return (
               <button
@@ -431,7 +431,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="pt-4">
+      <div className="m-4">
         Made with ❤️ by <a href="https://linktr.ee/alexkueth">Alex !CHIMP 🐒</a>
       </div>
     </div>
