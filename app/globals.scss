@@ -4,13 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 body {
-    font-family: 'Press Start 2P', cursive;
+  font-family: "Press Start 2P", cursive;
   height: 100vh;
 }
-
 
 @layer utilities {
   .text-balance {
@@ -18,43 +17,41 @@ body {
   }
 }
 
-
-
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
 }
 
 .bubble {
-    background-color: #eee;
-    border: 2px solid #333;
-    border-radius: 5px;
-    color: #333;
-    display: inline-block;
-    font: 16px/24px sans-serif;
-    padding: 12px 24px;
-    position: relative;
+  background-color: #eee;
+  border: 2px solid #333;
+  border-radius: 5px;
+  color: #333;
+  display: inline-block;
+  font: 16px/24px sans-serif;
+  padding: 12px 24px;
+  position: relative;
 }
 .bubble:after,
 .bubble:before {
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 20px solid #eee;
-    bottom: -20px;
-    content: '';
-    left: 50%;
-    margin-left: -20px;
-    position: absolute;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid #eee;
+  bottom: -20px;
+  content: "";
+  left: 50%;
+  margin-left: -20px;
+  position: absolute;
 }
 
 /* Styling for second triangle (border) */
 
 .bubble:before {
-    border-left: 23px solid transparent;
-    border-right: 23px solid transparent;
-    border-top: 23px solid;
-    border-top-color: inherit; /* Can't be included in the shorthand to work */
-    bottom: -23px;
-    margin-left: -23px;
+  border-left: 23px solid transparent;
+  border-right: 23px solid transparent;
+  border-top: 23px solid;
+  border-top-color: inherit; /* Can't be included in the shorthand to work */
+  bottom: -23px;
+  margin-left: -23px;
 }

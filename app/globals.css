@@ -4,7 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   height: 100vh;
   color: rgb(var(--foreground-rgb));
@@ -22,10 +21,8 @@ body {
   }
 }
 
-
-
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
 }
