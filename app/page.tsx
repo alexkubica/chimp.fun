@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { debounce } from "lodash";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -82,31 +83,101 @@ export default function Home() {
   const [x, setX] = useState(270);
   const [y, setY] = useState(50);
   const [scale, setScale] = useState(1.5);
-  const [customReaction, setCustomReaction] = useState("");
   const [overlayNumber, setOverlayNumber] = useState(27);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
   const [finalResult, setFinalResult] = useState<string | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      console.log("upload file");
-      setFile(e.target.files[0]);
-    }
-  };
+  const imageUrl = encodeURIComponent(
+    `https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif`,
+  );
 
+  const currentChimpGif = `/proxy?url=${imageUrl}`;
+
+  const debouncedRenderImageUrl = useCallback(
+    debounce(async () => {
+      if (!ffmpegReady) {
+        console.warn("FFmpeg not ready yet.");
+        return;
+      }
+
+      let overlaySettings: Partial<ReactionMetadata> = {
+        title: "",
+        filename: "",
+      };
+
+      if (typeof reactionsMap[overlayNumber] === "string") {
+        overlaySettings.filename = overlayNumber + ".png";
+      } else {
+        overlaySettings = reactionsMap[overlayNumber];
+      }
+
+      try {
+        await ffmpegRef.current.writeFile(
+          "reaction.png",
+          await fetchFile(`/reactions/${overlaySettings.filename}`),
+        );
+        await ffmpegRef.current.writeFile(
+          "credit.png",
+          await fetchFile(`/credit.png`),
+        );
+
+        let filedata;
+        if (uploadedImageUri) {
+          filedata = await fetchFile(uploadedImageUri);
+        } else {
+          filedata = await fetchFile(currentChimpGif);
+        }
+
+        await ffmpegRef.current.writeFile("input.gif", filedata);
+        await ffmpegRef.current.exec([
+          "-i",
+          "input.gif",
+          "-i",
+          "reaction.png",
+          "-i",
+          "credit.png",
+          "-filter_complex",
+          `[1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
+                     [0:v][scaled1]overlay=${x}:${y}[video1]; \
+                     [2:v]scale=iw/2.5:-1[scaled2]; \
+                     [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
+          "-f",
+          "gif",
+          "output.gif",
+        ]);
+
+        const data = await ffmpegRef.current.readFile("output.gif");
+        const url = URL.createObjectURL(
+          new Blob([data], { type: "image/gif" }),
+        );
+
+        // Update the state to trigger re-render
+        setFinalResult(url);
+        console.log("Image URL generated:", url);
+      } catch (error) {
+        console.error("Error during FFmpeg execution:", error);
+      }
+    }, 200),
+    [
+      ffmpegReady,
+      uploadedImageUri,
+      currentChimpGif,
+      overlayNumber,
+      scale,
+      x,
+      y,
+    ],
+  );
   useEffect(() => {
     const loadFfmpeg = async () => {
       try {
         const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
         const ffmpeg = ffmpegRef.current;
         ffmpeg.on("log", ({ message }) => {
-          // messageRef.current.innerHTML = message;
           console.log(message);
         });
-        // toBlobURL is used to bypass CORS issue, urls with the same
-        // domain can be used directly.
         await ffmpeg.load({
           coreURL: await toBlobURL(
             `${baseURL}/ffmpeg-core.js`,
@@ -118,8 +189,6 @@ export default function Home() {
           ),
         });
         setFfmpegReady(true);
-        //   await ffmpegRef.current.load();
-        //   setFfmpegReady(true);
       } catch (e) {
         console.error(e);
       }
@@ -127,58 +196,6 @@ export default function Home() {
 
     loadFfmpeg();
   }, []);
-
-  const imageUrl = encodeURIComponent(
-    `https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif`,
-  );
-  const currentChimpGif = `/proxy?url=${imageUrl}`;
-
-  const renderImageUrl = useCallback(async () => {
-    let overlaySettings: Partial<ReactionMetadata> = {
-      title: "",
-      filename: "",
-    };
-
-    if (typeof reactionsMap[overlayNumber] === "string") {
-      overlaySettings.filename = overlayNumber + ".png";
-    } else {
-      overlaySettings = reactionsMap[overlayNumber];
-    }
-    await ffmpegRef.current.writeFile(
-      "reaction.png",
-      await fetchFile(`/reactions/${overlaySettings.filename}`),
-    );
-    await ffmpegRef.current.writeFile(
-      "credit.png",
-      await fetchFile(`/credit.png`),
-    );
-    let filedata;
-    if (uploadedImageUri) {
-      filedata = await fetchFile(uploadedImageUri);
-    } else {
-      filedata = await fetchFile(currentChimpGif);
-    }
-    await ffmpegRef.current.writeFile("input.gif", filedata);
-    await ffmpegRef.current.exec([
-      "-i",
-      "input.gif",
-      "-i",
-      "reaction.png",
-      "-i",
-      "credit.png",
-      "-filter_complex",
-      `[1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
-                   [0:v][scaled1]overlay=${x}:${y}[video1]; \
-                   [2:v]scale=iw/2.5:-1[scaled2]; \
-                   [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
-      "-f",
-      "gif",
-      "output.gif",
-    ]);
-    const data = await ffmpegRef.current.readFile("output.gif");
-    const url = URL.createObjectURL(new Blob([data], { type: "image/gif" }));
-    setFinalResult(url);
-  }, [currentChimpGif, overlayNumber, scale, uploadedImageUri, x, y]);
 
   useEffect(() => {
     if (file) {
@@ -188,13 +205,19 @@ export default function Home() {
     } else {
       setUploadedImageUri(null);
     }
-  }, [file, renderImageUrl]);
+  }, [file]);
 
   useEffect(() => {
     if (ffmpegReady && (currentChimpGif || uploadedImageUri)) {
-      renderImageUrl();
+      debouncedRenderImageUrl();
     }
-  }, [ffmpegReady, currentChimpGif, renderImageUrl, uploadedImageUri]);
+  }, [ffmpegReady, currentChimpGif, uploadedImageUri, debouncedRenderImageUrl]);
+
+  useEffect(() => {
+    return () => {
+      debouncedRenderImageUrl.cancel(); // Cleanup the debounce on unmount
+    };
+  }, [debouncedRenderImageUrl]);
 
   useEffect(() => {
     let overlaySettings = reactionsMap[overlayNumber];
@@ -209,35 +232,6 @@ export default function Home() {
       setScale(4);
     }
   }, [gifNumber, overlayNumber]);
-
-  useEffect(() => {
-    if (customReaction) {
-      // kubica deploy server
-      fetch("https://pixelspeechbubble.com/make-bubble", {
-        headers: {
-          accept: "application/json, text/javascript, */*; q=0.01",
-          "accept-language": "en-US,en;q=0.9,he;q=0.8",
-          "cache-control": "no-cache",
-          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-          pragma: "no-cache",
-          "sec-ch-ua":
-            '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"macOS"',
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "same-origin",
-          "x-requested-with": "XMLHttpRequest",
-        },
-        referrer: "https://pixelspeechbubble.com/",
-        referrerPolicy: "strict-origin-when-cross-origin",
-        body: "text=dd&animated=false&orientation=left&xxx=speech",
-        method: "POST",
-        mode: "cors",
-        credentials: "omit",
-      });
-    }
-  }, [customReaction]);
 
   async function downloadGif() {
     console.log("downloading gif");
@@ -254,6 +248,23 @@ export default function Home() {
     a.click();
   }
 
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        console.log("upload file");
+        setFile(e.target.files[0]);
+      }
+    },
+    [],
+  );
+
+  const handleChimpNumberChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setGifNumber(Number(e.target.value));
+    },
+    [],
+  );
+
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
@@ -265,23 +276,14 @@ export default function Home() {
           min="1"
           max="5555"
           value={gifNumber}
-          onChange={(e) => {
-            const normalized = Number(e.target.value);
-            console.log("change chimp to", normalized);
-            setGifNumber(normalized);
-            setFile(null);
-          }}
+          onChange={handleChimpNumberChange}
         />
         <input
           type="range"
           min="1"
           max="5555"
           value={gifNumber}
-          onChange={(e) => {
-            const normalized = Number(e.target.value);
-            console.log("change chimp to", normalized);
-            setGifNumber(normalized);
-          }}
+          onChange={handleChimpNumberChange}
         />
         <button
           className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
@@ -388,6 +390,8 @@ export default function Home() {
             type="number"
             id="scale"
             value={scale}
+            min="-2"
+            max="5"
             onChange={(e) => {
               const normalized = Number(e.target.value);
               setScale(normalized);
@@ -396,8 +400,8 @@ export default function Home() {
           <input
             type="range"
             value={scale}
-            min="-1000"
-            max="1000"
+            min="-2"
+            max="5"
             onChange={(e) => {
               const normalized = Number(e.target.value);
               setScale(normalized);
@@ -426,13 +430,6 @@ export default function Home() {
           })}
         </div>
       </div>
-      {/* <div className="flex flex-col gap-1">
-        <label >Or type your input: </label>
-        <input className='w-fit' type="text" id="customReaction" value={customReaction}
-          onChange={(e => {
-            setCustomReaction(e.target.value);
-          })} />
-      </div> */}
 
       <div className="pt-4">
         Made with ❤️ by <a href="https://linktr.ee/alexkueth">Alex !CHIMP 🐒</a>
