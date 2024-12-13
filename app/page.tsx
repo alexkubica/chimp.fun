@@ -433,6 +433,12 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="m-4 flex flex-col gap-1">
+        <div>For donations:</div>
+        <div>ETH: 0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417</div>
+        <div>SOL: DMjh4rUhozxjXjVTRQhSBv8AzicPyQrGCD8UZZLXkEAe</div>
+        <div>BTC: bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk</div>
+      </div>
       <div className="m-4">
         Made with ❤️ by <a href="https://linktr.ee/alexkueth">Alex !CHIMP 🐒</a>
       </div>
