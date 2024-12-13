@@ -268,7 +268,7 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
-      <div className="flex  gap-1">
+      <div className="flex flex-col sm:flex-row gap-1">
         <label>Chimp #(1-5555): </label>
         <input
           type="number"
@@ -285,19 +285,19 @@ export default function Home() {
           value={gifNumber}
           onChange={handleChimpNumberChange}
         />
-        <button
-          className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          onClick={() => {
-            console.log("clicked random");
-            setGifNumber(Math.floor(Math.random() * 5555) + 1);
-          }}
-        >
-          RANDOM !CHIMP
-        </button>
       </div>
+      <button
+        className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+        onClick={() => {
+          console.log("clicked random");
+          setGifNumber(Math.floor(Math.random() * 5555) + 1);
+        }}
+      >
+        RANDOM !CHIMP
+      </button>
 
+      <label>Or upload your image: </label>
       <div className="flex gap-1 justify-center align-center">
-        <label>Or upload your image: </label>
         <input
           className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
           id="file"
@@ -317,6 +317,8 @@ export default function Home() {
             src={finalResult}
             alt="chimp will be displayed here"
             unoptimized
+            sizes="(max-width: 300px) 100vw, 300px"
+            className="max-w-[300px] max-h-[300px] w-full h-auto"
             height={300}
             width={300}
           />
@@ -337,7 +339,7 @@ export default function Home() {
         <h2>Settings:</h2>
       </div>
 
-      <div className="flex flex-row gap-1">
+      <div className="flex gap-1 flex-col sm:flex-row ">
         <div className="flex flex-col gap-1">
           <label>X: </label>
           <input
@@ -413,7 +415,7 @@ export default function Home() {
       <div className="flex flex-col gap-1">
         <label>Select a reaction: </label>
 
-        <div className="grid grid-cols-4 gap-1 max-w-md">
+        <div className="flex flex-wrap justify-center items-center gap-1 max-w-md">
           {Object.entries(reactionsMap).map(([key, value]) => {
             return (
               <button
