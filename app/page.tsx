@@ -75,6 +75,20 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     y: 50,
     filename: "WE ALWAYS !CHIMP.gif",
   },
+  28: {
+    title: "WELCOME!",
+    scale: 1,
+    x: 300,
+    y: 30,
+    filename: "welcome!.png",
+  },
+  29: {
+    title: "THANKS!",
+    scale: 1,
+    x: 300,
+    y: 30,
+    filename: "thanks.png",
+  },
 };
 
 export default function Home() {
