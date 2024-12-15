@@ -89,6 +89,13 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     y: 30,
     filename: "thanks.png",
   },
+  30: {
+    title: "LFCHIMP!",
+    scale: 1,
+    x: 300,
+    y: 30,
+    filename: "LFCHIMP.png",
+  },
 };
 
 export default function Home() {
