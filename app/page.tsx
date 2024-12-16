@@ -96,6 +96,13 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     y: 30,
     filename: "LFCHIMP.png",
   },
+  31: {
+    title: "WEN MINT?",
+    scale: 1,
+    x: 300,
+    y: 30,
+    filename: "wen mint.png",
+  },
 };
 
 export default function Home() {
