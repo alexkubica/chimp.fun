@@ -110,6 +110,20 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     y: 25,
     filename: "feeling chimpish.png",
   },
+  33: {
+    title: "WE LOVE $PENGU",
+    scale: 1.4,
+    x: 320,
+    y: 25,
+    filename: "we love pengu.png",
+  },
+  34: {
+    title: "$PENGU TO THE MOON!",
+    scale: 1.4,
+    x: 320,
+    y: 25,
+    filename: "pengu to the moon.png",
+  },
 };
 
 export default function Home() {
