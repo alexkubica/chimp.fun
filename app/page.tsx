@@ -103,6 +103,13 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     y: 30,
     filename: "wen mint.png",
   },
+  32: {
+    title: "FEELING !CHIMPISH",
+    scale: 1.1,
+    x: 320,
+    y: 25,
+    filename: "feeling chimpish.png",
+  },
 };
 
 export default function Home() {
@@ -111,7 +118,7 @@ export default function Home() {
   const [x, setX] = useState(270);
   const [y, setY] = useState(50);
   const [scale, setScale] = useState(1.5);
-  const [overlayNumber, setOverlayNumber] = useState(27);
+  const [overlayNumber, setOverlayNumber] = useState(32);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
