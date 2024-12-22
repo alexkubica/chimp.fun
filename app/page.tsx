@@ -317,6 +317,8 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
+      <h2>{`There's an issue with loading the GIFs and we're working to resolve this, stay tuned!`}</h2>
+      <h2>{`Meantime please upload your own pic.`}</h2>
       <div className="flex flex-col sm:flex-row gap-1">
         <label>Chimp #(1-5555): </label>
         <input
