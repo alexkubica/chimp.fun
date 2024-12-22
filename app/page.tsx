@@ -5,57 +5,6 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ethers } from "ethers";
-import { EtherscanProvider } from "ethers";
-
-const fetchChimpersImageUrl = async ({
-  tokenId,
-  contractAddress = "0x80336ad7a747236ef41f47ed2c7641828a480baa",
-}: {
-  tokenId: number;
-  contractAddress?: string;
-}): Promise<string> => {
-  if (tokenId < 1 || tokenId > 5555) {
-    throw new Error("Token ID must be between 1 and 5555.");
-  }
-
-  // Define the ABI for the tokenURI function
-  const abi = [
-    "function tokenURI(uint256 tokenId) external view returns (string memory)",
-  ];
-
-  try {
-    // Use EtherscanProvider from ethers.js
-    const provider = new EtherscanProvider(
-      "mainnet",
-      process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY,
-    );
-
-    // Connect to the contract
-    const contract = new ethers.Contract(contractAddress, abi, provider);
-
-    // Fetch the tokenURI
-    const tokenURI: string = await contract.tokenURI(tokenId);
-
-    // Fetch the metadata JSON from the tokenURI
-    const response = await fetch(tokenURI);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-    }
-
-    const metadata = await response.json();
-
-    // Validate and return the image URL
-    if (!metadata.image) {
-      throw new Error("Image field not found in metadata.");
-    }
-
-    return metadata.image;
-  } catch (error) {
-    console.error("Error fetching Chimpers image URL:", error);
-    throw error;
-  }
-};
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -334,12 +283,17 @@ export default function Home() {
         return null;
       }
 
-      const url = await fetchChimpersImageUrl({ tokenId: gifNumber });
+      const response = await fetch(`/fetchChimpersImage?tokenId=${gifNumber}`);
+      if (!response.ok) {
+        throw new Error(
+          `Error fetching Chimpers image URL: ${response.statusText}`,
+        );
+      }
+      const { imageUrl } = await response.json();
+      setImageUrl(imageUrl);
 
       // r3bell api
       // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
-
-      setImageUrl(url);
     })();
   }, [gifNumber]);
 
