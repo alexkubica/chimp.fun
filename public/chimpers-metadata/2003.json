@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #2003",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/RXpezsqQOog1ItHPFfdF3tYd7U12OFKb3NLmoG5wyZI",
+  "image_url": "https://arweave.net/RXpezsqQOog1ItHPFfdF3tYd7U12OFKb3NLmoG5wyZI",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightweight Mesh"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Strawberry Milk"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bowlcut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:14:08.515Z"
+}
