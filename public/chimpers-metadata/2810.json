@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #2810",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/9qrfLpb29dWk21kEzW3XUsYkPeOXD0GhHE3pQUZ5q2w",
+  "image_url": "https://arweave.net/9qrfLpb29dWk21kEzW3XUsYkPeOXD0GhHE3pQUZ5q2w",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Chimpfro"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Squinting"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:32:03.000Z"
+}

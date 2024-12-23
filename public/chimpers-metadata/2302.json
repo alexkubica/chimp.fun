@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #2302",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/mVlVZ7vbp1QQ7IrAFZdJiSTvxC9vM1emIyfG1RC7UdI",
+  "image_url": "https://arweave.net/mVlVZ7vbp1QQ7IrAFZdJiSTvxC9vM1emIyfG1RC7UdI",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Blue"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Black Goatee"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Recon Headset"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Hip Specs"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:20:17.377Z"
+}

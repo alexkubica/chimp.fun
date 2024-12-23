@@ -1,0 +1,46 @@
+{
+  "name": "Chimpers #4522",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/iOHb-sCbnrvk_GNFebNI2kQ1xav5dI-XlBGCW52djJw",
+  "image_url": "https://arweave.net/iOHb-sCbnrvk_GNFebNI2kQ1xav5dI-XlBGCW52djJw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vest"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "War Paint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Grey Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Undead Glow"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Adventure Sword"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Uneasy"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T12:09:45.582Z"
+}

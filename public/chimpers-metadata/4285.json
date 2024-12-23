@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #4285",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/QVh3YYe4RhHiiQT158gjSwUVYgx2YkbPAjbsOOadnrg",
+  "image_url": "https://arweave.net/QVh3YYe4RhHiiQT158gjSwUVYgx2YkbPAjbsOOadnrg",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Magenta"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Food Apron"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Captain's Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Undead Glow"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "refreshedAt": "2024-12-23T12:04:16.731Z"
+}
