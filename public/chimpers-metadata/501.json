@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #501",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/m7BjC1heGkKDYgwVhozrH2MTNM1e8dbEy6ZhTQvOWgw",
+  "image_url": "https://arweave.net/m7BjC1heGkKDYgwVhozrH2MTNM1e8dbEy6ZhTQvOWgw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Swift"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Unknown Faction"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Combat Pole"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Side Smile"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:16:14.853Z"
+}

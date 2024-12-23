@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #512",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/NubmGQzIzQl1pYTYEV2CuCxtGSBjxGn3SVNsIhBsw_w",
+  "image_url": "https://arweave.net/NubmGQzIzQl1pYTYEV2CuCxtGSBjxGn3SVNsIhBsw_w",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Pink"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Sabre Tooth"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Sabre"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Wrinkled"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:16:23.182Z"
+}

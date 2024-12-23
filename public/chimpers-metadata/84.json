@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #84",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/slmdQrERD061Xnj7Xt6BM0XDALKeU2_uwKjYIhfi0XU",
+  "image_url": "https://arweave.net/slmdQrERD061Xnj7Xt6BM0XDALKeU2_uwKjYIhfi0XU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Ramen Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Classic Specs"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:08:28.126Z"
+}

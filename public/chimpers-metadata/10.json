@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #10",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/NZuWhpwC8cqX8NXBmiOulD20y9b9WOGzlIiAsgZF-6M",
+  "image_url": "https://arweave.net/NZuWhpwC8cqX8NXBmiOulD20y9b9WOGzlIiAsgZF-6M",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Red"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Thief"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Poker Face"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:05:45.909Z"
+}

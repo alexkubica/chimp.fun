@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #51",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/DnwCd0fkHhNmQZ9HxwUIIpwLZUStGdNk3ftOX9kbFIs",
+  "image_url": "https://arweave.net/DnwCd0fkHhNmQZ9HxwUIIpwLZUStGdNk3ftOX9kbFIs",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Swift"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Marshmallow Stick"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Spikey Ninja"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Azure Blue Visor"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:06:15.264Z"
+}

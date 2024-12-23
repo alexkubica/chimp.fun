@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #646",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/EIAHR0xQIzZ3p30eQIkLpYFHL9q8Ewp3FDnpwapxv9M",
+  "image_url": "https://arweave.net/EIAHR0xQIzZ3p30eQIkLpYFHL9q8Ewp3FDnpwapxv9M",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Vibey Grey"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Blue"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Glowing Lantern"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Mellow Cherry"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Wrinkled"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:20:00.235Z"
+}

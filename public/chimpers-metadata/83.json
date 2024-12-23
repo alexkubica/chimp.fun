@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #83",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/cXEZDo6cQCMz5QMogvg7AODlZISvYp3qYaX6v1_fPgY",
+  "image_url": "https://arweave.net/cXEZDo6cQCMz5QMogvg7AODlZISvYp3qYaX6v1_fPgY",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vest"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Slurping Ramen"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Crimson Red Cap"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Squinting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:08:27.624Z"
+}
