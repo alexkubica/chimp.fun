@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #1861",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/UqyFBhlJ8MWSECpZpcXZzB7QkjU0zwm9QL29GbBZORs",
+  "image_url": "https://arweave.net/UqyFBhlJ8MWSECpZpcXZzB7QkjU0zwm9QL29GbBZORs",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Glowing Lantern"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Upset"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:11:34.422Z"
+}

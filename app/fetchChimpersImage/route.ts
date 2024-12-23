@@ -15,6 +15,34 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid Token ID" }, { status: 400 });
   }
 
+  const tokenIdNumber = Number(tokenId);
+
+  // Construct the absolute URL for the static file
+  const localMetadataUrl = `${req.nextUrl.origin}/chimpers-metadata/${tokenIdNumber}.json`;
+
+  try {
+    // Attempt to fetch metadata from the public directory
+    const localResponse = await fetch(localMetadataUrl);
+
+    if (localResponse.ok) {
+      const metadata = await localResponse.json();
+
+      if (!metadata.image) {
+        throw new Error("Image field not found in cached metadata.");
+      }
+
+      return NextResponse.json({ imageUrl: metadata.image });
+    } else {
+      console.log(`Local metadata not found for Token ID ${tokenId}`);
+    }
+  } catch (error) {
+    console.log(
+      `Error fetching local metadata for Token ID ${tokenId}:`,
+      error,
+    );
+  }
+
+  // Fallback: Fetch metadata from the blockchain
   const contractAddress = "0x80336ad7a747236ef41f47ed2c7641828a480baa";
 
   const abi = [
@@ -30,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     const contract = new ethers.Contract(contractAddress, abi, provider);
 
-    const tokenURI = await contract.tokenURI(Number(tokenId));
+    const tokenURI = await contract.tokenURI(tokenIdNumber);
     const response = await fetch(tokenURI);
 
     if (!response.ok) {

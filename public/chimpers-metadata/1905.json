@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #1905",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/xAE8LQh4tQoD8cHjN4w3HH-ANBsNleMnoR8xyk7zWHQ",
+  "image_url": "https://arweave.net/xAE8LQh4tQoD8cHjN4w3HH-ANBsNleMnoR8xyk7zWHQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vest"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Flamethrower"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Samurai Cut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Hip Specs"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:12:08.244Z"
+}

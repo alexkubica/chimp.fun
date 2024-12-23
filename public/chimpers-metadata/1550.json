@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #1550",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/8lmplHbL4omE7G0eApTIRDagDGq9Pz3wwCorLqd42ZM",
+  "image_url": "https://arweave.net/8lmplHbL4omE7G0eApTIRDagDGq9Pz3wwCorLqd42ZM",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Vibey Grey"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Samurai Training Gear"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Crimson Red Cap"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Demon"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Uneasy"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T09:57:13.670Z"
+}

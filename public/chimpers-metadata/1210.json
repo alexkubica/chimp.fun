@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #1210",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/i8MRcqdKGlhwfeIcgoSs8AIRs2KcFnQEusJ4AbPuGYU",
+  "image_url": "https://arweave.net/i8MRcqdKGlhwfeIcgoSs8AIRs2KcFnQEusJ4AbPuGYU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Royal Gold Armour"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Yellow Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Falling Sakura"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Poker Face"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T09:49:51.195Z"
+}
