@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #873",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/hBjPeDH5Ofu9zcnNVBabjwuaH4r4wmAMiNyCtIlvOCk",
+  "image_url": "https://arweave.net/hBjPeDH5Ofu9zcnNVBabjwuaH4r4wmAMiNyCtIlvOCk",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Ragged Jumper"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Grey Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Resting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Combat Pole"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:26:23.953Z"
+}
