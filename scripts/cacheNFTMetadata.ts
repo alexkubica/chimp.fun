@@ -4,6 +4,10 @@ import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 import readline from "readline";
+import fetch from "node-fetch";
+
+import { collectionsMetadata } from "../app/collectionsMetadata";
+// Example: { chimpers: { name: "Chimpers", cachePath: "chimpers-metadata", total: 5555, contract: "0x..." }, ... }
 
 // Load environment variables
 dotenv.config();
@@ -13,7 +17,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-const askQuestion = (query, defaultAnswer = "y") =>
+const askQuestion = (query: string, defaultAnswer = "y"): Promise<string> =>
   new Promise((resolve) =>
     rl.question(
       `${query} [${defaultAnswer === "y" ? "y" : "n"}/${defaultAnswer === "y" ? "n" : "y"}]: `,
@@ -23,21 +27,14 @@ const askQuestion = (query, defaultAnswer = "y") =>
     ),
   );
 
-const askMultiChoice = (query, defaultOption = "1") =>
-  new Promise((resolve) =>
-    rl.question(`${query} Enter [${defaultOption}]/2/3: `, (input) => {
-      resolve(input.trim() || defaultOption);
-    }),
-  );
-
-const ensureFolder = (folderPath) => {
+const ensureFolder = (folderPath: string) => {
   if (!fs.existsSync(folderPath)) {
     console.log(`Creating folder at: ${folderPath}`);
     fs.mkdirSync(folderPath, { recursive: true });
   }
 };
 
-const getExistingTokens = (folderPath) => {
+const getExistingTokens = (folderPath: string): Set<number> => {
   const files = fs
     .readdirSync(folderPath)
     .filter((file) => file.endsWith(".json"));
@@ -45,12 +42,16 @@ const getExistingTokens = (folderPath) => {
   return new Set(tokenIds);
 };
 
-const writeMetadataFile = (folderPath, tokenId, data) => {
+const writeMetadataFile = (folderPath: string, tokenId: number, data: any) => {
   const filePath = path.join(folderPath, `${tokenId}.json`);
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 };
 
-const fetchWithTimeout = async (url, options, timeout = 30000) => {
+const fetchWithTimeout = async (
+  url: string,
+  options: any,
+  timeout = 30000,
+): Promise<Response> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
 
@@ -60,14 +61,18 @@ const fetchWithTimeout = async (url, options, timeout = 30000) => {
       signal: controller.signal,
     });
     clearTimeout(timer);
-    return response;
+    return response as any;
   } catch (error) {
     clearTimeout(timer);
     throw error;
   }
 };
 
-const fetchMetadataForToken = async (contract, tokenId, retries = 3) => {
+const fetchMetadataForToken = async (
+  contract: ethers.Contract,
+  tokenId: number,
+  retries = 3,
+): Promise<any> => {
   const tokenURI = await contract.tokenURI(tokenId);
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
@@ -80,7 +85,7 @@ const fetchMetadataForToken = async (contract, tokenId, retries = 3) => {
       const metadata = await response.json();
       metadata.refreshedAt = new Date().toISOString();
       return metadata;
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         `Attempt ${attempt}/${retries} failed for token ${tokenId}: ${error.message}`,
       );
@@ -91,7 +96,10 @@ const fetchMetadataForToken = async (contract, tokenId, retries = 3) => {
   }
 };
 
-const scanMissingTokens = (totalTokens, existingTokens) => {
+const scanMissingTokens = (
+  totalTokens: number,
+  existingTokens: Set<number>,
+): number[] => {
   const missingTokens = [];
   for (let tokenId = 1; tokenId <= totalTokens; tokenId++) {
     if (!existingTokens.has(tokenId)) {
@@ -101,7 +109,7 @@ const scanMissingTokens = (totalTokens, existingTokens) => {
   return missingTokens;
 };
 
-const formatElapsedTime = (startTime) => {
+const formatElapsedTime = (startTime: number): string => {
   const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
   const seconds = elapsedSeconds % 60;
   const minutes = Math.floor(elapsedSeconds / 60) % 60;
@@ -112,7 +120,11 @@ const formatElapsedTime = (startTime) => {
   return `${seconds}s`;
 };
 
-const showProgressBar = (completed, total, startTime) => {
+const showProgressBar = (
+  completed: number,
+  total: number,
+  startTime: number,
+) => {
   const percentage = ((completed / total) * 100).toFixed(2);
   const progress = Math.round((completed / total) * 20);
   const bar = `${"█".repeat(progress)}${".".repeat(20 - progress)}`;
@@ -125,17 +137,19 @@ const showProgressBar = (completed, total, startTime) => {
   );
 };
 
-const fetchChimpersMetadata = async () => {
-  console.log("Starting to fetch Chimpers metadata...");
+async function fetchCollectionMetadata(
+  collectionKey: keyof typeof collectionsMetadata,
+) {
+  // Get collection details from the imported metadata
+  const { name, contract, cachePath, total } =
+    collectionsMetadata[collectionKey];
+  console.log(`\nSelected collection: ${name}`);
+
   console.log(
     "Warning: API calls are rate-limited to 5 calls per second. The script will respect this limit.",
   );
 
-  const contractAddress = "0x80336ad7a747236ef41f47ed2c7641828a480baa";
-  const abi = [
-    "function tokenURI(uint256 tokenId) external view returns (string memory)",
-  ];
-
+  // Check for ETHERSCAN_API_KEY in .env
   if (!process.env.ETHERSCAN_API_KEY) {
     console.error("Error: ETHERSCAN_API_KEY is missing in your .env file.");
     process.exit(1);
@@ -145,22 +159,23 @@ const fetchChimpersMetadata = async () => {
     "mainnet",
     process.env.ETHERSCAN_API_KEY,
   );
-  const contract = new ethers.Contract(contractAddress, abi, provider);
+  const abi = [
+    "function tokenURI(uint256 tokenId) external view returns (string memory)",
+  ];
+  const contractInstance = new ethers.Contract(contract, abi, provider);
 
-  const totalTokens = 5555;
-  const metadataFolderPath = path.resolve("./public/chimpers-metadata");
-
+  // Prepare the folder path where metadata will be stored
+  const metadataFolderPath = path.resolve("./public/", cachePath);
   ensureFolder(metadataFolderPath);
-  const existingTokens = getExistingTokens(metadataFolderPath);
 
-  const missingTokensBeforeStart = scanMissingTokens(
-    totalTokens,
-    existingTokens,
-  );
+  // Find existing tokens on disk
+  const existingTokens = getExistingTokens(metadataFolderPath);
+  const missingTokensBeforeStart = scanMissingTokens(total, existingTokens);
   console.log(
     `Found ${missingTokensBeforeStart.length} missing tokens before starting.`,
   );
 
+  // Ask user if they want to start
   const startResponse = await askQuestion(
     `Start fetching metadata for ${missingTokensBeforeStart.length} tokens? (default: y)`,
     "y",
@@ -172,13 +187,15 @@ const fetchChimpersMetadata = async () => {
     process.exit(0);
   }
 
+  // Begin fetching
   const startTime = Date.now();
 
   for (const tokenId of missingTokensBeforeStart) {
     try {
-      const metadata = await fetchMetadataForToken(contract, tokenId);
+      const metadata = await fetchMetadataForToken(contractInstance, tokenId);
       writeMetadataFile(metadataFolderPath, tokenId, metadata);
     } catch (error) {
+      // If there's an error, write an error JSON
       const errorMetadata = {
         error: "Failed to fetch metadata",
         refreshedAt: new Date().toISOString(),
@@ -192,19 +209,18 @@ const fetchChimpersMetadata = async () => {
       startTime,
     );
 
+    // Rate limit: after every 5 tokens, pause for 1 second
     if ((missingTokensBeforeStart.indexOf(tokenId) + 1) % 5 === 0) {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Pause to respect rate limits
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
+  // Retry any still-missing tokens
   console.log(
     "\nInitial fetching complete. Scanning for any remaining tokens...",
   );
   const finalExistingTokens = getExistingTokens(metadataFolderPath);
-  const missingTokensAfterFetch = scanMissingTokens(
-    totalTokens,
-    finalExistingTokens,
-  );
+  const missingTokensAfterFetch = scanMissingTokens(total, finalExistingTokens);
 
   if (missingTokensAfterFetch.length > 0) {
     console.log(
@@ -213,7 +229,7 @@ const fetchChimpersMetadata = async () => {
 
     for (const tokenId of missingTokensAfterFetch) {
       try {
-        const metadata = await fetchMetadataForToken(contract, tokenId);
+        const metadata = await fetchMetadataForToken(contractInstance, tokenId);
         writeMetadataFile(metadataFolderPath, tokenId, metadata);
       } catch (error) {
         const errorMetadata = {
@@ -229,8 +245,9 @@ const fetchChimpersMetadata = async () => {
         startTime,
       );
 
+      // Rate limit again
       if ((missingTokensAfterFetch.indexOf(tokenId) + 1) % 5 === 0) {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Pause to respect rate limits
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   }
@@ -238,10 +255,47 @@ const fetchChimpersMetadata = async () => {
   console.log("\nMetadata fetching complete.");
   console.log(`Metadata saved to: ${metadataFolderPath}`);
   rl.close();
-};
+}
 
-// Execute the script
-fetchChimpersMetadata().catch((error) => {
+async function main() {
+  // 1. List all collections
+  const collectionKeys = Object.keys(collectionsMetadata) as Array<
+    keyof typeof collectionsMetadata
+  >;
+
+  // 2. Prompt user to select a collection
+  console.log("Available collections:");
+  collectionKeys.forEach((key, index) => {
+    console.log(`${index + 1}. ${collectionsMetadata[key].name}`);
+  });
+
+  const userSelection = await new Promise<number>((resolve) => {
+    rl.question(
+      "Enter the number of the collection you want to cache: ",
+      (answer) => {
+        resolve(parseInt(answer.trim(), 10));
+      },
+    );
+  });
+
+  // Basic validation
+  if (
+    isNaN(userSelection) ||
+    userSelection < 1 ||
+    userSelection > collectionKeys.length
+  ) {
+    console.log("Invalid selection. Exiting...");
+    rl.close();
+    process.exit(0);
+  }
+
+  // 3. Fetch metadata for the selected collection
+  const selectedCollectionKey = collectionKeys[userSelection - 1];
+  await fetchCollectionMetadata(selectedCollectionKey);
+}
+
+main().catch((error) => {
   console.error("Unexpected error during script execution:", error);
   rl.close();
+  process.exit(1);
 });

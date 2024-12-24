@@ -1,0 +1,27 @@
+{
+  "name": "Daiyamondo",
+  "created_by": "Timpers",
+  "description": "An outcast that turned to another world for hope, he sought for adventure but was never understood. After years astray, the world froze when he returned wielding the sacred artefact.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/95.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/95.gif",
+  "image_details": {
+    "bytes": 41606,
+    "format": "PNG",
+    "sha256": "10022c16addc5ad4abe391020d2f97ecc114e8a8dbea9cca5667225ad0d7920e",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=95",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/5.png",
+  "refreshedAt": "2024-12-24T10:08:19.936Z"
+}

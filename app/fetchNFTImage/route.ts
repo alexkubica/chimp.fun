@@ -1,16 +1,30 @@
 import { EtherscanProvider } from "ethers";
 import { ethers } from "ethers";
 import { NextRequest, NextResponse } from "next/server";
+import { CollectionNames } from "../types";
+import { collectionsMetadata } from "../collectionsMetadata";
+
+const tokenURIABI = [
+  "function tokenURI(uint256 tokenId) external view returns (string memory)",
+];
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tokenId = searchParams.get("tokenId");
+  const collection = searchParams.get("collection") as CollectionNames;
+  if (!collection) {
+    return NextResponse.json(
+      { error: "Collection not provided" },
+      { status: 400 },
+    );
+  }
+  const collectionMetadata = collectionsMetadata[collection];
 
   if (
     !tokenId ||
     isNaN(Number(tokenId)) ||
     Number(tokenId) < 1 ||
-    Number(tokenId) > 5555
+    Number(tokenId) > collectionMetadata.total
   ) {
     return NextResponse.json({ error: "Invalid Token ID" }, { status: 400 });
   }
@@ -18,7 +32,7 @@ export async function GET(req: NextRequest) {
   const tokenIdNumber = Number(tokenId);
 
   // Construct the absolute URL for the static file
-  const localMetadataUrl = `${req.nextUrl.origin}/chimpers-metadata/${tokenIdNumber}.json`;
+  const localMetadataUrl = `${req.nextUrl.origin}/${collectionMetadata.cachePath}/${tokenIdNumber}.json`;
 
   try {
     // Attempt to fetch metadata from the public directory
@@ -42,13 +56,6 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Fallback: Fetch metadata from the blockchain
-  const contractAddress = "0x80336ad7a747236ef41f47ed2c7641828a480baa";
-
-  const abi = [
-    "function tokenURI(uint256 tokenId) external view returns (string memory)",
-  ];
-
   try {
     // Use EtherscanProvider from ethers.js
     const provider = new EtherscanProvider(
@@ -56,7 +63,11 @@ export async function GET(req: NextRequest) {
       process.env.ETHERSCAN_API_KEY,
     );
 
-    const contract = new ethers.Contract(contractAddress, abi, provider);
+    const contract = new ethers.Contract(
+      collectionMetadata.contract,
+      tokenURIABI,
+      provider,
+    );
 
     const tokenURI = await contract.tokenURI(tokenIdNumber);
     const response = await fetch(tokenURI);

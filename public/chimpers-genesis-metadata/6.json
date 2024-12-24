@@ -1,0 +1,27 @@
+{
+  "name": "Tedi",
+  "created_by": "Timpers",
+  "description": "Despite his world, and civilisation lost, he resolved to pass on his knowledge to new generations through song, dance and cuddles. His philosophy governed his every move, as he sought to integrate into the new world.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/6.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/6.gif",
+  "image_details": {
+    "bytes": 36799,
+    "format": "PNG",
+    "sha256": "26325b1f66c6478a2bd2d3d89ae2a04611096143ac6c0339f6deba255063b42c",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=6",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/71.png",
+  "refreshedAt": "2024-12-24T10:07:08.206Z"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Sora",
+  "created_by": "Timpers",
+  "description": "After being shunned by her family, she ran away and was orphaned by a mysterious scientist. He taught her everything, from battle to literary, she was soon moulded into a fierce and intelligent warrior, thirsting for revenge.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/14.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/14.gif",
+  "image_details": {
+    "bytes": 45603,
+    "format": "PNG",
+    "sha256": "b982d7ce4ea9510ad77ab8b744087ec695c1e793b8f5cab8e791f14a257e2cc1",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=14",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/26.png",
+  "refreshedAt": "2024-12-24T10:07:12.677Z"
+}

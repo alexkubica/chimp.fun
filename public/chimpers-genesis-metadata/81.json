@@ -1,0 +1,27 @@
+{
+  "name": "Shimo",
+  "created_by": "Timpers",
+  "description": "Shimo is an ancient warrior who roamed the old world, and for thousands of years he remained frozen in the depths of a cave. It wasn't until treasure hunters revealed his tomb that his soul was awakened. His resurrection would send shivers across the land.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/81.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/81.gif",
+  "image_details": {
+    "bytes": 38773,
+    "format": "PNG",
+    "sha256": "ae08453fdf4b7c08984e65dce1c10f53c29038cd2c62e98ad617d4c1ba8c8812",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=81",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/34.png",
+  "refreshedAt": "2024-12-24T10:07:57.096Z"
+}

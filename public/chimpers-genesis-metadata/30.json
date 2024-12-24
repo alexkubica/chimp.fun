@@ -1,0 +1,27 @@
+{
+  "name": "Mekanikku",
+  "created_by": "Timpers",
+  "description": "Mekanikku was integral to the defence of the world, he worked on a secret operation led by the council that would disrupt the supply chain to other planets. When he disobeyed their orders and intercepted intelligence the mission collapsed, and he fled into hiding.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/30.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/30.gif",
+  "image_details": {
+    "bytes": 36808,
+    "format": "PNG",
+    "sha256": "dc6b1fc71fc02478aeaa1bc787ddaa3962fac50fa0742d378a4c5895df2ddb12",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=30",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/82.png",
+  "refreshedAt": "2024-12-24T10:07:22.233Z"
+}

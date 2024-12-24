@@ -1,0 +1,27 @@
+{
+  "name": "Mokuzai",
+  "created_by": "Timpers",
+  "description": "She is one with the forests, equipped with a charm and charisma that entices anyone around her. If it wasn't for her rebellious nature she could have been crowned queen of the land, instead she chose tranquillity.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/39.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/39.gif",
+  "image_details": {
+    "bytes": 37470,
+    "format": "PNG",
+    "sha256": "be559c10f8274693eb16d0229a85fe0cd8b0bd5fd346ce044377ee425bb3e3c0",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=39",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/2.png",
+  "refreshedAt": "2024-12-24T10:07:27.903Z"
+}

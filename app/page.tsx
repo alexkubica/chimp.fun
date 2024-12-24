@@ -5,6 +5,8 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CollectionNames } from "./types";
+import { collectionsMetadata } from "./collectionsMetadata";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -266,7 +268,8 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
 
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
-  const [gifNumber, setGifNumber] = useState(2956);
+  const [tokenID, setTokenID] = useState(2956);
+  const [collection, setCollection] = useState<CollectionNames>("chimpers");
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
@@ -277,13 +280,18 @@ export default function Home() {
   const [finalResult, setFinalResult] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+  const collectionMetadata = collectionsMetadata[collection];
+  const maxTokenID = collectionMetadata.total;
+
   useEffect(() => {
     (async () => {
-      if (gifNumber < 1 || gifNumber > 5555) {
-        return null;
+      if (!tokenID || tokenID < 1 || tokenID > maxTokenID) {
+        return;
       }
 
-      const response = await fetch(`/fetchChimpersImage?tokenId=${gifNumber}`);
+      const response = await fetch(
+        `/fetchNFTImage?tokenId=${tokenID}&collection=${collection}`,
+      );
       if (!response.ok) {
         throw new Error(
           `Error fetching Chimpers image URL: ${response.statusText}`,
@@ -295,7 +303,7 @@ export default function Home() {
       // r3bell api
       // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
     })();
-  }, [gifNumber]);
+  }, [collection, maxTokenID, tokenID]);
 
   const encodedImageUrl = useMemo(() => {
     if (!imageUrl) {
@@ -343,15 +351,26 @@ export default function Home() {
           // filedata = await fetchFile(encodedImageUrl);
           filedata = await fetchFile(imageUrl);
         }
-        console.log("File data type:", typeof filedata);
-        console.log("File data length:", filedata.length);
-        console.log("File data (first bytes):", filedata.slice(0, 10));
+        const imageBytes = new Uint8Array(filedata);
 
-        await ffmpegRef.current.writeFile("input.png", filedata);
+        const isPNG =
+          imageBytes[0] === 0x89 &&
+          imageBytes[1] === 0x50 &&
+          imageBytes[2] === 0x4e &&
+          imageBytes[3] === 0x47;
+
+        const isGIF =
+          imageBytes[0] === 0x47 &&
+          imageBytes[1] === 0x49 &&
+          imageBytes[2] === 0x46;
+
+        const imageExtension = isPNG ? "png" : isGIF ? "gif" : "jpg";
+
+        await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
 
         await ffmpegRef.current.exec([
           "-i",
-          "input.png",
+          `input.${imageExtension}`,
           "-i",
           "reaction.png",
           "-i",
@@ -361,16 +380,18 @@ export default function Home() {
                      [0:v][scaled1]overlay=${x}:${y}[video1]; \
                      [2:v]scale=iw/1.5:-1[scaled2]; \
                      [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
-          "output.png",
+          ...(isGIF ? ["-f", "gif"] : []),
+
+          `output.${imageExtension}`,
         ]);
         console.log("FFmpeg command executed successfully");
 
         // kubica debug why this is not working
-        const data = await ffmpegRef.current.readFile("output.png");
-        console.log("Output file size:", data.length);
-        console.log("Output file (first bytes):", data.slice(0, 10));
+        const data = await ffmpegRef.current.readFile(
+          `output.${imageExtension}`,
+        );
         const url = URL.createObjectURL(
-          new Blob([data], { type: "image/png" }),
+          new Blob([data], { type: `image/${imageExtension}` }),
         );
 
         // Update the state to trigger re-render
@@ -452,7 +473,7 @@ export default function Home() {
       setY(0);
       setScale(4);
     }
-  }, [gifNumber, overlayNumber]);
+  }, [tokenID, overlayNumber]);
 
   async function downloadGif() {
     console.log("downloading gif");
@@ -481,10 +502,16 @@ export default function Home() {
 
   const handleChimpNumberChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setGifNumber(Number(e.target.value));
+      setTokenID(Number(e.target.value));
     },
     [],
   );
+
+  useEffect(() => {
+    if (tokenID < 1 || tokenID > maxTokenID) {
+      setTokenID(1);
+    }
+  }, [collection, maxTokenID, tokenID]);
 
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
@@ -494,21 +521,25 @@ export default function Home() {
         <br />
         {`Meantime a static asset is provided 🙏`}
       </p>
+      <select onChange={(e) => setCollection(e.target.value)}>
+        <option value="chimpers">Chimpers</option>
+        <option value="chimpersGenesis">Chimpers Genesis</option>
+      </select>
       <div className="flex flex-col sm:flex-row gap-1">
-        <label>Chimp #(1-5555): </label>
+        <label>Token ID #(1-{maxTokenID}): </label>
         <input
           type="number"
           id="gifNumber"
           min="1"
-          max="5555"
-          value={gifNumber}
+          max={maxTokenID}
+          value={tokenID}
           onChange={handleChimpNumberChange}
         />
         <input
           type="range"
           min="1"
-          max="5555"
-          value={gifNumber}
+          max={maxTokenID}
+          value={tokenID}
           onChange={handleChimpNumberChange}
         />
       </div>
@@ -516,7 +547,7 @@ export default function Home() {
         className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
         onClick={() => {
           console.log("clicked random");
-          setGifNumber(Math.floor(Math.random() * 5555) + 1);
+          setTokenID(Math.floor(Math.random() * maxTokenID) + 1);
         }}
       >
         RANDOM !CHIMP

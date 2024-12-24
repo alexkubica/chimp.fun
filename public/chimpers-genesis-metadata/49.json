@@ -1,0 +1,27 @@
+{
+  "name": "Bakuhatsu",
+  "created_by": "Timpers",
+  "description": "Bakuhatsu is a dark mage dedicated to the fire gods. He had plans to overthrow the guild and establish a new order. His home was barbarous by modern standards, and he had a deep yearning for destruction.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/49.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/49.gif",
+  "image_details": {
+    "bytes": 39056,
+    "format": "PNG",
+    "sha256": "7acd39bddf635582c7fbbe159369984f2942044314250da0a45af2b35a5df27d",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=49",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/76.png",
+  "refreshedAt": "2024-12-24T10:07:33.771Z"
+}

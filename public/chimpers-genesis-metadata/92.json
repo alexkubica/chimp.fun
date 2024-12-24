@@ -1,0 +1,27 @@
+{
+  "name": "Tokumei",
+  "created_by": "Timpers",
+  "description": "Leader of the Annonites, his population was greatly reduced due to hardships. To rebuild, he possessed those willing to make the sacrifice, a sacred energy was transferred that came at the cost of both their sight, and their identity.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/92.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/92.gif",
+  "image_details": {
+    "bytes": 37987,
+    "format": "PNG",
+    "sha256": "5b94f43fe24ac8fc2b01a18d9b2fc3d6f6bb06f8d2599114228ca667d0f89e57",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=92",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/66.png",
+  "refreshedAt": "2024-12-24T10:08:18.568Z"
+}

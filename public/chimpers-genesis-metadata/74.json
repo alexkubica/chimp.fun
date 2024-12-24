@@ -1,0 +1,27 @@
+{
+  "name": "Kaunto-juba",
+  "created_by": "Timpers",
+  "description": "Many accepted Kaunto as the messiah that their faith told when he entered the planet. He spoke about the legends of the past as if he had seen them with his own eyes. Many accepted it, as he declared to lead Chimpers to a new interstellar golden age.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/74.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/74.gif",
+  "image_details": {
+    "bytes": 39411,
+    "format": "PNG",
+    "sha256": "b5ce5812f025bddafe6b10653335f426d070e2d5b6e89a0e848c597ec3a1cec4",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=74",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/74.png",
+  "refreshedAt": "2024-12-24T10:07:51.099Z"
+}

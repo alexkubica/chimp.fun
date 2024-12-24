@@ -1,0 +1,27 @@
+{
+  "name": "Oda",
+  "created_by": "Timpers",
+  "description": "A cold blooded villain in his former days, Oda's path soon changed when he was fortuitously blessed by the shrine of Denki. Despite his agitation, he was forced to use his energy for protection, rather than the bloodshed he was accustomed to.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/46.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/46.gif",
+  "image_details": {
+    "bytes": 37457,
+    "format": "PNG",
+    "sha256": "39afe72c2d307be4ada5c247f278e78500a47d381a1b0bc1f0c45ee763381173",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=46",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/40.png",
+  "refreshedAt": "2024-12-24T10:07:32.603Z"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Ryū-senshi",
+  "created_by": "Timpers",
+  "description": "A mystical dragon warrior, only heard of in tales, his existence was confirmed when he fell into an elaborately placed trap by the emperor. Forced to fight under the command of the kingdom, he quickly became a famed influence, and was feared by many.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/85.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/85.gif",
+  "image_details": {
+    "bytes": 38405,
+    "format": "PNG",
+    "sha256": "fb46355b4ef4a5ad1bbd523ad9c9a6b1ec39f0e32b442d143199756ccdbfb049",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=85",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/87.png",
+  "refreshedAt": "2024-12-24T10:07:59.222Z"
+}

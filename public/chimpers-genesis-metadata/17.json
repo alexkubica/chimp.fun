@@ -1,0 +1,27 @@
+{
+  "name": "Hotaru",
+  "created_by": "Timpers",
+  "description": "With a lust for power, he travelled extreme lengths to fulfil his desire. It took him to the deep pits of a volcano, where here his former self and everything he believed in turned to ashes. The blaze within him took precedence, his soul resting in the fire.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/17.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/17.gif",
+  "image_details": {
+    "bytes": 40873,
+    "format": "PNG",
+    "sha256": "55a5866e794d77ed194f687b5365de96a08551099c84b736e2f318a2d7848669",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=17",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/89.png",
+  "refreshedAt": "2024-12-24T10:07:14.849Z"
+}

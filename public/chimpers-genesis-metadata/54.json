@@ -1,0 +1,27 @@
+{
+  "name": "Kaze",
+  "created_by": "Timpers",
+  "description": "Everything about him is shrouded in mystery, the dark past he cannot reveal, the memories that allude him, but yet the people have chosen him as their leader, dead or alive his power is transcendent.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/54.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/54.gif",
+  "image_details": {
+    "bytes": 36800,
+    "format": "PNG",
+    "sha256": "c19eb855ab9f155c6d688b01659601ec2572d6bec00bc045d57cffea147bc30a",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=54",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/31.png",
+  "refreshedAt": "2024-12-24T10:07:36.978Z"
+}

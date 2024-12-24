@@ -1,0 +1,27 @@
+{
+  "name": "Zenchi",
+  "created_by": "Timpers",
+  "description": "Cursed by a demonic energy, she has learned to live with her uncontrollable desire for blood. For years she had no way of knowing how to channel the energy, until her sword was created, a purified weapon that would counter her demons and ascend her to glory.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/56.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/56.gif",
+  "image_details": {
+    "bytes": 37348,
+    "format": "PNG",
+    "sha256": "5a85e3ed1405b10d9be0a02c7b02188c41075148cb48f496080c8743e77843df",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=56",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/32.png",
+  "refreshedAt": "2024-12-24T10:07:38.745Z"
+}

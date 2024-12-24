@@ -1,0 +1,27 @@
+{
+  "name": "Yukimura",
+  "created_by": "Timpers",
+  "description": "As well as a man of extraordinary intelligence, Yukimura wields a destructive weapon, one that he mastered in his years of training. He is also haunted by the memories of the past when his own kind abandoned him, he has roamed solitarily ever since.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/60.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/60.gif",
+  "image_details": {
+    "bytes": 37026,
+    "format": "PNG",
+    "sha256": "8c8f88e00394352d5e3fc1c9195de4f8969c18868ab8fa66291871a458f9d566",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=60",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/23.png",
+  "refreshedAt": "2024-12-24T10:07:40.330Z"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Kaito",
+  "created_by": "Timpers",
+  "description": "Once a great warrior, his nobleness and skills were envied, so much so that they plotted to remove him entirely. When leading a voyage, he was thrown overboard, unable to escape the wrath of the ocean. Instead, he chose to become one with it.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/35.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/35.gif",
+  "image_details": {
+    "bytes": 36346,
+    "format": "PNG",
+    "sha256": "b35481b3853253d67c3344c20f7664488fa13cc5f9c5e76254a2ffbd7c083c6d",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=35",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/48.png",
+  "refreshedAt": "2024-12-24T10:07:25.227Z"
+}

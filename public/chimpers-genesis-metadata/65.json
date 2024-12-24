@@ -1,0 +1,27 @@
+{
+  "name": "Kanshi-in",
+  "created_by": "Timpers",
+  "description": "Warden of the intergalactic warp, he commanded a mothership that could quickly travel light years away from any inhabited world. But with this power over space came a great cost, their vessel was under constant scrutiny from mercenaries and demons, all yearning for control.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/65.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/65.gif",
+  "image_details": {
+    "bytes": 37527,
+    "format": "PNG",
+    "sha256": "d4acd3104022f17eb2f701a3b84dc4bb4f64660a200f17c87cec6b16a9ef715b",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=65",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/85.png",
+  "refreshedAt": "2024-12-24T10:07:44.484Z"
+}
