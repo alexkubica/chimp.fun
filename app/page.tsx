@@ -278,6 +278,13 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     y: 100,
     filename: "merry christmas.png",
   },
+  37: {
+    title: "MERRY CHIMPMAS!",
+    scale: 0.8,
+    x: 400,
+    y: 100,
+    filename: "Merry Chimpmas.png",
+  },
 };
 
 export default function Home() {
@@ -287,7 +294,7 @@ export default function Home() {
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
-  const [overlayNumber, setOverlayNumber] = useState(35);
+  const [overlayNumber, setOverlayNumber] = useState(37);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
