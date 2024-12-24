@@ -521,7 +521,9 @@ export default function Home() {
         <br />
         {`Meantime a static asset is provided 🙏`}
       </p>
-      <select onChange={(e) => setCollection(e.target.value)}>
+      <select
+        onChange={(e) => setCollection(e.target.value as CollectionNames)}
+      >
         <option value="chimpers">Chimpers</option>
         <option value="chimpersGenesis">Chimpers Genesis</option>
       </select>

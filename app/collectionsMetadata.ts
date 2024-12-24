@@ -18,7 +18,7 @@ export const collectionsMetadata: Record<
   chimpersGenesis: {
     name: "Chimpers Genesis",
     cachePath: "chimpers-genesis-metadata",
-    total: 100,
+    total: 98,
     contract: "0x4d55109a17a6914130ace90325dc98cf66ebfa00",
   },
 };
