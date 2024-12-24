@@ -272,9 +272,9 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
     filename: "Happy Christmas Eve.png",
   },
   36: {
-    title: "HAPPY CHRISTMAS!",
-    scale: 0.9,
-    x: 550,
+    title: "MERRY CHRISTMAS!",
+    scale: 0.8,
+    x: 600,
     y: 100,
     filename: "merry christmas.png",
   },
