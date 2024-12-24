@@ -189,58 +189,58 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
   },
   24: {
     title: "I AM !CHIMP AND !CHIMP IS ME",
-    scale: 1.7,
-    x: 270,
-    y: 50,
+    scale: 0.9,
+    x: 500,
+    y: 100,
     filename: "I AM !CHIMP AND !CHIMP IS ME.png",
   },
   25: {
     title: "#CHOOSECUTE",
-    scale: 1.5,
-    x: 270,
-    y: 50,
+    scale: 0.9,
+    x: 550,
+    y: 100,
     filename: "CHOOSECUTE.png",
   },
   26: {
     title: "HAPPY 100K!",
-    scale: 1.5,
-    x: 270,
-    y: 50,
+    scale: 0.9,
+    x: 550,
+    y: 100,
     filename: "happy 100k.png",
   },
-  27: {
-    title: "WE ALWAYS !CHIMP",
-    scale: 1.5,
-    x: 250,
-    y: 50,
-    filename: "WE ALWAYS !CHIMP.gif",
-  },
+  // 27: {
+  //   title: "WE ALWAYS !CHIMP",
+  //   scale: 0.9,
+  //   x: 550,
+  //   y: 100,
+  //   filename: "WE ALWAYS !CHIMP.gif",
+  // },
   28: {
     title: "WELCOME!",
-    scale: 1,
-    x: 300,
-    y: 30,
+    scale: 0.7,
+    x: 600,
+    y: 100,
     filename: "welcome!.png",
   },
   29: {
     title: "THANKS!",
-    scale: 1,
-    x: 300,
-    y: 30,
+    scale: 0.7,
+    x: 600,
+    y: 100,
     filename: "thanks.png",
   },
   30: {
     title: "LFCHIMP!",
-    scale: 1,
-    x: 300,
-    y: 30,
+    scale: 0.7,
+    x: 600,
+    y: 100,
     filename: "LFCHIMP.png",
   },
   31: {
     title: "WEN MINT?",
-    scale: 1,
-    x: 300,
-    y: 30,
+    scale: 0.7,
+    x: 600,
+    y: 100,
     filename: "wen mint.png",
   },
   32: {
@@ -252,17 +252,24 @@ const reactionsMap: { [key: number]: string | ReactionMetadata } = {
   },
   33: {
     title: "WE LOVE $PENGU",
-    scale: 1.4,
-    x: 320,
-    y: 25,
+    scale: 0.9,
+    x: 700,
+    y: 80,
     filename: "we love pengu.png",
   },
   34: {
     title: "$PENGU TO THE MOON!",
-    scale: 1.4,
-    x: 320,
-    y: 25,
+    scale: 0.9,
+    x: 700,
+    y: 80,
     filename: "pengu to the moon.png",
+  },
+  35: {
+    title: "HAPPY CHRISTMAS EVE!",
+    scale: 0.9,
+    x: 550,
+    y: 100,
+    filename: "Happy Christmas Eve.png",
   },
 };
 
@@ -273,7 +280,7 @@ export default function Home() {
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
-  const [overlayNumber, setOverlayNumber] = useState(32);
+  const [overlayNumber, setOverlayNumber] = useState(35);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
