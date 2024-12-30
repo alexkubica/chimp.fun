@@ -8,6 +8,7 @@ export const collectionsMetadata: Record<
     total: number;
     contract: string;
     gifOverride?: (tokenId: string) => string;
+    scaleMultiplier?: number;
   }
 > = {
   chimpers: {
@@ -15,8 +16,9 @@ export const collectionsMetadata: Record<
     cachePath: "chimpers-metadata",
     total: 5555,
     contract: "0x80336ad7a747236ef41f47ed2c7641828a480baa",
-    // gifOverride: (tokenId) =>
-    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/chimpers/pfp-bounce-pixel/${tokenId}.gif`,
+    gifOverride: (tokenId) =>
+      `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/chimpers/pfp-bounce-pixel/${tokenId}.gif`,
+    // scaleMultiplier: 2,
   },
   chimpersGenesis: {
     name: "Chimpers Genesis",

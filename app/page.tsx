@@ -43,7 +43,10 @@ export default function Home() {
 
       if (collectionMetadata.gifOverride) {
         const gifUrl = collectionMetadata.gifOverride(tokenID.toString());
-        setImageUrl(gifUrl);
+        // r3bell api
+        // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
+
+        setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
         return;
       }
 
@@ -57,9 +60,6 @@ export default function Home() {
       }
       const { imageUrl } = await response.json();
       setImageUrl(imageUrl);
-
-      // r3bell api
-      // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
     })();
   }, [collection, collectionMetadata, maxTokenID, tokenID]);
 
@@ -106,7 +106,6 @@ export default function Home() {
         if (uploadedImageUri) {
           filedata = await fetchFile(uploadedImageUri);
         } else {
-          // filedata = await fetchFile(encodedImageUrl);
           filedata = await fetchFile(imageUrl);
         }
         const imageBytes = new Uint8Array(filedata);
@@ -126,20 +125,22 @@ export default function Home() {
 
         await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
 
+        // kubica resize input image to 1080x1080 before overlaying
+
         await ffmpegRef.current.exec([
           "-i",
-          `input.${imageExtension}`,
+          `input.${imageExtension}`, // Main input image
           "-i",
-          "reaction.png",
+          "reaction.png", // First overlay
           "-i",
-          "credit.png",
+          "credit.png", // Second overlay
           "-filter_complex",
-          `[1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
-                     [0:v][scaled1]overlay=${x}:${y}[video1]; \
-                     [2:v]scale=iw/1.5:-1[scaled2]; \
-                     [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
+          `[0:v]scale=1080:1080[scaled_input]; \
+   [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
+   [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
+   [2:v]scale=iw/1.5:-1[scaled2]; \
+   [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
           ...(isGIF ? ["-f", "gif"] : []),
-
           `output.${imageExtension}`,
         ]);
         console.log("FFmpeg command executed successfully");
@@ -312,7 +313,6 @@ export default function Home() {
       >
         RANDOM !CHIMP
       </button>
-
       <label>Or upload your image: </label>
       <div className="flex gap-1 justify-center align-center">
         <input
@@ -326,7 +326,6 @@ export default function Home() {
         For best results use a 1080x1080 image, you can use{" "}
         <a href="https://www.iloveimg.com/resize-image">this tool</a>.
       </small>
-
       <div id="gifContainer">
         {finalResult && (
           <Image
@@ -342,20 +341,18 @@ export default function Home() {
         )}
         {!finalResult && "CHIMPLOADING..."}
       </div>
-
       <div>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           onClick={downloadGif}
         >
-          Download GIF
+          Download
         </button>
       </div>
-
       <div>
         <h2>Settings:</h2>
       </div>
-
+      {/* kubica add gif toggle */}
       <div className="flex gap-1 flex-col sm:flex-row ">
         <div className="flex flex-col gap-1">
           <label>X: </label>
@@ -428,7 +425,6 @@ export default function Home() {
           />
         </div>
       </div>
-
       <div className="flex flex-col gap-1">
         <label>Select a reaction: </label>
 
@@ -449,7 +445,6 @@ export default function Home() {
           })}
         </div>
       </div>
-
       <div className="m-4 flex flex-col gap-1">
         <div>For donations:</div>
         <div>ETH: 0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417</div>
