@@ -86,11 +86,7 @@ export default function Home() {
         filename: "",
       };
 
-      if (typeof reactionsMap[overlayNumber] === "string") {
-        overlaySettings.filename = overlayNumber + ".png";
-      } else {
-        overlaySettings = reactionsMap[overlayNumber];
-      }
+      overlaySettings = reactionsMap[overlayNumber - 1];
 
       try {
         await ffmpegRef.current.writeFile(
@@ -221,17 +217,11 @@ export default function Home() {
   }, [debouncedRenderImageUrl]);
 
   useEffect(() => {
-    let overlaySettings = reactionsMap[overlayNumber];
+    let overlaySettings = reactionsMap[overlayNumber - 1];
 
-    if (typeof overlaySettings !== "string") {
-      setX(overlaySettings.x);
-      setY(overlaySettings.y);
-      setScale(overlaySettings.scale);
-    } else {
-      setX(320);
-      setY(0);
-      setScale(4);
-    }
+    setX(overlaySettings.x);
+    setY(overlaySettings.y);
+    setScale(overlaySettings.scale);
   }, [tokenID, overlayNumber]);
 
   async function downloadGif() {
@@ -429,17 +419,16 @@ export default function Home() {
         <label>Select a reaction: </label>
 
         <div className="flex flex-wrap justify-center items-center gap-1 max-w-md">
-          {Object.entries(reactionsMap).map(([key, value]) => {
+          {reactionsMap.map((value, index) => {
             return (
               <button
-                key={key}
+                key={index + 1}
                 className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
                 onClick={() => {
-                  console.log("change reaction to", key);
-                  setOverlayNumber(Number(key));
+                  setOverlayNumber(Number(index + 1));
                 }}
               >
-                {typeof value === "string" ? value : value.title}
+                {value.title}
               </button>
             );
           })}
