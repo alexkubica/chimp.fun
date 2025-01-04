@@ -57,20 +57,35 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    console.log("Fetching metadata from contract");
+    console.debug("initialize ethers provider");
     // Use EtherscanProvider from ethers.js
     const provider = new EtherscanProvider(
       "mainnet",
       process.env.ETHERSCAN_API_KEY,
     );
 
+    console.debug("load contract ABI");
     const contract = new ethers.Contract(
       collectionMetadata.contract,
       tokenURIABI,
       provider,
     );
 
-    const tokenURI = await contract.tokenURI(tokenIdNumber);
+    console.log("fetch tokenURI");
+    let tokenURI = await contract.tokenURI(tokenIdNumber);
+    console.log("tokenURI", tokenURI);
+
+    if (tokenURI.startsWith("ipfs://")) {
+      console.log(
+        "IPFS URI detected, fetching from IPFS gateway using ipfs.io",
+      );
+      tokenURI = `https://ipfs.io/ipfs/${tokenURI.slice(7)}`;
+    }
+
+    console.log("fetch metadata from tokenURI");
     const response = await fetch(tokenURI);
+    console.log("response", response);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch metadata: ${response.statusText}`);
@@ -84,7 +99,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ imageUrl: metadata.image });
   } catch (error) {
-    console.error("Error fetching Chimpers image URL:", error);
+    console.error("Error fetching nft image URL:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

@@ -273,8 +273,16 @@ export default function Home() {
       <select
         onChange={(e) => setCollection(e.target.value as CollectionNames)}
       >
-        <option value="chimpers">Chimpers</option>
-        <option value="chimpersGenesis">Chimpers Genesis</option>
+        {Object.keys(collectionsMetadata).map((collectionKey) => {
+          const collection =
+            collectionsMetadata[collectionKey as CollectionNames];
+
+          return (
+            <option key={collection.name} value={collectionKey}>
+              {collection.name}
+            </option>
+          );
+        })}
       </select>
       <div className="flex flex-col sm:flex-row gap-1">
         <label>Token ID #(1-{maxTokenID}): </label>
@@ -301,7 +309,7 @@ export default function Home() {
           setTokenID(Math.floor(Math.random() * maxTokenID) + 1);
         }}
       >
-        RANDOM !CHIMP
+        RANDOM 🎲
       </button>
       <label>Or upload your image: </label>
       <div className="flex gap-1 justify-center align-center">

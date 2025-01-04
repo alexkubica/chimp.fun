@@ -28,4 +28,12 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+  ssow: {
+    name: "Secret Society of Whales",
+    cachePath: "ssow-metadata",
+    total: 9997,
+    contract: "0x88091012eedf8dba59d08e27ed7b22008f5d6fe5",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
 };
