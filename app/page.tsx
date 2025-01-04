@@ -25,7 +25,7 @@ export default function Home() {
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
-  const [overlayNumber, setOverlayNumber] = useState(37);
+  const [overlayNumber, setOverlayNumber] = useState(18);
   const [ffmpegReady, setFfmpegReady] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
