@@ -267,4 +267,11 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 80,
     filename: "happy new year.png",
   },
+  {
+    title: "TOGETHER WE WHALE!",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "together we whale.png",
+  },
 ];
