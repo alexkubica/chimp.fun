@@ -36,4 +36,12 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+  // FishBallerz: {
+  //   name: "FishBallerz",
+  //   cachePath: "FishBallerz-metadata",
+  //   total: 4444,
+  //   contract: "0x7e7d01e39ae07ba3653ae967ca35abbe73fd5b44",
+  //   // gifOverride: (tokenId) =>
+  //   //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  // },
 };

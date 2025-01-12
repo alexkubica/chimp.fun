@@ -93,11 +93,19 @@ export async function GET(req: NextRequest) {
 
     const metadata = await response.json();
 
-    if (!metadata.image) {
+    let image = metadata.image;
+    if (!image) {
       throw new Error("Image field not found in metadata.");
     }
 
-    return NextResponse.json({ imageUrl: metadata.image });
+    if (image.startsWith("ipfs://")) {
+      console.log(
+        "IPFS image detected, fetching from IPFS gateway using ipfs.io",
+      );
+      image = `https://ipfs.io/ipfs/${image.slice(7)}`;
+    }
+
+    return NextResponse.json({ imageUrl: image });
   } catch (error) {
     console.error("Error fetching nft image URL:", error);
     return NextResponse.json(
