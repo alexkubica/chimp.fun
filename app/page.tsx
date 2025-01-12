@@ -265,11 +265,6 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
-      <p>
-        {`There's an issue with loading the GIFs and we're working to resolve this, stay tuned!`}
-        <br />
-        {`Meantime a static asset is provided 🙏`}
-      </p>
       <select
         onChange={(e) => setCollection(e.target.value as CollectionNames)}
       >
