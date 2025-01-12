@@ -1,5 +1,11 @@
-export type CollectionNames = "chimpers" | "chimpersGenesis" | "ssow";
+export type CollectionNames =
+  | "chimpers"
+  | "chimpersGenesis"
+  | "ssow"
+  | "chibis";
 // | "FishBallerz";
+
+export type ChainNames = "polygon" | "ethereum";
 
 export type ReactionMetadata = {
   title: string;

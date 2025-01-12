@@ -1,8 +1,25 @@
-import { EtherscanProvider } from "ethers";
-import { ethers } from "ethers";
+import { EtherscanProvider, ethers } from "ethers";
 import { NextRequest, NextResponse } from "next/server";
 import { CollectionNames } from "../types";
 import { collectionsMetadata } from "../collectionsMetadata";
+import { AbstractProvider } from "ethers";
+
+const ipfsProviders = [
+  (ipfs: string) => {
+    return `https://ipfs.io/ipfs/${ipfs.slice(7)}`;
+  },
+  (ipfs: string) => {
+    return `https://gateway.pinata.cloud/ipfs/${ipfs.slice(7)}`;
+  },
+  (ipfs: string) => {
+    const ipfsParts = ipfs.slice(7).split("/");
+    return `https://${ipfsParts[0]}.ipfs.w3s.link/${ipfsParts[1]}`;
+  },
+];
+
+const getRandomIpfsProviderURL = (ipfs: string) => {
+  return ipfsProviders[Math.floor(Math.random() * ipfsProviders.length)](ipfs);
+};
 
 const tokenURIABI = [
   "function tokenURI(uint256 tokenId) external view returns (string memory)",
@@ -59,11 +76,23 @@ export async function GET(req: NextRequest) {
   try {
     console.log("Fetching metadata from contract");
     console.debug("initialize ethers provider");
-    // Use EtherscanProvider from ethers.js
-    const provider = new EtherscanProvider(
-      "mainnet",
-      process.env.ETHERSCAN_API_KEY,
-    );
+    let provider: AbstractProvider;
+
+    if (collectionMetadata.chain === "polygon") {
+      // Use EtherscanProvider for the Polygon network
+      provider = new ethers.EtherscanProvider(
+        "matic",
+        process.env.POLYGONSCAN_API_KEY,
+      );
+    } else if (collectionMetadata.chain === "ethereum") {
+      // Use EtherscanProvider from ethers.js
+      provider = new EtherscanProvider(
+        "mainnet",
+        process.env.ETHERSCAN_API_KEY,
+      );
+    } else {
+      throw new Error("Invalid chain");
+    }
 
     console.debug("load contract ABI");
     const contract = new ethers.Contract(
@@ -77,13 +106,14 @@ export async function GET(req: NextRequest) {
     console.log("tokenURI", tokenURI);
 
     if (tokenURI.startsWith("ipfs://")) {
+      tokenURI = getRandomIpfsProviderURL(tokenURI);
       console.log(
         "IPFS URI detected, fetching from IPFS gateway using ipfs.io",
+        tokenURI,
       );
-      tokenURI = `https://ipfs.io/ipfs/${tokenURI.slice(7)}`;
     }
 
-    console.log("fetch metadata from tokenURI");
+    console.log("fetch metadata from tokenURI", tokenURI);
     const response = await fetch(tokenURI);
     console.log("response", response);
 
@@ -92,6 +122,7 @@ export async function GET(req: NextRequest) {
     }
 
     const metadata = await response.json();
+    console.log("NFT metadata", metadata);
 
     let image = metadata.image;
     if (!image) {
@@ -99,10 +130,11 @@ export async function GET(req: NextRequest) {
     }
 
     if (image.startsWith("ipfs://")) {
+      image = getRandomIpfsProviderURL(image);
       console.log(
         "IPFS image detected, fetching from IPFS gateway using ipfs.io",
+        image,
       );
-      image = `https://ipfs.io/ipfs/${image.slice(7)}`;
     }
 
     return NextResponse.json({ imageUrl: image });
