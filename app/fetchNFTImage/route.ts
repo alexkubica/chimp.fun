@@ -4,6 +4,8 @@ import { CollectionNames } from "../types";
 import { collectionsMetadata } from "../collectionsMetadata";
 import { AbstractProvider } from "ethers";
 
+let lastUsedIpfsProviderIndex = -1; // Start with -1 to ensure the first provider is used initially
+
 const ipfsProviders = [
   (ipfs: string) => {
     return `https://ipfs.io/ipfs/${ipfs.slice(7)}`;
@@ -17,8 +19,11 @@ const ipfsProviders = [
   },
 ];
 
-const getRandomIpfsProviderURL = (ipfs: string) => {
-  return ipfsProviders[Math.floor(Math.random() * ipfsProviders.length)](ipfs);
+const getNextIpfsProviderURL = (ipfs: string) => {
+  // Rotate to the next provider
+  lastUsedIpfsProviderIndex =
+    (lastUsedIpfsProviderIndex + 1) % ipfsProviders.length;
+  return ipfsProviders[lastUsedIpfsProviderIndex](ipfs);
 };
 
 const tokenURIABI = [
@@ -106,7 +111,7 @@ export async function GET(req: NextRequest) {
     console.log("tokenURI", tokenURI);
 
     if (tokenURI.startsWith("ipfs://")) {
-      tokenURI = getRandomIpfsProviderURL(tokenURI);
+      tokenURI = getNextIpfsProviderURL(tokenURI);
       console.log(
         "IPFS URI detected, fetching from IPFS gateway using ipfs.io",
         tokenURI,
@@ -130,7 +135,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (image.startsWith("ipfs://")) {
-      image = getRandomIpfsProviderURL(image);
+      image = getNextIpfsProviderURL(image);
       console.log(
         "IPFS image detected, fetching from IPFS gateway using ipfs.io",
         image,
