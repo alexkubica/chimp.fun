@@ -58,4 +58,13 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+  coolCats: {
+    name: "Cool Cats",
+    cachePath: "cool-cats-metadata",
+    total: 9968,
+    contract: "0x1a92f7381b9f03921564a437210bb9396471050c",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
 };

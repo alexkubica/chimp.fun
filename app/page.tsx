@@ -33,11 +33,15 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const collectionMetadata = collectionsMetadata[collection];
-  const maxTokenID = collectionMetadata.total;
+  const minTokenID = collection === "coolCats" ? 0 : 1;
+  const maxTokenID =
+    collection === "coolCats"
+      ? collectionMetadata.total - 1
+      : collectionMetadata.total;
 
   useEffect(() => {
     (async () => {
-      if (!tokenID || tokenID < 1 || tokenID > maxTokenID) {
+      if (isNaN(tokenID) || tokenID < minTokenID || tokenID > maxTokenID) {
         return;
       }
 
@@ -61,7 +65,7 @@ export default function Home() {
       const { imageUrl } = await response.json();
       setImageUrl(imageUrl);
     })();
-  }, [collection, collectionMetadata, maxTokenID, tokenID]);
+  }, [collection, collectionMetadata, maxTokenID, minTokenID, tokenID]);
 
   const encodedImageUrl = useMemo(() => {
     if (!imageUrl) {
@@ -249,18 +253,12 @@ export default function Home() {
     [],
   );
 
-  const handleChimpNumberChange = useCallback(
+  const handleTokenIdChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setTokenID(Number(e.target.value));
+      if (/^\d+$/.test(e.target.value)) setTokenID(Number(e.target.value));
     },
     [],
   );
-
-  useEffect(() => {
-    if (tokenID < 1 || tokenID > maxTokenID) {
-      setTokenID(1);
-    }
-  }, [collection, maxTokenID, tokenID]);
 
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
@@ -280,21 +278,16 @@ export default function Home() {
         })}
       </select>
       <div className="flex flex-col sm:flex-row gap-1">
-        <label>Token ID #(1-{maxTokenID}): </label>
+        <label>
+          Token ID #({minTokenID}-{maxTokenID}):{" "}
+        </label>
         <input
           type="number"
           id="gifNumber"
-          min="1"
+          min={minTokenID}
           max={maxTokenID}
           value={tokenID}
-          onChange={handleChimpNumberChange}
-        />
-        <input
-          type="range"
-          min="1"
-          max={maxTokenID}
-          value={tokenID}
-          onChange={handleChimpNumberChange}
+          onChange={handleTokenIdChange}
         />
       </div>
       <button

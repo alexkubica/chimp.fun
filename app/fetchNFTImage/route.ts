@@ -42,15 +42,6 @@ export async function GET(req: NextRequest) {
   }
   const collectionMetadata = collectionsMetadata[collection];
 
-  if (
-    !tokenId ||
-    isNaN(Number(tokenId)) ||
-    Number(tokenId) < 1 ||
-    Number(tokenId) > collectionMetadata.total
-  ) {
-    return NextResponse.json({ error: "Invalid Token ID" }, { status: 400 });
-  }
-
   const tokenIdNumber = Number(tokenId);
 
   // Construct the absolute URL for the static file
