@@ -3,7 +3,8 @@ export type CollectionNames =
   | "chimpersGenesis"
   | "ssow"
   | "chibis"
-  | "coolCats";
+  | "coolCats"
+  | "bayc";
 // | "FishBallerz";
 
 export type ChainNames = "polygon" | "ethereum";
