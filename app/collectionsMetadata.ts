@@ -67,4 +67,13 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+  bayc: {
+    name: "Bored Ape Yacht Club",
+    cachePath: "bayc-metadata",
+    total: 9998,
+    contract: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
 };
