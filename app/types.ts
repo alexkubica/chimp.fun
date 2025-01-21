@@ -4,7 +4,8 @@ export type CollectionNames =
   | "ssow"
   | "chibis"
   | "coolCats"
-  | "bayc";
+  | "bayc"
+  | "muskers";
 // | "FishBallerz";
 
 export type ChainNames = "polygon" | "ethereum";
