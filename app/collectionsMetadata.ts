@@ -76,4 +76,13 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+  muskers: {
+    name: "Muskers",
+    cachePath: "muskers-metadata",
+    total: 2222,
+    contract: "0xE6e6B146aDBEe274Fa1A011FE91f6F708f9cBBF8",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
 };
