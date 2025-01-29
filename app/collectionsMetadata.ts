@@ -76,6 +76,15 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+mayc: {
+    name: "Mutant Ape Yacht Club",
+    cachePath: "mayc-metadata",
+    total: 19542,
+    contract: "0x60E4d786628Fea6478F785A6d7e704777c86a7c6",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
   muskers: {
     name: "Muskers",
     cachePath: "muskers-metadata",
