@@ -85,4 +85,31 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
+azuki: {
+    name: "Azuki",
+    cachePath: "azuki-metadata",
+    total: 9999,
+    contract: "0xED5AF388653567Af2F388E6224dC7C4b3241C544",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
+azukiElementals: {
+    name: "Azuki Elementals",
+    cachePath: "azuki-elementals-metadata",
+    total: 17502,
+    contract: "0xB6a37b5d14D502c3Ab0Ae6f3a0E058BC9517786e",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
+beanz: {
+    name: "BEANZ",
+    cachePath: "beanz-metadata",
+    total: 19950,
+    contract: "0x306b1ea3ecdf94aB739F1910bbda052Ed4A9f949",
+    chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
 };
