@@ -5,7 +5,10 @@ export type CollectionNames =
   | "chibis"
   | "coolCats"
   | "bayc"
-  | "muskers";
+  | "muskers"
+| "azuki"
+| "azukiElementals"
+| "beanz";
 // | "FishBallerz";
 
 export type ChainNames = "polygon" | "ethereum";
