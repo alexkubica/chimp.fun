@@ -5,6 +5,7 @@ export type CollectionNames =
   | "chibis"
   | "coolCats"
   | "bayc"
+  | "mayc"
   | "muskers"
 | "azuki"
 | "azukiElementals"
