@@ -5,7 +5,7 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CollectionNames, ReactionMetadata } from "./types";
+import { ReactionMetadata } from "./types";
 import { collectionsMetadata } from "./collectionsMetadata";
 import { reactionsMap } from "./assetsMetadata";
 
@@ -21,7 +21,7 @@ const fileToDataUri = (file: File) =>
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [tokenID, setTokenID] = useState(2956);
-  const [collection, setCollection] = useState<CollectionNames>("chimpers");
+  const [collection, setCollection] = useState<string>("chimpers");
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
@@ -263,12 +263,9 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
-      <select
-        onChange={(e) => setCollection(e.target.value as CollectionNames)}
-      >
+      <select onChange={(e) => setCollection(e.target.value)}>
         {Object.keys(collectionsMetadata).map((collectionKey) => {
-          const collection =
-            collectionsMetadata[collectionKey as CollectionNames];
+          const collection = collectionsMetadata[collectionKey];
 
           return (
             <option key={collection.name} value={collectionKey}>

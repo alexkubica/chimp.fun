@@ -1,18 +1,4 @@
-export type CollectionNames =
-  | "chimpers"
-  | "chimpersGenesis"
-  | "ssow"
-  | "chibis"
-  | "coolCats"
-  | "bayc"
-  | "mayc"
-  | "muskers"
-| "azuki"
-| "azukiElementals"
-| "beanz";
-// | "FishBallerz";
-
-export type ChainNames = "polygon" | "ethereum";
+export type ChainNames = "polygon" | "ethereum" | "ape";
 
 export type ReactionMetadata = {
   title: string;

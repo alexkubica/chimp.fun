@@ -1,7 +1,5 @@
-import { CollectionNames } from "./types";
-
 export const collectionsMetadata: Record<
-  CollectionNames,
+  string,
   {
     name: string;
     cachePath: string;
@@ -76,7 +74,7 @@ export const collectionsMetadata: Record<
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
-mayc: {
+  mayc: {
     name: "Mutant Ape Yacht Club",
     cachePath: "mayc-metadata",
     total: 19542,
@@ -94,7 +92,7 @@ mayc: {
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
-azuki: {
+  azuki: {
     name: "Azuki",
     cachePath: "azuki-metadata",
     total: 9999,
@@ -103,7 +101,7 @@ azuki: {
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
-azukiElementals: {
+  azukiElementals: {
     name: "Azuki Elementals",
     cachePath: "azuki-elementals-metadata",
     total: 17502,
@@ -112,12 +110,21 @@ azukiElementals: {
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },
-beanz: {
+  beanz: {
     name: "BEANZ",
     cachePath: "beanz-metadata",
     total: 19950,
     contract: "0x306b1ea3ecdf94aB739F1910bbda052Ed4A9f949",
     chain: "ethereum",
+    // gifOverride: (tokenId) =>
+    //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
+  },
+  dsnrs: {
+    name: "DSNRS",
+    cachePath: "dsnrs-metadata",
+    total: 8888,
+    contract: "0x896BE40d15d1dbFA4F4Ff25A110F3CE770e07897",
+    chain: "ape",
     // gifOverride: (tokenId) =>
     //   `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/genesis/pfp-bounce-pixel/${tokenId}.gif`,
   },

@@ -281,4 +281,11 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 50,
     filename: "rumor is chimp is the alpha.png",
   },
+  {
+    title: "HANDSOME!",
+    scale: 0.7,
+    x: 550,
+    y: 70,
+    filename: "handsome.png",
+  },
 ];

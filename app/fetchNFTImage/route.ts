@@ -1,8 +1,9 @@
 import { EtherscanProvider, ethers } from "ethers";
 import { NextRequest, NextResponse } from "next/server";
-import { CollectionNames } from "../types";
 import { collectionsMetadata } from "../collectionsMetadata";
 import { AbstractProvider } from "ethers";
+import { Network } from "ethers";
+import { EtherscanPlugin } from "ethers";
 
 let lastUsedIpfsProviderIndex = -1; // Start with -1 to ensure the first provider is used initially
 
@@ -33,7 +34,7 @@ const tokenURIABI = [
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tokenId = searchParams.get("tokenId");
-  const collection = searchParams.get("collection") as CollectionNames;
+  const collection = searchParams.get("collection");
   if (!collection) {
     return NextResponse.json(
       { error: "Collection not provided" },
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
 
   try {
     console.log("Fetching metadata from contract");
-    console.debug("initialize ethers provider");
+    console.debug("initialize ethers provider", collectionMetadata.chain);
     let provider: AbstractProvider;
 
     if (collectionMetadata.chain === "polygon") {
@@ -80,6 +81,16 @@ export async function GET(req: NextRequest) {
         "matic",
         process.env.POLYGONSCAN_API_KEY,
       );
+    } else if (collectionMetadata.chain === "ape") {
+      const apeNetwork = new Network(
+        "apechain", // Network name
+        33139, // Chain ID
+      );
+
+      const apeEtherscanPlugin = new EtherscanPlugin("https://api.apescan.io/");
+      apeNetwork.attachPlugin(apeEtherscanPlugin);
+
+      provider = new EtherscanProvider(apeNetwork, process.env.APESCAN_API_KEY);
     } else if (collectionMetadata.chain === "ethereum") {
       // Use EtherscanProvider from ethers.js
       provider = new EtherscanProvider(
