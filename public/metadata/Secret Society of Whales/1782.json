@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Philosopher"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sleepy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Fish"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmdY9oXK92XWGoCQxpaAQiJAC6AgZWLq4rhh7UBSin7CD2"
+}

@@ -262,8 +262,9 @@ export default function Home() {
       <h1>CHIMP.FUN 🐒</h1>
       <select
         onChange={(e) => {
-          setCollectionIndex(e.target.value as unknown as number);
-          collectionMetadata = collectionsMetadata[e.target.value];
+          const newCollectionIndex = e.target.value as unknown as number;
+          setCollectionIndex(newCollectionIndex);
+          collectionMetadata = collectionsMetadata[newCollectionIndex];
           minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
           maxTokenID =
             collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
