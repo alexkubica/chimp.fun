@@ -1,150 +1,52 @@
-import { EtherscanProvider, ethers } from "ethers";
+import { collectionsMetadata } from "@/consts";
+import {
+  fetchTokenMetadata,
+  getEtherscanProvider,
+  getTokenImageUrl,
+} from "@/utils";
 import { NextRequest, NextResponse } from "next/server";
-import { collectionsMetadata } from "../collectionsMetadata";
-import { AbstractProvider } from "ethers";
-import { Network } from "ethers";
-import { EtherscanPlugin } from "ethers";
-
-let lastUsedIpfsProviderIndex = -1; // Start with -1 to ensure the first provider is used initially
-
-const ipfsProviders = [
-  (ipfs: string) => {
-    return `https://ipfs.io/ipfs/${ipfs.slice(7)}`;
-  },
-  (ipfs: string) => {
-    return `https://gateway.pinata.cloud/ipfs/${ipfs.slice(7)}`;
-  },
-  (ipfs: string) => {
-    const ipfsParts = ipfs.slice(7).split("/");
-    return `https://${ipfsParts[0]}.ipfs.w3s.link/${ipfsParts[1]}`;
-  },
-];
-
-const getNextIpfsProviderURL = (ipfs: string) => {
-  // Rotate to the next provider
-  lastUsedIpfsProviderIndex =
-    (lastUsedIpfsProviderIndex + 1) % ipfsProviders.length;
-  return ipfsProviders[lastUsedIpfsProviderIndex](ipfs);
-};
-
-const tokenURIABI = [
-  "function tokenURI(uint256 tokenId) external view returns (string memory)",
-];
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const tokenId = searchParams.get("tokenId");
-  const collection = searchParams.get("collection");
-  if (!collection) {
+  const contract = searchParams.get("contract");
+  if (!tokenId) {
     return NextResponse.json(
-      { error: "Collection not provided" },
+      { error: "tokenId not provided" },
       { status: 400 },
     );
   }
-  const collectionMetadata = collectionsMetadata[collection];
-
-  const tokenIdNumber = Number(tokenId);
-
-  // Construct the absolute URL for the static file
-  const localMetadataUrl = `${req.nextUrl.origin}/${collectionMetadata.cachePath}/${tokenIdNumber}.json`;
-
-  try {
-    // Attempt to fetch metadata from the public directory
-    const localResponse = await fetch(localMetadataUrl);
-
-    if (localResponse.ok) {
-      const metadata = await localResponse.json();
-
-      if (!metadata.image) {
-        throw new Error("Image field not found in cached metadata.");
-      }
-
-      return NextResponse.json({ imageUrl: metadata.image });
-    } else {
-      console.log(`Local metadata not found for Token ID ${tokenId}`);
-    }
-  } catch (error) {
-    console.log(
-      `Error fetching local metadata for Token ID ${tokenId}:`,
-      error,
+  if (!contract) {
+    return NextResponse.json(
+      { error: "contract not provided" },
+      { status: 400 },
+    );
+  }
+  const collectionMetadata = collectionsMetadata.find(
+    (c) => c.contract === contract,
+  );
+  if (!collectionMetadata) {
+    return NextResponse.json(
+      { error: "collection not found" },
+      { status: 404 },
     );
   }
 
   try {
     console.log("Fetching metadata from contract");
     console.debug("initialize ethers provider", collectionMetadata.chain);
-    let provider: AbstractProvider;
+    let provider = getEtherscanProvider(collectionMetadata.chain);
 
-    if (collectionMetadata.chain === "polygon") {
-      // Use EtherscanProvider for the Polygon network
-      provider = new ethers.EtherscanProvider(
-        "matic",
-        process.env.POLYGONSCAN_API_KEY,
-      );
-    } else if (collectionMetadata.chain === "ape") {
-      const apeNetwork = new Network(
-        "apechain", // Network name
-        33139, // Chain ID
-      );
-
-      const apeEtherscanPlugin = new EtherscanPlugin("https://api.apescan.io/");
-      apeNetwork.attachPlugin(apeEtherscanPlugin);
-
-      provider = new EtherscanProvider(apeNetwork, process.env.APESCAN_API_KEY);
-    } else if (collectionMetadata.chain === "ethereum") {
-      // Use EtherscanProvider from ethers.js
-      provider = new EtherscanProvider(
-        "mainnet",
-        process.env.ETHERSCAN_API_KEY,
-      );
-    } else {
-      throw new Error("Invalid chain");
-    }
-
-    console.debug("load contract ABI");
-    const contract = new ethers.Contract(
-      collectionMetadata.contract,
-      tokenURIABI,
+    const tokenMetadata = await fetchTokenMetadata(
       provider,
+      collectionMetadata,
+      tokenId,
+      req.nextUrl.origin,
     );
 
-    console.log("fetch tokenURI");
-    let tokenURI = await contract.tokenURI(tokenIdNumber);
-    console.log("tokenURI", tokenURI);
-
-    if (tokenURI.startsWith("ipfs://")) {
-      tokenURI = getNextIpfsProviderURL(tokenURI);
-      console.log(
-        "IPFS URI detected, fetching from IPFS gateway using ipfs.io",
-        tokenURI,
-      );
-    }
-
-    console.log("fetch metadata from tokenURI", tokenURI);
-    const response = await fetch(tokenURI);
-    console.log("response", response);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-    }
-
-    const metadata = await response.json();
-    console.log("NFT metadata", metadata);
-
-    let image = metadata.image;
-    if (!image) {
-      throw new Error("Image field not found in metadata.");
-    }
-
-    if (image.startsWith("ipfs://")) {
-      image = getNextIpfsProviderURL(image);
-      console.log(
-        "IPFS image detected, fetching from IPFS gateway using ipfs.io",
-        image,
-      );
-    }
-
-    return NextResponse.json({ imageUrl: image });
+    return NextResponse.json({
+      imageUrl: getTokenImageUrl(tokenMetadata),
+    });
   } catch (error) {
     console.error("Error fetching nft image URL:", error);
     return NextResponse.json(

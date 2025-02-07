@@ -5,9 +5,8 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ReactionMetadata } from "./types";
-import { collectionsMetadata } from "./collectionsMetadata";
-import { reactionsMap } from "./assetsMetadata";
+import { ReactionMetadata } from "@/types";
+import { collectionsMetadata, reactionsMap } from "@/consts";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -21,7 +20,7 @@ const fileToDataUri = (file: File) =>
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [tokenID, setTokenID] = useState(2956);
-  const [collection, setCollection] = useState<string>("chimpers");
+  const [collectionIndex, setCollectionIndex] = useState(0);
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
@@ -32,12 +31,10 @@ export default function Home() {
   const [finalResult, setFinalResult] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const collectionMetadata = collectionsMetadata[collection];
-  const minTokenID = collection === "coolCats" ? 0 : 1;
+  const collectionMetadata = collectionsMetadata[collectionIndex];
+  const minTokenID = collectionMetadata.firstTokenId ?? 1;
   const maxTokenID =
-    collection === "coolCats"
-      ? collectionMetadata.total - 1
-      : collectionMetadata.total;
+    minTokenID === 0 ? collectionMetadata.total - 1 : collectionMetadata.total;
 
   useEffect(() => {
     (async () => {
@@ -55,7 +52,7 @@ export default function Home() {
       }
 
       const response = await fetch(
-        `/fetchNFTImage?tokenId=${tokenID}&collection=${collection}`,
+        `/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
       );
       if (!response.ok) {
         throw new Error(
@@ -65,7 +62,7 @@ export default function Home() {
       const { imageUrl } = await response.json();
       setImageUrl(imageUrl);
     })();
-  }, [collection, collectionMetadata, maxTokenID, minTokenID, tokenID]);
+  }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
 
   const encodedImageUrl = useMemo(() => {
     if (!imageUrl) {
@@ -263,12 +260,16 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
-      <select onChange={(e) => setCollection(e.target.value)}>
-        {Object.keys(collectionsMetadata).map((collectionKey) => {
-          const collection = collectionsMetadata[collectionKey];
+      <select
+        onChange={(e) =>
+          setCollectionIndex(e.target.value as unknown as number)
+        }
+      >
+        {collectionsMetadata.map((_, index) => {
+          const collection = collectionsMetadata[index];
 
           return (
-            <option key={collection.name} value={collectionKey}>
+            <option key={collection.name} value={index}>
               {collection.name}
             </option>
           );

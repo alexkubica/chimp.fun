@@ -1,4 +1,83 @@
-import { ReactionMetadata } from "./types";
+import { CollectionMetadata, ReactionMetadata } from "@/types";
+
+export const collectionsMetadata: CollectionMetadata[] = [
+  {
+    name: "Chimpers",
+    total: 5555,
+    contract: "0x80336ad7a747236ef41f47ed2c7641828a480baa",
+    chain: "ethereum",
+    gifOverride: (tokenId) =>
+      `https://chimp.lon1.cdn.digitaloceanspaces.com/assets/chimpers/pfp-bounce-pixel/${tokenId}.gif`,
+  },
+  {
+    name: "Chimpers Genesis",
+    total: 98,
+    contract: "0x4d55109a17a6914130ace90325dc98cf66ebfa00",
+    chain: "ethereum",
+  },
+  {
+    name: "Secret Society of Whales",
+    total: 9997,
+    contract: "0x88091012eedf8dba59d08e27ed7b22008f5d6fe5",
+    chain: "ethereum",
+  },
+  // check why ipfs times out
+  //   {
+  //     name: "Pixel Chibis",
+  //     total: 9996,
+  //     contract: "0x8bd99726c3af7e30b35d1537cdcbbd9d6fb1c6a8",
+  //     chain: "polygon",
+  //   },
+  {
+    name: "Cool Cats",
+    total: 9968,
+    firstTokenId: 0,
+    contract: "0x1a92f7381b9f03921564a437210bb9396471050c",
+    chain: "ethereum",
+  },
+  {
+    name: "Bored Ape Yacht Club",
+    total: 9998,
+    contract: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+    chain: "ethereum",
+  },
+  {
+    name: "Mutant Ape Yacht Club",
+    total: 19542,
+    contract: "0x60E4d786628Fea6478F785A6d7e704777c86a7c6",
+    chain: "ethereum",
+  },
+  {
+    name: "Muskers",
+    total: 2222,
+    contract: "0xE6e6B146aDBEe274Fa1A011FE91f6F708f9cBBF8",
+    chain: "ethereum",
+  },
+  {
+    name: "Azuki",
+    total: 9999,
+    contract: "0xED5AF388653567Af2F388E6224dC7C4b3241C544",
+    chain: "ethereum",
+  },
+  {
+    name: "Azuki Elementals",
+    total: 17502,
+    contract: "0xB6a37b5d14D502c3Ab0Ae6f3a0E058BC9517786e",
+    chain: "ethereum",
+  },
+  {
+    name: "BEANZ",
+    total: 19950,
+    contract: "0x306b1ea3ecdf94aB739F1910bbda052Ed4A9f949",
+    chain: "ethereum",
+  },
+  {
+    name: "DSNRS",
+    total: 8888,
+    contract: "0x896BE40d15d1dbFA4F4Ff25A110F3CE770e07897",
+    chain: "ape",
+  },
+];
 
 export const reactionsMap: ReactionMetadata[] = [
   {
@@ -288,4 +367,8 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 70,
     filename: "handsome.png",
   },
+];
+
+export const tokenURIABI = [
+  "function tokenURI(uint256 tokenId) external view returns (string memory)",
 ];
