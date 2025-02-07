@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #644",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/vmLu110phEQq4X_XG7GFh_3FXcRoHd0xiTvdUjwi8_g",
+  "image_url": "https://arweave.net/vmLu110phEQq4X_XG7GFh_3FXcRoHd0xiTvdUjwi8_g",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rock Chakra"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=644"
+}

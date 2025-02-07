@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #1083",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/SpgcTFrDyKMH8Gt8gAi1xbMBCKca-PUL3nj3sjbUsFc",
+  "image_url": "https://arweave.net/SpgcTFrDyKMH8Gt8gAi1xbMBCKca-PUL3nj3sjbUsFc",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Pink Yukata"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Undead Pink"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rock Chakra"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Frog Patch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Uneasy"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=1083"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #166",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/O6V8vG9HFfbV0R6geQ1hkP9r8f_sLhDq3F8G2lRo_Tc",
+  "image_url": "https://arweave.net/O6V8vG9HFfbV0R6geQ1hkP9r8f_sLhDq3F8G2lRo_Tc",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Mr Quack"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "KO"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Bamboo Batch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=166"
+}

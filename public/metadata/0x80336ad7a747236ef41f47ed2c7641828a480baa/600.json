@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #600",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/THzpDmqkds0Be0U34QzRgi6HkMYD6RPh2p5jP6PMCp0",
+  "image_url": "https://arweave.net/THzpDmqkds0Be0U34QzRgi6HkMYD6RPh2p5jP6PMCp0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lone Wolf"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "War Paint"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Glimmering Rays"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Thief"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Poker Face"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=600"
+}

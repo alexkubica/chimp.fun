@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #243",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/BnfxkMN8dEQVkmAv7ChaOpXwjmH1Iq6hL3QOZIfKiPQ",
+  "image_url": "https://arweave.net/BnfxkMN8dEQVkmAv7ChaOpXwjmH1Iq6hL3QOZIfKiPQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=243"
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #960",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/J9kcVdUmifoSSG_nOtvArDLKkxcfEgGx_K0oUd7msTY",
+  "image_url": "https://arweave.net/J9kcVdUmifoSSG_nOtvArDLKkxcfEgGx_K0oUd7msTY",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightspeed Suit"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Love"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=960"
+}

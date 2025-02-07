@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/TzXIwa_F9GvfxP2ilaLrk4skfiiX-4f2YkmWUfhK7_A",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Royal Blonde Hair"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shifu"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Katana"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Judging"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Blue Sky"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Baggy Sweater"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 3"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #176",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=176"
+}

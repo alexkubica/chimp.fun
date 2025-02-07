@@ -1,0 +1,46 @@
+{
+  "name": "Chimpers #228",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/CkzyPwVFKaxecbYlvfxrdKgweqTT6M2inKOCpIMy4ro",
+  "image_url": "https://arweave.net/CkzyPwVFKaxecbYlvfxrdKgweqTT6M2inKOCpIMy4ro",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue Sky"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Red"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "War Paint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Cake Slice"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Polished Platinum"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Squinting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Poker Face"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=228"
+}

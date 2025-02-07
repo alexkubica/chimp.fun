@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #398",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/-mPCbhI3S66y9t2wiNqUSqEiLIM-YX8bElAtsEwR5YU",
+  "image_url": "https://arweave.net/-mPCbhI3S66y9t2wiNqUSqEiLIM-YX8bElAtsEwR5YU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Black Goatee"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Samurai Cut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Bamboo Batch"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Hip Specs"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=398"
+}

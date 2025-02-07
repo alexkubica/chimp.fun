@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #460",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/NqqMTtQzysj5xy0FmXMCqW51zAD3hBcYY3Ds74akJpo",
+  "image_url": "https://arweave.net/NqqMTtQzysj5xy0FmXMCqW51zAD3hBcYY3Ds74akJpo",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wooly Shoulders"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Spikey Ninja"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=460"
+}

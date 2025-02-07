@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #256",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/pP1zr2OfOvDI3OVJB4PhD9dxBi-9mHBUPZUMbg0Mi_8",
+  "image_url": "https://arweave.net/pP1zr2OfOvDI3OVJB4PhD9dxBi-9mHBUPZUMbg0Mi_8",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Red Panda Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Sparkling Sapphire"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Poker Face"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=256"
+}

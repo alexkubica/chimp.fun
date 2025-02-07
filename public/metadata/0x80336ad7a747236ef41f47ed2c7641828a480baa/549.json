@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #549",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Gr0OwJGWukghp_nr1R9H2BMIBByHXWT-PhCGKv1HsVs",
+  "image_url": "https://arweave.net/Gr0OwJGWukghp_nr1R9H2BMIBByHXWT-PhCGKv1HsVs",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Holo"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Elder Armour"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Ol' Pilot Helmet"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Uneasy"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=549"
+}

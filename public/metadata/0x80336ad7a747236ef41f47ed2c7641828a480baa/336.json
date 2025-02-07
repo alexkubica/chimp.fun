@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #336",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/OA-V6Y4PAsaBiQcVZzFWyTMrGcz9yuniNjq3U9qEec0",
+  "image_url": "https://arweave.net/OA-V6Y4PAsaBiQcVZzFWyTMrGcz9yuniNjq3U9qEec0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Battle Jacket"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Swept Over"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "The Mega Sabre"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=336"
+}

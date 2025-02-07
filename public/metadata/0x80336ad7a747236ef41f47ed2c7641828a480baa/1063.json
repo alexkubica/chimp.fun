@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #1063",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/3cwfmcvu-ysC1ZoNNR3B4ftPnblvSAjjYkC77LFaqZ4",
+  "image_url": "https://arweave.net/3cwfmcvu-ysC1ZoNNR3B4ftPnblvSAjjYkC77LFaqZ4",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Swift"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Ancient Protector"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Possessed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=1063"
+}

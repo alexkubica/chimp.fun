@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #688",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/raXrtTFObKij1RKDg2elUYt3MGFruMl4AO_O8tHWWTM",
+  "image_url": "https://arweave.net/raXrtTFObKij1RKDg2elUYt3MGFruMl4AO_O8tHWWTM",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lone Wolf"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Glimmering Rays"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=688"
+}

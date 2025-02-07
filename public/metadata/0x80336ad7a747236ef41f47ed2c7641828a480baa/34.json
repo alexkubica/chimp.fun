@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #34",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Xkru99VTqp7oq3lQZjWsKkCX1_rDMq8qwz2zf3Nuc4Y",
+  "image_url": "https://arweave.net/Xkru99VTqp7oq3lQZjWsKkCX1_rDMq8qwz2zf3Nuc4Y",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Mutton Chops"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Salmon"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gazing"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Apple Stick"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=34"
+}

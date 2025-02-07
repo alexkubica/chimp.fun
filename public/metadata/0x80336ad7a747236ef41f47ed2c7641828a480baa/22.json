@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #22",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Gi8RIlyN2r5iOjhaQL9uStMEPvNz0UUUkaf135Nc5Uw",
+  "image_url": "https://arweave.net/Gi8RIlyN2r5iOjhaQL9uStMEPvNz0UUUkaf135Nc5Uw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bowlcut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Raspberry Pink Visor"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Whiskers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=22"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #819",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/jGyTVvWhmAzPK__NCo3IhozK_JbvK9QfEW-WNP455sU",
+  "image_url": "https://arweave.net/jGyTVvWhmAzPK__NCo3IhozK_JbvK9QfEW-WNP455sU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bowler Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "KO"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=819"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #879",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/adetLTz_1Xzs_qpfqnp0Q4i1IitMzc51PcfFrPgPzw8",
+  "image_url": "https://arweave.net/adetLTz_1Xzs_qpfqnp0Q4i1IitMzc51PcfFrPgPzw8",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Wise Beard"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Kitsune Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=879"
+}

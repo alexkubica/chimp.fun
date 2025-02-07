@@ -1,0 +1,40 @@
+{
+  "image": "https://arweave.net/Ym4ge_rEq5_hObrkQRJ--ZjoRFfOEgwAt5-hTOCMmjk",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "The Gemstone Trifecta"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Makeup"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Puppy Eyes"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Yellow"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 3"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #426",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=426"
+}

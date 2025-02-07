@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/FZM9v3RwkWD5CN_iXaBCCylnO4yaYBERPnHnuDmlz2M",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Head",
+      "value": "King's Crown"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Katana"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Royal Gown"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 1"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "name": "Chimpers #576",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=576"
+}

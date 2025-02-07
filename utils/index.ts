@@ -6,7 +6,7 @@ import { Network } from "ethers";
 import { AbstractProvider, ethers } from "ethers";
 
 export const getCachePath = (collection: CollectionMetadata) => {
-  return `public/cache/${collection.name}`;
+  return `public/metadata/${collection.contract}`;
 };
 
 export const getEtherscanProvider = (chain: Chain) => {
@@ -56,20 +56,22 @@ export const getIpfsUrl = (cid: string) => {
 export const fetchTokenMetadata = async (
   provider: AbstractProvider,
   collection: CollectionMetadata,
-  tokenId: string,
-  baseUrl: string,
+  tokenId: string | number,
+  baseUrl?: string,
 ) => {
-  try {
-    console.log("Fetching cached metadata");
-    const cachedTokenMetadataUrl = `${baseUrl}/${getCachePath(collection)}/${tokenId}.json`;
-    const cachedTokenMetadataResponse = await fetch(cachedTokenMetadataUrl);
+  if (baseUrl) {
+    try {
+      console.log("Fetching cached metadata");
+      const cachedTokenMetadataUrl = `${baseUrl}/${getCachePath(collection)}/${tokenId}.json`;
+      const cachedTokenMetadataResponse = await fetch(cachedTokenMetadataUrl);
 
-    if (cachedTokenMetadataResponse.ok) {
-      console.log("Cached metadata found");
-      return await cachedTokenMetadataResponse.json();
+      if (cachedTokenMetadataResponse.ok) {
+        console.log("Cached metadata found");
+        return await cachedTokenMetadataResponse.json();
+      }
+    } catch (error) {
+      console.log("Cached metadata not found");
     }
-  } catch (error) {
-    console.log("Cached metadata not found");
   }
 
   console.log("Fetching metadata from contract");

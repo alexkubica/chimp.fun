@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #655",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/1uj2oouMNJWuxDKX_haYfQOjBWjj2hpgsX6UaseSUV8",
+  "image_url": "https://arweave.net/1uj2oouMNJWuxDKX_haYfQOjBWjj2hpgsX6UaseSUV8",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Red Fox Beanie"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Resting"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=655"
+}

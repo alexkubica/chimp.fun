@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #389",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Xw8oS_DcA4VyoxdXCUscvpMqdOk2gHWkl9FzG5fGdRA",
+  "image_url": "https://arweave.net/Xw8oS_DcA4VyoxdXCUscvpMqdOk2gHWkl9FzG5fGdRA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Kabuki Facepaint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "!"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=389"
+}

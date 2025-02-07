@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #835",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/JgU5LUq_pZ3Rsi98-wM9jAb1kftwDrCtL6Qim_2h8yA",
+  "image_url": "https://arweave.net/JgU5LUq_pZ3Rsi98-wM9jAb1kftwDrCtL6Qim_2h8yA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue Sky"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Ragged Jumper"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Squinting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=835"
+}

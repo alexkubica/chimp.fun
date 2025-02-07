@@ -32,9 +32,9 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const collectionMetadata = collectionsMetadata[collectionIndex];
-  const minTokenID = collectionMetadata.firstTokenId ?? 1;
+  const minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
   const maxTokenID =
-    minTokenID === 0 ? collectionMetadata.total - 1 : collectionMetadata.total;
+    collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
 
   useEffect(() => {
     (async () => {

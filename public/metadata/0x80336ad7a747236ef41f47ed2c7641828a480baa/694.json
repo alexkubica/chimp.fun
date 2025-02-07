@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #694",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/5WQT-0qt_3ZqByZnqCK7BgQ6uz5PCFkYdywxwsume0o",
+  "image_url": "https://arweave.net/5WQT-0qt_3ZqByZnqCK7BgQ6uz5PCFkYdywxwsume0o",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightspeed Suit"
+    },
+    {
+      "trait_type": "Head",
+      "value": "The Soul Chaser"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyelash"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=694"
+}

@@ -1,0 +1,40 @@
+{
+  "image": "https://arweave.net/QCOt_ND4_eUc6ZkyBopPwWWMY64Dsj6yGlfHBsPOvIQ",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Skull Protector"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Deadpan"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Forest Green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Plucky Adventurer"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 2"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "name": "Chimpers #494",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=494"
+}

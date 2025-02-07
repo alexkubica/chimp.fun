@@ -31,7 +31,7 @@ export const collectionsMetadata: CollectionMetadata[] = [
   {
     name: "Cool Cats",
     total: 9968,
-    firstTokenId: 0,
+    tokenIdOffset: -1,
     contract: "0x1a92f7381b9f03921564a437210bb9396471050c",
     chain: "ethereum",
   },

@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #1077",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/m_v7Lz76tFbTlNIytdsNwvH8vuLPZxWJfgBmM1PPRqw",
+  "image_url": "https://arweave.net/m_v7Lz76tFbTlNIytdsNwvH8vuLPZxWJfgBmM1PPRqw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Slurping Ramen"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Thief"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=1077"
+}

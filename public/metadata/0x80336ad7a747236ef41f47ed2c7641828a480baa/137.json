@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #137",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/qwrNlCqctN4CAf8S98nsoqOJXpvMT3xPIkW8lNTbXE0",
+  "image_url": "https://arweave.net/qwrNlCqctN4CAf8S98nsoqOJXpvMT3xPIkW8lNTbXE0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Magenta"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Relaxed Tee"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Grey Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Combat Pole"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Raspberry Pink Visor"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Undead Growl"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=137"
+}

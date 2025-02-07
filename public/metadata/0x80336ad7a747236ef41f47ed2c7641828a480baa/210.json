@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #210",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/32ByqV4KRlCwQN1o0jrC5BnUBpFdtR9Bv56H_vnLsuQ",
+  "image_url": "https://arweave.net/32ByqV4KRlCwQN1o0jrC5BnUBpFdtR9Bv56H_vnLsuQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Shirt and Tie"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "White Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Scorching Embers"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Psychedelic Beam"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=210"
+}

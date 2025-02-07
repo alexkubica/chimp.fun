@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #812",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/b8t1g9lKmZYwiQ7OURCVFLKbCoID06RQNF23u_TLS5Q",
+  "image_url": "https://arweave.net/b8t1g9lKmZYwiQ7OURCVFLKbCoID06RQNF23u_TLS5Q",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Holo"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Spikey Ninja"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rain Drizzle"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=812"
+}

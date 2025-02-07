@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #653",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/DNvZZ6SiJVgZIj_8gdZ0VC7x-VbTJK1zZQ9zF61MGjk",
+  "image_url": "https://arweave.net/DNvZZ6SiJVgZIj_8gdZ0VC7x-VbTJK1zZQ9zF61MGjk",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Reliable Raincoat"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Black Goatee"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Resting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=653"
+}

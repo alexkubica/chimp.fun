@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #448",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/bDWlEwrYPPAXjZNhmEGtUkuuJmbIm3TMSJRrkgyAwOY",
+  "image_url": "https://arweave.net/bDWlEwrYPPAXjZNhmEGtUkuuJmbIm3TMSJRrkgyAwOY",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Magenta"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Swept Over"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Glittering Amethyst"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rain Drizzle"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Whiskers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=448"
+}

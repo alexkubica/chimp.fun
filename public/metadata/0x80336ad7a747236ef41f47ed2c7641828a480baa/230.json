@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #230",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/SYir7yk7m6I2nxqW8QDxR1qLh7iQbaKUiy0oHGk1RBA",
+  "image_url": "https://arweave.net/SYir7yk7m6I2nxqW8QDxR1qLh7iQbaKUiy0oHGk1RBA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Black Goatee"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=230"
+}

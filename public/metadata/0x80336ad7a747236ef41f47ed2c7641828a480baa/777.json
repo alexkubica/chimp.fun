@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #777",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/9GqWA9DRp_ICjR61PMMmmvn0fgPVDX2Ta8yOGxN9iNg",
+  "image_url": "https://arweave.net/9GqWA9DRp_ICjR61PMMmmvn0fgPVDX2Ta8yOGxN9iNg",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Vibey Grey"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Shirt and Tie"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Hungry"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Rebel"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=777"
+}

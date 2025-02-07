@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #945",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/_u9A7tSxkYAjcViPJprrQ5NsxCtRBFiOUEnd6o0UYuA",
+  "image_url": "https://arweave.net/_u9A7tSxkYAjcViPJprrQ5NsxCtRBFiOUEnd6o0UYuA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bliss Jumper"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Red Fox Beanie"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Carved Cane"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=945"
+}

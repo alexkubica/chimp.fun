@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/8eSe5b2ELJaJnk7kEfimaoXyW0Br_COSB9sQ68K5Hag",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Oceanic Hair"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Katana"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Plucky Adventurer"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 2"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #1032",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=1032"
+}

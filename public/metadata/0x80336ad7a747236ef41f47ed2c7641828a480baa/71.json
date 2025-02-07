@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #71",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/7SJJLc7B_whBcQVCA8VAIkO6Vt5iBkrIQgavHoHVMtM",
+  "image_url": "https://arweave.net/7SJJLc7B_whBcQVCA8VAIkO6Vt5iBkrIQgavHoHVMtM",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Green Dragon"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Robo Panda"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Sabre"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=71"
+}

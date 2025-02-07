@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #454",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/XsX7IzOdo2DBonOde_lvfU3EiBOdgRxEPvicBt39yhM",
+  "image_url": "https://arweave.net/XsX7IzOdo2DBonOde_lvfU3EiBOdgRxEPvicBt39yhM",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Food Apron"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Marshmallow Stick"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyelash"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=454"
+}

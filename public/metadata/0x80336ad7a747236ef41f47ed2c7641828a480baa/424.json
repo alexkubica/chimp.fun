@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #424",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/5fglZxX8bObr7H9C0GMzGTwq0UKJVnC6BgZ7-h3IFa4",
+  "image_url": "https://arweave.net/5fglZxX8bObr7H9C0GMzGTwq0UKJVnC6BgZ7-h3IFa4",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Vibey Grey"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Blackout Ninja Morph"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Samurai Cut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Polished Platinum"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gazing"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Diamond Dust"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Uneasy"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=424"
+}

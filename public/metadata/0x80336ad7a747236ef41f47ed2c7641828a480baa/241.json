@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #241",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/2wfKc-pSqOh4i90KM-cM-X4WDtG49rGRPQs7YbS3nzs",
+  "image_url": "https://arweave.net/2wfKc-pSqOh4i90KM-cM-X4WDtG49rGRPQs7YbS3nzs",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Layered Up"
+    },
+    {
+      "trait_type": "Head",
+      "value": "White Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Rebel"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Carved Cane"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=241"
+}

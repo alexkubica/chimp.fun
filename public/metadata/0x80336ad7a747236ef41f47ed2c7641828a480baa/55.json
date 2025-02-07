@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #55",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/egtRMLk6uwIXB7evUsxhQ0N13GrbIIBeLgmnWZ5dpi4",
+  "image_url": "https://arweave.net/egtRMLk6uwIXB7evUsxhQ0N13GrbIIBeLgmnWZ5dpi4",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightweight Mesh"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Strawberry Milk"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyelash"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Adventure Sword"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=55"
+}

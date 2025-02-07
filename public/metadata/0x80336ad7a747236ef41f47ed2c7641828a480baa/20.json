@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #20",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/impT_aft5VYSMGTCyjNtAU_Jc3UVPbxaPw0soytL95Q",
+  "image_url": "https://arweave.net/impT_aft5VYSMGTCyjNtAU_Jc3UVPbxaPw0soytL95Q",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Layered Up"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Wise Beard"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Kitsune Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Resting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Bamboo Batch"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=20"
+}

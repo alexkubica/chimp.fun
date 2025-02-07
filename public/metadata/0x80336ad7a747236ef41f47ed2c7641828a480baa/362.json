@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #362",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/HFjLOEkPogEeeFENRaEJ-op8sOYUtJcj7xxA_RPw1ok",
+  "image_url": "https://arweave.net/HFjLOEkPogEeeFENRaEJ-op8sOYUtJcj7xxA_RPw1ok",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gazing"
+    },
+    {
+      "trait_type": "Back",
+      "value": "The Shielding Wings"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Side Smile"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=362"
+}

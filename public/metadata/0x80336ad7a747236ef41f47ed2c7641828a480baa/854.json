@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #854",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/VbwCD1YskAnXJeu1ScWf3Du9JepWeat8HxyxRFzp_XQ",
+  "image_url": "https://arweave.net/VbwCD1YskAnXJeu1ScWf3Du9JepWeat8HxyxRFzp_XQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vest"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Kamen"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=854"
+}

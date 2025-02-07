@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #63",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/eNrTUR1RKxeIz5uogR5zTBSfG4yVQ7xd4bLKom8DCs0",
+  "image_url": "https://arweave.net/eNrTUR1RKxeIz5uogR5zTBSfG4yVQ7xd4bLKom8DCs0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Red"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Wise Beard"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimpborg"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Combat Pole"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=63"
+}

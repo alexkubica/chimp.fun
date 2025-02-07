@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #103",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/rUdDA21CLa-tDqotKON4LaKUKCAIHwtMxt_Q0_lDSAg",
+  "image_url": "https://arweave.net/rUdDA21CLa-tDqotKON4LaKUKCAIHwtMxt_Q0_lDSAg",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightweight Mesh"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Kamen"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Raspberry Pink Visor"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Wrinkled"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=103"
+}

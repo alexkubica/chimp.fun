@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #508",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/iFOm1L9ooaOni-PJdaiho-phDHWebL9BE6fMEfw2ct8",
+  "image_url": "https://arweave.net/iFOm1L9ooaOni-PJdaiho-phDHWebL9BE6fMEfw2ct8",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Green Bow Uniform"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Kabuki Facepaint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Fallen Leaf"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Sabre"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=508"
+}

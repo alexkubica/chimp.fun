@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #887",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/HiO4dTmcYh2fpaDuXBl8ZoZzlL5x1TcBglDSOwF-EB0",
+  "image_url": "https://arweave.net/HiO4dTmcYh2fpaDuXBl8ZoZzlL5x1TcBglDSOwF-EB0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "CEO"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Meow Cap"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Bamboo Batch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "3 - Orange"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=887"
+}

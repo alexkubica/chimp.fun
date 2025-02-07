@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/2KHl7F3-bOVpVFTuBLYUsy6G62KsEylvNwH5MoJ3tak",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Aged Adventurer Bun"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Makeup"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Majestic Quiver"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Judging"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Blue Sky"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Baggy Sweater"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 3"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #870",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=870"
+}

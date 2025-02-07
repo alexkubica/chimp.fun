@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/net-iQSauOt7XoiLRwiRpZtPR8g3B1OWwXXm3mV5Wpg",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Pandana"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Sakura Katana"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Baggy Sweater"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 3"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #912",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=912"
+}

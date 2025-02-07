@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #805",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/imWLnUX4fW2boSbt3imapMXv9zchUiy-I3l9aIGu_uI",
+  "image_url": "https://arweave.net/imWLnUX4fW2boSbt3imapMXv9zchUiy-I3l9aIGu_uI",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Shirt and Tie"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Marshmallow Stick"
+    },
+    {
+      "trait_type": "Head",
+      "value": "White Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Rebel"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Glimmering Rays"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=805"
+}

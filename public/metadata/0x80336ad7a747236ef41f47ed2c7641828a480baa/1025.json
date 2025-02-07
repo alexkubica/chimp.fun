@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #1025",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/n_UbY8TnSAig3TcQ9R17MPOXsW95SmYIuas9P2wy5HA",
+  "image_url": "https://arweave.net/n_UbY8TnSAig3TcQ9R17MPOXsW95SmYIuas9P2wy5HA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Diligent Messenger"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rock Chakra"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Poker Face"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=1025"
+}

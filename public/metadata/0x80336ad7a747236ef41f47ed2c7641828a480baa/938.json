@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #938",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/0jR05YDkl0-vb2I1DvxjhtwyALthjNhGvUittrNNgEA",
+  "image_url": "https://arweave.net/0jR05YDkl0-vb2I1DvxjhtwyALthjNhGvUittrNNgEA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Magenta"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Battle Jacket"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bowlcut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Resting"
+    },
+    {
+      "trait_type": "Back",
+      "value": "The Mega Sabre"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=938"
+}

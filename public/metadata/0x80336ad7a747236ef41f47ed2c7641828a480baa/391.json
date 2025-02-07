@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #391",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/oTG1wNHonOe9lvrMSIql-5Wcx7X3u55T5f10hvC53do",
+  "image_url": "https://arweave.net/oTG1wNHonOe9lvrMSIql-5Wcx7X3u55T5f10hvC53do",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bliss Jumper"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Giga Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "3 - Orange"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=391"
+}

@@ -1,0 +1,46 @@
+{
+  "name": "Chimpers #174",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/blEmlN2ZXdD8R6WDo-axDNX1mXf7id_cjAkHgXU8H0w",
+  "image_url": "https://arweave.net/blEmlN2ZXdD8R6WDo-axDNX1mXf7id_cjAkHgXU8H0w",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Blackout Ninja Morph"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "War Paint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Swept Over"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Apple Stick"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=174"
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #642",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/5kjqj0ZbfyALvhUYuDknDNG5qug1-kMHqNQKSb99mFo",
+  "image_url": "https://arweave.net/5kjqj0ZbfyALvhUYuDknDNG5qug1-kMHqNQKSb99mFo",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vest"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Gold Kitsune Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Adventure Sword"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Azure Blue Visor"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=642"
+}

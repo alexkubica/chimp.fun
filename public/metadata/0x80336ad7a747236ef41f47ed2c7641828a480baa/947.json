@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #947",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/b9I13iYHgpneXYlelGKwl_HbGu-4Gw0VrOuHOunyCFU",
+  "image_url": "https://arweave.net/b9I13iYHgpneXYlelGKwl_HbGu-4Gw0VrOuHOunyCFU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Golden Dragon"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Swept Over"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=947"
+}

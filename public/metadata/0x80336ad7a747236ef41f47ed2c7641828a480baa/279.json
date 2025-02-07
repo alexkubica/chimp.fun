@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #279",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/6-SBxglVBXUmJ7Vbghg-SKdYnFm2iwDDlhwNp_NVb8I",
+  "image_url": "https://arweave.net/6-SBxglVBXUmJ7Vbghg-SKdYnFm2iwDDlhwNp_NVb8I",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightspeed Suit"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Undead Pink"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Bamboo Batch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Bloodthirsty"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=279"
+}

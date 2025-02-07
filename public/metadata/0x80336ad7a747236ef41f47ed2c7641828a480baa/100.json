@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #100",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/1beM0JpL146ZPXmuzU-M47TDAm-JCrGx15DE56iFoh4",
+  "image_url": "https://arweave.net/1beM0JpL146ZPXmuzU-M47TDAm-JCrGx15DE56iFoh4",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Sunset Magenta"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sensei"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Red Panda Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Sabre"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=100"
+}

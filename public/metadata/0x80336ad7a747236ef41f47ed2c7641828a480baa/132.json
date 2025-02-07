@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #132",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Ws8Yern1zW1gW9xOyEw72g0JZ-37hdrHUTA8duLcmRE",
+  "image_url": "https://arweave.net/Ws8Yern1zW1gW9xOyEw72g0JZ-37hdrHUTA8duLcmRE",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Spilt Ramen"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "KO"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=132"
+}

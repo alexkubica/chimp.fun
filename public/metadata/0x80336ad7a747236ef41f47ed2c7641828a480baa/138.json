@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #138",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/vfgJZ4__Na_VW-EqkyO3sx84Fbkf1aarz7CjaCPAl6k",
+  "image_url": "https://arweave.net/vfgJZ4__Na_VW-EqkyO3sx84Fbkf1aarz7CjaCPAl6k",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Pink Yukata"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Jam on Toast"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Bamboo Batch"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Thief"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=138"
+}

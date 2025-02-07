@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #616",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/V6Tc2LcCe3TF8D6b6esA_22yW8WBabxdNCQK3ASyWYQ",
+  "image_url": "https://arweave.net/V6Tc2LcCe3TF8D6b6esA_22yW8WBabxdNCQK3ASyWYQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sensei"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bowlcut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=616"
+}

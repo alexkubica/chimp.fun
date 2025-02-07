@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #869",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/yKvpqiVt8btHgYgf4g6TFycnbv4-uXNeMiODVPtgzLI",
+  "image_url": "https://arweave.net/yKvpqiVt8btHgYgf4g6TFycnbv4-uXNeMiODVPtgzLI",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Marshmallow Stick"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stunned"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=869"
+}

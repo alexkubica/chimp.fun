@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #977",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/-sm2Wn44RhH6eld4jIYhS_ZdfQUSlwJR-DF0p74WpcA",
+  "image_url": "https://arweave.net/-sm2Wn44RhH6eld4jIYhS_ZdfQUSlwJR-DF0p74WpcA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bubble"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Recon Headset"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Apple Stick"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=977"
+}

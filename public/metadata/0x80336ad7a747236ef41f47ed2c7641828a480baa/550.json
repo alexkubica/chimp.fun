@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #550",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/RQuuaxFZIkDWaZfzCOH-O_7hlssWmltliRGYTLz0FxE",
+  "image_url": "https://arweave.net/RQuuaxFZIkDWaZfzCOH-O_7hlssWmltliRGYTLz0FxE",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Shirt and Tie"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Jam on Toast"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Spikey Ninja"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Giga Chimped"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=550"
+}

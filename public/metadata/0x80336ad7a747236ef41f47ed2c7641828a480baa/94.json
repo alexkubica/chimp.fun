@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #94",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/QiKWB3REc9BlcKA8-3X73iwsD6VcxupP3KBHsujDmd0",
+  "image_url": "https://arweave.net/QiKWB3REc9BlcKA8-3X73iwsD6VcxupP3KBHsujDmd0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue Sky"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vigilant Wanderer"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Marshmallow Stick"
+    },
+    {
+      "trait_type": "Head",
+      "value": "White Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Combat Pole"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Classic Specs"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=94"
+}

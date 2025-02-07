@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #929",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/zGcUMeo-KZzxIz58j-VtFpW7N91Uf5zeKn0Ij94Ghsw",
+  "image_url": "https://arweave.net/zGcUMeo-KZzxIz58j-VtFpW7N91Uf5zeKn0Ij94Ghsw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Galactic Hoodie"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Small Fren"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyelash"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=929"
+}

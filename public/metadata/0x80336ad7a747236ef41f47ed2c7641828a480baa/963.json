@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #963",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Nh8z87Hsa7-XgKMIgQndq5vJ0ZH9Z2wefFi4U9d7dj0",
+  "image_url": "https://arweave.net/Nh8z87Hsa7-XgKMIgQndq5vJ0ZH9Z2wefFi4U9d7dj0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Spikey Ninja"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Embarrassed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=963"
+}

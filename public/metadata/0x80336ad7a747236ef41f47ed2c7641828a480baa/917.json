@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #917",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/gkDOEbfTx1Iy_0qagMMFGyjQsFuBrMFYnMFQqKDJ3CU",
+  "image_url": "https://arweave.net/gkDOEbfTx1Iy_0qagMMFGyjQsFuBrMFYnMFQqKDJ3CU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue Sky"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Pink"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Displayoooor"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Mellow Cherry"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Furious"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Side Smile"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=917"
+}

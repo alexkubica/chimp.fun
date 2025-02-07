@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #788",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/XmiSEbIqta4TmElC0FVZsI0Unhei4dpuNUqGBeJ-deo",
+  "image_url": "https://arweave.net/XmiSEbIqta4TmElC0FVZsI0Unhei4dpuNUqGBeJ-deo",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightspeed Suit"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Yellow Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rain Drizzle"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Whiskers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=788"
+}

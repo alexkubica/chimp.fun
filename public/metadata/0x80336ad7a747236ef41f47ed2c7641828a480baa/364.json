@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #364",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/9-F7WZEhkjnmpVVEFKNP7tmICT302g57jlPm0E5VXxE",
+  "image_url": "https://arweave.net/9-F7WZEhkjnmpVVEFKNP7tmICT302g57jlPm0E5VXxE",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Kabuki Facepaint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Cake Slice"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Carved Cane"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=364"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #208",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/vVDXlOy7SE5RqJeScSxVOnuG836Prz6LycLX_BiDZzA",
+  "image_url": "https://arweave.net/vVDXlOy7SE5RqJeScSxVOnuG836Prz6LycLX_BiDZzA",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lone Wolf"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Radiant Ruby"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Giga Chimped"
+    },
+    {
+      "trait_type": "Back",
+      "value": "The Shielding Wings"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "4 - Green"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=208"
+}

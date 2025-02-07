@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #19",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/C6J-PjGb5bKlrMCUqEfIyUYv42yNUxmzfJtCKdEu9ec",
+  "image_url": "https://arweave.net/C6J-PjGb5bKlrMCUqEfIyUYv42yNUxmzfJtCKdEu9ec",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sensei"
+    },
+    {
+      "trait_type": "Head",
+      "value": "The Lost Amulet"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Mellow Cherry"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Squinting"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=19"
+}

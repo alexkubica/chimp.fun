@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #829",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/YpFU8AQmNOvXWHZb-155pp1AV7qpUZtX8NEvGuW12wQ",
+  "image_url": "https://arweave.net/YpFU8AQmNOvXWHZb-155pp1AV7qpUZtX8NEvGuW12wQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Wooly Shoulders"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Light Machinist"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=829"
+}

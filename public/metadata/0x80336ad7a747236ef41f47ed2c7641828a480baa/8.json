@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/YTzRcCFhXrQDDanoIyiSed_93jwI9NnkY0pgw8DinYo",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Dapper Flat Cap"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Vibrant Eyes"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Sakura Katana"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Elite Warrior"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 3"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "name": "Chimpers #8",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=8"
+}

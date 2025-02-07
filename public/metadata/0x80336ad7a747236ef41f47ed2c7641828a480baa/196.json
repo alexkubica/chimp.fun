@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/eicEgKBsmm9O9C4afdFzx11BywRjjNEuczQd3qdcB9I",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Cat Fren"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Roar"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Sakura Katana"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Medieval Warrior"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 2"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #196",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=196"
+}

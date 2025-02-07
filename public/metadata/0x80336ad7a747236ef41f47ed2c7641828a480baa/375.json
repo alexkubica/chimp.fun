@@ -1,0 +1,46 @@
+{
+  "name": "Chimpers #375",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/nJGKq6L88JLReSGIQcz6HxtmHvgoXKVwUWn5fnlYFtc",
+  "image_url": "https://arweave.net/nJGKq6L88JLReSGIQcz6HxtmHvgoXKVwUWn5fnlYFtc",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Pink"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "War Paint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Grey Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Mellow Cherry"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Seeing Stars"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Diamond Dust"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=375"
+}

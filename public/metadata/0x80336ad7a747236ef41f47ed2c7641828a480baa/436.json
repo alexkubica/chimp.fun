@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #436",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/VAdQXPnlAuz-MkkBIvvueElGl68IGDXk-LGRuK_lB1Q",
+  "image_url": "https://arweave.net/VAdQXPnlAuz-MkkBIvvueElGl68IGDXk-LGRuK_lB1Q",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Diligent Messenger"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Wise Beard"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Yellow Bandana"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=436"
+}

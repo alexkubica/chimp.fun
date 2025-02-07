@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #471",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/tFAfkVmtjQj3-jZwqPiCJRsg8WFYpKgLNkLEJzpPtTU",
+  "image_url": "https://arweave.net/tFAfkVmtjQj3-jZwqPiCJRsg8WFYpKgLNkLEJzpPtTU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nexus Suit"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Kabuki Facepaint"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bucket Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=471"
+}

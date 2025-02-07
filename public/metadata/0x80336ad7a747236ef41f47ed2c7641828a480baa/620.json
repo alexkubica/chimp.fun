@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #620",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/h1oNM9vi-G3j6D0ohfuKTRPR-DKF5_ZFH36PauJcAY8",
+  "image_url": "https://arweave.net/h1oNM9vi-G3j6D0ohfuKTRPR-DKF5_ZFH36PauJcAY8",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Tactical Flack"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Love"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "4 - Green"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=620"
+}

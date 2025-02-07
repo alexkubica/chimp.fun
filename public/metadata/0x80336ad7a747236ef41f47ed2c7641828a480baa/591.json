@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #591",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/lZ71DlzZ2mjIE3pMZsEaMoPK4--3d8ziJuIcVwT5CFw",
+  "image_url": "https://arweave.net/lZ71DlzZ2mjIE3pMZsEaMoPK4--3d8ziJuIcVwT5CFw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Breezy Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Relaxed Tee"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Old Head Warmer"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Arctic White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "KO"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Falling Sakura"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=591"
+}

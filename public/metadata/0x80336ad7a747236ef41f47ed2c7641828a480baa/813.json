@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/dGQFDO99CVXltHF6K-rxzpJJyMvrquS0xcsK9VvtK3E",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Tranquil Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Angelic Evolution"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Furious"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Sakura Katana"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Smug Smirk"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Baggy Sweater"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 3"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #813",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=813"
+}

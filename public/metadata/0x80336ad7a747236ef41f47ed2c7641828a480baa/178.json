@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #178",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/3kJXYvlsmfbXh1-aFwTPp8iJRTQfoA9I36EYAgnDHY0",
+  "image_url": "https://arweave.net/3kJXYvlsmfbXh1-aFwTPp8iJRTQfoA9I36EYAgnDHY0",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Flamethrower"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Sacred Vapour"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Rebel"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Carved Cane"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=178"
+}

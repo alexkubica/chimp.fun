@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #172",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/hKAw3xmGkv8XNc3cEjdwKDtxbQS5HmSQYEUDsKHyA5o",
+  "image_url": "https://arweave.net/hKAw3xmGkv8XNc3cEjdwKDtxbQS5HmSQYEUDsKHyA5o",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Strawberry Milk"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Bowlcut"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Chimped"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=172"
+}

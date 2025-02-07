@@ -1,0 +1,18 @@
+{
+  "name": "Chimpers #643",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/2yPKeJiKW9mDXgui9Gjwbn6_nu4pGK1_9_SkUxMslfs",
+  "image_url": "https://arweave.net/2yPKeJiKW9mDXgui9Gjwbn6_nu4pGK1_9_SkUxMslfs",
+  "attributes": [
+    {
+      "trait_type": "Legendary",
+      "value": "Chubby Chimps"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=643"
+}

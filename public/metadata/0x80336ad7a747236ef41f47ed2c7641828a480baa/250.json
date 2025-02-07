@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #250",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/soq3OwRFf1e-ihHAGuri5elGx_dvkgKFapGc96YNdGo",
+  "image_url": "https://arweave.net/soq3OwRFf1e-ihHAGuri5elGx_dvkgKFapGc96YNdGo",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Green Bow Uniform"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Lucky Plant"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Mellow Cherry"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Whiskers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=250"
+}

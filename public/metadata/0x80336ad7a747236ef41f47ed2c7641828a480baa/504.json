@@ -1,0 +1,34 @@
+{
+  "name": "Chimpers #504",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/6MT5OfvAH-lTsUzRijq7QEBGjrNlNJs_Gc9inhMlrxE",
+  "image_url": "https://arweave.net/6MT5OfvAH-lTsUzRijq7QEBGjrNlNJs_Gc9inhMlrxE",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Holo"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Red"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=504"
+}

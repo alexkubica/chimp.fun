@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #168",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/FKR4hIWW_6aKjetmEHzhVi7Eb0ZNOMBtBjqk1rlm_ns",
+  "image_url": "https://arweave.net/FKR4hIWW_6aKjetmEHzhVi7Eb0ZNOMBtBjqk1rlm_ns",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Green Bow Uniform"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rock Chakra"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=168"
+}

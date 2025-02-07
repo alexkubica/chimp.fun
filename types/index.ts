@@ -11,7 +11,7 @@ export type ReactionMetadata = {
 export type CollectionMetadata = {
   name: string;
   total: number;
-  firstTokenId?: number;
+  tokenIdOffset?: number;
   contract: string;
   gifOverride?: (tokenId: string) => string;
   chain: Chain;

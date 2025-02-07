@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #634",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/3I6qjFRFHperKcKMlHHSVHA1HmUvAKaJ44jvUWZLIxE",
+  "image_url": "https://arweave.net/3I6qjFRFHperKcKMlHHSVHA1HmUvAKaJ44jvUWZLIxE",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Samurai Training Gear"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Mutton Chops"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Rice Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=634"
+}

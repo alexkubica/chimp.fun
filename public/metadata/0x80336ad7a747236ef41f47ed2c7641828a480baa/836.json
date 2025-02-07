@@ -1,0 +1,44 @@
+{
+  "image": "https://arweave.net/ZWHzpK2LdGL2iKDMT9O4pY-YebwDgn-tJRfT_Yskm78",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Wizard's Hat"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Kitty Patch"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Katana"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Vibey Grey"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Tiger Disguise"
+    },
+    {
+      "trait_type": "Evolved",
+      "value": "Tier 2"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "name": "Chimpers #836",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=836"
+}

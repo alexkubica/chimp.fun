@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #491",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/y1mcn3CESCv0AkU8I4brFK4vq-CORr-PpxpCZp5hehE",
+  "image_url": "https://arweave.net/y1mcn3CESCv0AkU8I4brFK4vq-CORr-PpxpCZp5hehE",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Relaxed Tee"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyelash"
+    },
+    {
+      "trait_type": "Back",
+      "value": "The Shielding Wings"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Whiskers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=491"
+}

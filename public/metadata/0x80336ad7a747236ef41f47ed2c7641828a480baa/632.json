@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #632",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/C7HN5BQTAWmfKnP7ErIEeXEFZeT1P6-OvqQpg7iYapk",
+  "image_url": "https://arweave.net/C7HN5BQTAWmfKnP7ErIEeXEFZeT1P6-OvqQpg7iYapk",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Pink"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Injured"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Ramen Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stunned"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Fishing Rod"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "4 - Green"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=632"
+}

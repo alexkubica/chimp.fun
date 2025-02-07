@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #783",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/0YXRBgg0F8pRimhZRXI-Ug54NbZPOg1NGu-n2t9bJgI",
+  "image_url": "https://arweave.net/0YXRBgg0F8pRimhZRXI-Ug54NbZPOg1NGu-n2t9bJgI",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lightspeed Suit"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Strawberry Milk"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Charcoal Grey"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gazing"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=783"
+}

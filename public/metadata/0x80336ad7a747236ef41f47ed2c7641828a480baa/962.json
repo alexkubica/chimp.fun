@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #962",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/dczMXUVVKCVlOzt8Ku_uNPf2TvEI8b0jSAd4z9KltRw",
+  "image_url": "https://arweave.net/dczMXUVVKCVlOzt8Ku_uNPf2TvEI8b0jSAd4z9KltRw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Chef Kimono"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Sabre Tooth"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Undead Pink"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Ancient Sabre"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Decayed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=962"
+}

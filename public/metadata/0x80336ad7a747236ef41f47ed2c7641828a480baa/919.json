@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #919",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/rmS7n4Bz3tHK-vzlhvoZuDLSIJ8DiQWNXuaynP7hymw",
+  "image_url": "https://arweave.net/rmS7n4Bz3tHK-vzlhvoZuDLSIJ8DiQWNXuaynP7hymw",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "CEO"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Kitsune Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Jet Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Intense"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Trusty Katana"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Exclaimed"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=919"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #410",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/TdUHY6u9R5cmusSjrFi7XzWscB5z-B76Ww1rB3Kk1Pk",
+  "image_url": "https://arweave.net/TdUHY6u9R5cmusSjrFi7XzWscB5z-B76Ww1rB3Kk1Pk",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Dark Samurai"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Choc Stick"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Guiding Lanterns"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/chimpers?id=410"
+}
