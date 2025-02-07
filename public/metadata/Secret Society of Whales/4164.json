@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fisherman Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbwBhNjwSN3JxYhPyZfPf7Ex8QYs5ugzCvc35vynK669n"
+}
