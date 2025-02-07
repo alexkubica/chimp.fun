@@ -60,7 +60,7 @@ export default function Home() {
         );
       }
       const { imageUrl } = await response.json();
-      setImageUrl(imageUrl);
+      setImageUrl(`/proxy?url=${imageUrl}`);
     })();
   }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
 
