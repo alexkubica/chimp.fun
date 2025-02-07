@@ -60,7 +60,11 @@ export default function Home() {
         );
       }
       const { imageUrl } = await response.json();
-      setImageUrl(`/proxy?url=${imageUrl}`);
+      if (imageUrl.includes("ipfs")) {
+        setImageUrl(imageUrl);
+      } else {
+        setImageUrl(`/proxy?url=${imageUrl}`);
+      }
     })();
   }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
 
