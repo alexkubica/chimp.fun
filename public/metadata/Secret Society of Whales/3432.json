@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Student"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Punks Comic"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQ52F5aaBLehmCqcKXpef73w5YMec5c1e6GJWg2s6vZpN"
+}

@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Mouse Ears"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Fish"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmX7vDi73oTDLJnUfYuRR12so1SM9NdRmy8B8Q6HiXcgfc"
+}
