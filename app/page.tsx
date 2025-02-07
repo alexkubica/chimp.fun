@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ReactionMetadata } from "@/types";
 import { collectionsMetadata, reactionsMap } from "@/consts";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -19,7 +20,9 @@ const fileToDataUri = (file: File) =>
 
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
-  const [tokenID, setTokenID] = useState(2956);
+  const [imageExtension, setImageExtension] = useState("gif");
+  const [loading, setLoading] = useState(true);
+  const [tokenID, setTokenID] = useState<string | number>(2956);
   const [collectionIndex, setCollectionIndex] = useState(0);
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
@@ -104,6 +107,7 @@ export default function Home() {
         );
 
         let filedata;
+        setLoading(true);
         if (uploadedImageUri) {
           filedata = await fetchFile(uploadedImageUri);
         } else {
@@ -123,6 +127,7 @@ export default function Home() {
           imageBytes[2] === 0x46;
 
         const imageExtension = isPNG ? "png" : isGIF ? "gif" : "jpg";
+        setImageExtension(imageExtension);
 
         await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
 
@@ -146,7 +151,6 @@ export default function Home() {
         ]);
         console.log("FFmpeg command executed successfully");
 
-        // kubica debug why this is not working
         const data = await ffmpegRef.current.readFile(
           `output.${imageExtension}`,
         );
@@ -159,6 +163,8 @@ export default function Home() {
         console.log("Image URL generated:", url);
       } catch (error) {
         console.error("Error during FFmpeg execution:", error);
+      } finally {
+        setLoading(false);
       }
     }, 200),
     [
@@ -229,9 +235,7 @@ export default function Home() {
     setScale(overlaySettings.scale);
   }, [tokenID, overlayNumber]);
 
-  async function downloadGif() {
-    console.log("downloading gif");
-
+  async function downloadOutput() {
     if (!finalResult) {
       console.warn("can't download gif, no final result");
       return;
@@ -240,13 +244,14 @@ export default function Home() {
     // Create a download link and trigger the download
     const a = document.createElement("a");
     a.href = finalResult;
-    a.download = "output.gif";
+    a.download = `${collectionMetadata.name}-${tokenID}-${reactionsMap[overlayNumber - 1].title}.${imageExtension}`;
     a.click();
   }
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files) {
+        setLoading(true);
         console.log("upload file");
         setFile(e.target.files[0]);
       }
@@ -256,7 +261,8 @@ export default function Home() {
 
   const handleTokenIdChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (/^\d+$/.test(e.target.value)) setTokenID(Number(e.target.value));
+      setLoading(true);
+      setTokenID(e.target.value);
     },
     [],
   );
@@ -267,6 +273,7 @@ export default function Home() {
       <select
         onChange={(e) => {
           const newCollectionIndex = e.target.value as unknown as number;
+          setLoading(true);
           setCollectionIndex(newCollectionIndex);
           collectionMetadata = collectionsMetadata[newCollectionIndex];
           minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -292,7 +299,6 @@ export default function Home() {
           Token ID #({minTokenID}-{maxTokenID}):{" "}
         </label>
         <input
-          type="number"
           id="gifNumber"
           min={minTokenID}
           max={maxTokenID}
@@ -305,6 +311,7 @@ export default function Home() {
         onClick={() => {
           console.log("clicked random");
           setTokenID(Math.floor(Math.random() * maxTokenID) + 1);
+          setLoading(true);
         }}
       >
         RANDOM 🎲
@@ -323,24 +330,26 @@ export default function Home() {
         <a href="https://www.iloveimg.com/resize-image">this tool</a>.
       </small>
       <div id="gifContainer">
-        {finalResult && (
+        <div className="relative max-w-[300px] max-h-[300px] w-full h-auto">
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 rounded-lg">
+              <AiOutlineLoading3Quarters className="animate-spin text-white text-8xl" />
+            </div>
+          )}
           <Image
             id="gif"
-            src={finalResult}
-            alt="chimp will be displayed here"
+            src={finalResult ?? "placeholder.png"}
+            alt=""
             unoptimized
-            sizes="(max-width: 300px) 100vw, 300px"
-            className="max-w-[300px] max-h-[300px] w-full h-auto"
             height={300}
             width={300}
           />
-        )}
-        {!finalResult && "CHIMPLOADING..."}
+        </div>
       </div>
       <div>
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={downloadGif}
+          onClick={downloadOutput}
         >
           Download
         </button>
@@ -357,6 +366,7 @@ export default function Home() {
             id="x"
             value={x}
             onChange={(e) => {
+              setLoading(true);
               const normalized = Number(e.target.value);
               setX(normalized);
             }}
@@ -367,6 +377,7 @@ export default function Home() {
             min="-1000"
             max="1000"
             onChange={(e) => {
+              setLoading(true);
               const normalized = Number(e.target.value);
               setX(normalized);
             }}
@@ -380,6 +391,7 @@ export default function Home() {
             id="y"
             value={y}
             onChange={(e) => {
+              setLoading(true);
               const normalized = Number(e.target.value);
               setY(normalized);
             }}
@@ -390,6 +402,7 @@ export default function Home() {
             min="-1000"
             max="1000"
             onChange={(e) => {
+              setLoading(true);
               const normalized = Number(e.target.value);
               setY(normalized);
             }}
@@ -405,6 +418,7 @@ export default function Home() {
             min="-2"
             max="5"
             onChange={(e) => {
+              setLoading(true);
               const normalized = Number(e.target.value);
               setScale(normalized);
             }}
@@ -415,6 +429,7 @@ export default function Home() {
             min="-2"
             max="5"
             onChange={(e) => {
+              setLoading(true);
               const normalized = Number(e.target.value);
               setScale(normalized);
             }}
@@ -431,6 +446,7 @@ export default function Home() {
                 key={index + 1}
                 className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
                 onClick={() => {
+                  setLoading(true);
                   setOverlayNumber(Number(index + 1));
                 }}
               >

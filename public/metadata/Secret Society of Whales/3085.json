@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Mouse Ears"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Third Eye"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmeDMLNNUM9pzueM7rfUfSd6cXJygZMKKJcsU5JZqUPH7V"
+}

@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Top Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPzFD3oAAPh93Rm61j2pu7mFtsm5Ju6kBfaLG4vZbXEca"
+}

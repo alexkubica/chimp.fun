@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmXFa2VrPUb8Tkpjv4RPVKrRz3AeW2TpkTYqTqyuHCPW1q"
+}
