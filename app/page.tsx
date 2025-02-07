@@ -41,7 +41,11 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      if (isNaN(tokenID) || tokenID < minTokenID || tokenID > maxTokenID) {
+      if (
+        isNaN(Number(tokenID)) ||
+        Number(tokenID) < minTokenID ||
+        Number(tokenID) > maxTokenID
+      ) {
         return;
       }
 
@@ -279,7 +283,7 @@ export default function Home() {
           minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
           maxTokenID =
             collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
-          if (tokenID < minTokenID || tokenID > maxTokenID) {
+          if (Number(tokenID) < minTokenID || Number(tokenID) > maxTokenID) {
             setTokenID(minTokenID);
           }
         }}
