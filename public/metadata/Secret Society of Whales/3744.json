@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Play Boy"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Beanie"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Battle Scar"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRdaNQSNF1x4MQbfrx7cpJDpk1rzipY2bWSizVYvUgvWA"
+}

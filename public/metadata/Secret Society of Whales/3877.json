@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fisherman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Straw Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPG7PiijJA1fWPiBy7xj5RpZKM9ATJR36vmnCrXx53q2u"
+}

@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Cowboy Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQsfJ77wcKNLvKoUZHtaamqvG4zV5zWg2Hz1jM1YYcwta"
+}

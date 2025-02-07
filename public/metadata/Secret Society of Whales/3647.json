@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sailor"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Third Eye"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Pipe"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmeNddo812ups8WmasNePF7A6oYyA157JWVZyNRnzUGTNv"
+}

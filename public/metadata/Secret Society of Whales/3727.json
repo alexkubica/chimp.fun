@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Rockstar"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pirate Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmNqvYssKYSDKe94EhidnvYkd3bNiuyjHpLTbcn8Akq8UN"
+}

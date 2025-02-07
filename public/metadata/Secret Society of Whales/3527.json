@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Barista"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTDjmh4VKTeJx2avGnq7MuciigzYYMGncag28dGtY8fAH"
+}

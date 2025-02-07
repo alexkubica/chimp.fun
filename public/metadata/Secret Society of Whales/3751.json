@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Graduation Cap"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Circle Shades"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWruw8jnJ5f6Mmek7BZ8uay3CGTuBHstajLmDmd6rPBv4"
+}

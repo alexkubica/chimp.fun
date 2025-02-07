@@ -1,0 +1,37 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Barista"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Mouse Ears"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Punks Comic"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmU3Fk8GVWM5iU8SHp28jy4fmx7XN7QtpYPiy2vp8eWcSF"
+}

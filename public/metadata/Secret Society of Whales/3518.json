@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bowler"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "VR"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Cigar"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Money Bags"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmcQL2iLJazYok6n434z7u1EhW8mACLedpqAEiByrgUUcV"
+}

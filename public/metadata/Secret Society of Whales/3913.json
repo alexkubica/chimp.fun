@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vacationer"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Cowboy Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmNtQX79oRtR7ShDQ4qnhuBLjbmUc7tye9ZfqoCmWxcCzn"
+}

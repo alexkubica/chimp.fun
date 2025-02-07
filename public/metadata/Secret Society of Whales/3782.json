@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmVi7UUKYj3S42iS5DR8faSAwR11jjApMfkfYCKPV41ES7"
+}

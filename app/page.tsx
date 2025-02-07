@@ -267,6 +267,8 @@ export default function Home() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setLoading(true);
       setTokenID(e.target.value);
+      setFile(null);
+      setUploadedImageUri(null);
     },
     [],
   );
@@ -286,6 +288,8 @@ export default function Home() {
           if (Number(tokenID) < minTokenID || Number(tokenID) > maxTokenID) {
             setTokenID(minTokenID);
           }
+          setFile(null);
+          setUploadedImageUri(null);
         }}
       >
         {collectionsMetadata.map((_, index) => {
@@ -316,6 +320,8 @@ export default function Home() {
           console.log("clicked random");
           setTokenID(Math.floor(Math.random() * maxTokenID) + 1);
           setLoading(true);
+          setFile(null);
+          setUploadedImageUri(null);
         }}
       >
         RANDOM 🎲

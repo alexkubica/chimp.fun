@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sleepy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmP7EWdycbSxTMEPCQJ8uJVbjyNWAh25zkAaVsSHjku6bF"
+}

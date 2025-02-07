@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pimp Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWR6zVb73omeU1BPGEv7HjiWNibiMP7QVjLczNkmGS2o5"
+}

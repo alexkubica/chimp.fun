@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fisherman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Laser"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmYfPxmzkhjnxBpg5fRHrsudmTD5JV4qfWKHFBtrKhnDNz"
+}

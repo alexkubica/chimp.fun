@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nice Suit Guy"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pirate Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmZGCJNdQQF251tbeK8oNQ1yJGjpU7n61qdNJoEC7xcwhm"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Venture Capitalist"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sleepy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmdyJffAusT5BBdXn51kfP9CwE4EGNU7gq9HCWcdW2BULh"
+}

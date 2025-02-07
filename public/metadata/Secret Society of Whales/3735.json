@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nurse"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPQCzs4pY5DTYQXZxRq5KfrbwbkmWoP7JdJnYH8bkyQ86"
+}

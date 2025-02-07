@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Lightning"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Barista"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Cowboy Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Monocle"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Tongue Out"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUQmgXyQa9c2imDyH6NzKWed7oJu4KDBAYxbNYMh6KdcD"
+}

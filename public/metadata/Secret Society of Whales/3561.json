@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Raver"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmesaAn1TeZ6F2aWba9mxbiVqiLUMRYmPRcJAoyqMKHUCL"
+}

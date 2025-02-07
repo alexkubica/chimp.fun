@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Construction Worker"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Turtle Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grill Smile"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQZ3cbhX6gwX4xXYFEfsgq5aitHCszSfmrbUQwMyguXbx"
+}

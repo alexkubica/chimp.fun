@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Commie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbT7io2JpcjhxsecwopRH2x4iS8JozytsNKohpGDZvFUW"
+}

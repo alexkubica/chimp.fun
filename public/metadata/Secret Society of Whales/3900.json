@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Tech CEO"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Winged Helmet"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Tongue Out"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbciCnW1XHMX2WFJTYSaKU88Ce8WTx34Huttj65ezp5RC"
+}

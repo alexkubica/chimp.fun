@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Construction Worker"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Angry"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Pipe"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQcFFAB8cM1hZYuEa6zos4NCTwqx7Kj9XWEi8nERoBhF1"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Spinner"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Angry"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmaC8oGfjdEXbzMHh1Ms46p6oPgPATEWSnx9dRa8e5Z8kq"
+}

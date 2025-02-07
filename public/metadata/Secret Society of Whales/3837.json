@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Beanie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSbvzZw7rsSi5GhnAMn7gcJVY4qnFH2A1nDs5kYYREUaL"
+}

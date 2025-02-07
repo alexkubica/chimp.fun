@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fisherman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUnJonh9Nw1pbzvTPC3dHX3ETtag1trzHZLUvGa3mWLT6"
+}

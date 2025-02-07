@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Sushi Chef"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTDAq22wjVxBgBKYhr1KjeRTtyqiSvKK25j1jUzLQJ6KJ"
+}

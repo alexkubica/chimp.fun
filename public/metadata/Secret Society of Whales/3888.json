@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fashion Designer"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Cowboy Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sleepy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmX6dv3tg4zx8ZiUio4n6sUbX8couiaBiM1bKyjirF4d7W"
+}

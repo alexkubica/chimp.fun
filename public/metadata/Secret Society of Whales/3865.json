@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Jesters Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmXwhG2uggZ6i29pJAo6zQ81YdxiTbrtpA8GPHXM2jJz2D"
+}

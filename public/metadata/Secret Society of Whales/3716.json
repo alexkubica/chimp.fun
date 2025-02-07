@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nurse"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Gold Laurel Wreath"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQiST8PyzbmuTyC7vJRmgm7a2iyrf6ZikR9rpVdm1gPeu"
+}

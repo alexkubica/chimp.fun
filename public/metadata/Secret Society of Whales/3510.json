@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Pilot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Commie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQpns8Ex1EFQg6DzS4QkMD6B74twZLNyiwWE6QtysRjj2"
+}

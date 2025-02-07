@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Tech CEO"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Cross"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRH2rovjGYFtEBWwXgup2jaesKjvutEy13zSsVH1n1vJg"
+}

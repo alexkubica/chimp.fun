@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nice Suit Guy"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Headphones"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Turtle Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmaFziynbZKtXWV3BHTExvdvKW68dHuaTiLK6HojjGmWwn"
+}

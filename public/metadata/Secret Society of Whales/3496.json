@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Flames"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQNXtKsKSUfENtQ7vTKdqcnE8T2YGj6RDUYUMufykc6NL"
+}

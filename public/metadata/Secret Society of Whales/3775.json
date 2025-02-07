@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Laughing"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSnCdoMrX74t59hvcN3rXgqJXXyXr7bSoKFmAPVzezu6y"
+}

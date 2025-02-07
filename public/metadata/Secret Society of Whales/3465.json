@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lumberjack"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRsN7qCJ9JyrDLrXPNec9nfQuoV9PLWs3sf5qQ3fU5ccG"
+}

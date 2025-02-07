@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Caveman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Beanie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Groucho Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmZbAoDLfcKd3p9b6eS15PQGmcyUumUMU6mWZUYdykyX4Z"
+}

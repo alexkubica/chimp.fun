@@ -1,0 +1,37 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Digital Marketer"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Jesters Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Ski Mask"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Bag Holder"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTc9C6zyRTz7W4TwYyf6eVD5WdrZzraSs5Tbjj6DqwFEw"
+}

@@ -1,0 +1,37 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Caveman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "SSoW Cap"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Punks Comic"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTeBZLUR45AEvGqUpRWCMbzzjJAvvPWLmHRANVG1n4SBp"
+}

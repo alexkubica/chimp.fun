@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Sushi Chef"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Ego Death"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbijAJSnxAkBWcNDAQq6p7wXBj5XDLDB31QwBcss2et4c"
+}

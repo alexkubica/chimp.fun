@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Rockstar"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Jesters Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qmd7hmnUBhZxX7ksAZYPeMfwzGnmD92dvUBhxQMjs5GaEn"
+}

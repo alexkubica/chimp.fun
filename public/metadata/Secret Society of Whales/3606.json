@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bullet Proof"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWVjzKxurdQW1vPsvgH8oFFVUWswZdojDxY8DEHuXXfc1"
+}

@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nurse"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Pipe"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQT4CsnBqjaiHUZneaExADoE9hCQqADSUQKXQqMmaGp8g"
+}

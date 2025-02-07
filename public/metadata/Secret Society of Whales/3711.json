@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Salesman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fisherman Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyepatch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmcFSYeT8K97D5sdaxy3EEAk7zR7Ks4JWDVQaNAs6EtMuA"
+}

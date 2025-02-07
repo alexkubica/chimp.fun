@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Battle Scar"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmdbXGGud3LpSth7TZfVPvimN52DqVbkfiriXjTtdgQ6iL"
+}

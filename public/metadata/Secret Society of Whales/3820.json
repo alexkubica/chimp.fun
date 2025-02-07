@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyepatch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPDEtg68WXEkUTkBb4SQXDhjfqqJYC5F58HKPoQTNZXYY"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Lumberjack"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fisherman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmVi4PjFAC1B9KV1bXp66JYSutwnGqkZ2a9Vo9pwRxk2sK"
+}

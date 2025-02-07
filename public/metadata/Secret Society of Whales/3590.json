@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Basketball"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fish Bowl"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmYTA1kXQ7G5LuK5GyqwyAHSoExMEjPse8aeF957hbUYPS"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Lightning"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Butler"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Colored Lenses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWCXedBJdvgF1Ci5G78ZbA3B9JjFRzqUMxzeqYe9TZsaF"
+}

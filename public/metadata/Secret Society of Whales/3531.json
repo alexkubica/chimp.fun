@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Raver"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fisherman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRYV4837i98aF6NX2ieUtyZk3a86tDy3DUueB4gkiKVxd"
+}

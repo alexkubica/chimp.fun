@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sports Card Collector"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmVCYiimBbUY8sW69bLeuB3WqRZe9v4WosV6kNnSjdJh7L"
+}

@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Gold Laurel Wreath"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Angry"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Tongue Out"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTHh6GHyKutuWW1whwJLbTm9U8PoHek9rDMSyG8zq3jEd"
+}

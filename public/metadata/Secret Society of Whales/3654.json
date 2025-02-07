@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fisherman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Mohawk"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Tripping"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Laughing"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmNms8UJCvtpCaT6VGFQmwsQRFE7KksjKXkCLciZd9R2LS"
+}

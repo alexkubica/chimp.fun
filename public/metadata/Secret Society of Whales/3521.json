@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Caveman"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grill Smile"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qma35cip4do3D5LuWtbCHtCjKba6pZJT3RVRAxTbGnDsKz"
+}

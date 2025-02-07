@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Hipster"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Jesters Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Pipe"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmREUUt1XQbFijq8VcmxmxhVUPyqvHxz1tFPoi4uBPHE4N"
+}

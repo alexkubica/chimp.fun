@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Night Club Owner"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Knight Helmet"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Cigar"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Money Bags"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSVWz2e8qK7PadpLZLBeQWkBA3CFkadX4y4mcTNrxmUxm"
+}

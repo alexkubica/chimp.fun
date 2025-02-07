@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Round Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSWwSfehZCZtXavftBh7q2z9Kqw2i56crBUxe28tQ7wni"
+}

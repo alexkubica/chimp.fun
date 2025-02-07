@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Cowboy Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUjBECihM5QxJ6AdoZ1wA7dBKEs85RgdYaqs52ouBPKaZ"
+}

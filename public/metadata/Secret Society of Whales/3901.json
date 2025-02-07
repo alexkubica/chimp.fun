@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Crusader"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPqdwMty4dmbwfJQcEmUDCVZiNoV4CjyeZp776ukghpah"
+}

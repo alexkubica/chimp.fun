@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Lightning"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fisherman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Pipe"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmZvUmesFyox6459dVoHKrHeGTNWT38ayBTnHUBppuaPb8"
+}

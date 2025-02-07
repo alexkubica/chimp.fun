@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Mime"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyepatch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmeUT61dPxtCbTn9avtyirZZnFYtT36qrxPC1231Goz3br"
+}

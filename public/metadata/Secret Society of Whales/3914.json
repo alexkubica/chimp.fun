@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "SSoW Cap"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Bag Holder"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmerhsFjmMbrQ5uzu9opNQfVNvTQ8QTe7FBcp64FNHr9KU"
+}

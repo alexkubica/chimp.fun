@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Trippy"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Salesman"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmNvrcuWcBiDBiQVXcMRX3AWXTdZLT6j6B42PYkTRiakKL"
+}

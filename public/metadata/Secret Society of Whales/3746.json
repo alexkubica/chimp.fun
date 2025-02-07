@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nurse"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Tripping"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWd1VuxYhRmeRjzKEw29MJkW96MacQs2KCmy8d2Lg4UyS"
+}

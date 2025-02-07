@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Salesman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Bunny Ears"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Colored Lenses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWkU8QHboJNuBYfk82Rm24LSxbXL3sb4DDBUSLQ6sSZhX"
+}

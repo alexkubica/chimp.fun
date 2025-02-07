@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Jesters Hat"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Third Eye"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyepatch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmNkDbnJj1kNRiX46LLYguG3f8QJrdXK85VeJWsRppFf5A"
+}

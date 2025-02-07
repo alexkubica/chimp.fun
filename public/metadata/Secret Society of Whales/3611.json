@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Crusader"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Sushi Chef"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Colored Lenses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSupzPoarK7eBPJ6qh2EnRAJh5aEVhkH6Dks9tGsFE6s8"
+}

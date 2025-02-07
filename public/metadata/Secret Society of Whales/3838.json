@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Eyepatch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Laughing"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbAYnL83WH6RMJoRAWNycG3LVUVLvUQUXRQ9eoXnTJ7xG"
+}

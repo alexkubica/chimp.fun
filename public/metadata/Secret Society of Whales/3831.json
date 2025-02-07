@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Trippy"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vacationer"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRXLMiKnw9qfkqfTZ9f8vcMABcoCnaNUs589K4yNk8qP6"
+}

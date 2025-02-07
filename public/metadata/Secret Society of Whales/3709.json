@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Wizard Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTxBnZU3A8PmrCpyFfY2urTYxHYZX75DiP2d17n9ozBmV"
+}

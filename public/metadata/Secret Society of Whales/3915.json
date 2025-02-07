@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Raver"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Bag Holder"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRsdfYvGkNcTBnKiNibh1DjjC4ebnGPZ6VdE11sAQrQSi"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Actress"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Skeptical"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTGM3DGxM9UgTSGGsWQtKX3H3LickQnVwUePRZJ59prDk"
+}

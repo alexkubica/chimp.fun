@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Doctor"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Money Bags"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmdpvdfHrKXJ8PxDDpjA5ThgLj6aqqztjAyTPzEyZSqNys"
+}

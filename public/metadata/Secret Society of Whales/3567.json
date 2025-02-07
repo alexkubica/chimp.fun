@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Seaman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Tripping"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Laughing"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmQvf24mfXMfdbmg7NgHCi9ZTogehFxSWAEmzGKjcTMefP"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Software Engineer"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qmc8bN2WFTfaNvT4bvmFmCc4Jrzc9ddzrM3NiCFVLiZxmZ"
+}

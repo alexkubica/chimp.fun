@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Day Trader"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Flames"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Monocle"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Pipe"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmZwtS46fvkiJPG5sV6vFtn3mmxviSYD8UY8npY2GDWArc"
+}

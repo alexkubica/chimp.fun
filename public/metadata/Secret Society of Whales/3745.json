@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Basketball"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pimp Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Laughing"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qme1pgwV3mAzBgBFemkJXiKHxdv6uCGBMYrQ1tsJS2TSgR"
+}

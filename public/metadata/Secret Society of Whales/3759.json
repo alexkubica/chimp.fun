@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Software Engineer"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Sushi Chef"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Laughing"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmX1mQNk5CYU7vAiNqSBjHpTi2VHah4eWaJkZt7hrrLCM3"
+}

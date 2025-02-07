@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Rockstar"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Sushi Chef"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Circle Shades"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmZb5ZwNfSaDhMAa5ndiUQCu5JTrBrsLZTS7MY5ASseqpe"
+}
