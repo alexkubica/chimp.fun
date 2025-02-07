@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Butler"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Tongue Out"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Jewels"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmVPrM8NqivFV6eMFaaex14PRizJkwLScHzyCmK7cMppr1"
+}

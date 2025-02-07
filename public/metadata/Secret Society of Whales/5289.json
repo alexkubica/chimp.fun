@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Construction Worker"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Ice Grill"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmXuyGiNNqtZeR7uLvF95LQ6wGGjBRQQLbMCM35bRUfWPH"
+}

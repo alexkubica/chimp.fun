@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Gold Laurel Wreath"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Glasses"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qmf4paDU73McXEkAtsEZ96KvHwRn7P2Z9E5aEUfAeXCDZY"
+}

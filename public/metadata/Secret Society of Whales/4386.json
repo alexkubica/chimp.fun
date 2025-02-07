@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pimp Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Circle Shades"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qmev9xTFoFAV52hvTkdFz3uA37fe19gAmCprZ7eEH1GC7N"
+}

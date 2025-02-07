@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Mohawk"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Chandelier"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Colored Lenses"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPPJ7ej5bV2rV8pZhLRWpjbbvhU4ia7rA2ntnwkMuyysG"
+}

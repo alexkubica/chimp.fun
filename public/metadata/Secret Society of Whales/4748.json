@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fez"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmW741YVzrEbESTpHqaHBVJ99Y2hYrju52sLtrTBAmgS9h"
+}
