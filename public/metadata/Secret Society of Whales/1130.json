@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fisherman"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmS1BsNaYgevbykoTcSdL9hcQJUhtJoaKyeBK9rEtxVEd9"
+}

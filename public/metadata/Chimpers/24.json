@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #24",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Rg2zcXtKHC3aXVtg_yBt_gtDZHfZCkpP7raM4_l--hQ",
+  "image_url": "https://arweave.net/Rg2zcXtKHC3aXVtg_yBt_gtDZHfZCkpP7raM4_l--hQ",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Frosty White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Ramen Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cocoa Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Gleeful"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Combat Pole"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Shocked"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "5 - Blue"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:05:56.102Z"
+}

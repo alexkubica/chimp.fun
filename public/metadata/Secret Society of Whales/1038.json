@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Pimp"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Knight Helmet"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Shy"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPLgckqNV5NbhdM9LRQ8T6x6FtQoCE1heA3MWpGgZGDvN"
+}

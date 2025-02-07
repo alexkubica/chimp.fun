@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Mime"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Winged Helmet"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Hoop"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmdyXnJfNT3mp1YAwWGbZieMvYwZ7aDtumBg18zNZ84LU2"
+}

@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Philosopher"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmShSHuDt7JnNEYf1RR3QXJKz5KoGVZQsHr7k8AoZXmE6m"
+}

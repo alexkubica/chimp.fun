@@ -1,0 +1,27 @@
+{
+  "name": "Michi",
+  "created_by": "Timpers",
+  "description": "A spirit of the great palace, she teleported to the surface to finally reveal her true form. Her physical presence was foreshadowed in the ancient scripts, guiding her followers on a bright path, and their reunification would bring immense victories.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/47.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/47.gif",
+  "image_details": {
+    "bytes": 37772,
+    "format": "PNG",
+    "sha256": "bc920b87997f2c4076153a99d8cb87591b181dc583c2e5497ad305a32c36a44a",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=47",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/97.png",
+  "refreshedAt": "2024-12-24T10:07:32.983Z"
+}

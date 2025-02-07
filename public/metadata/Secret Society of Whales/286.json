@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Doctor"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Bunny Ears"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Bag Holder"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbvcEVaqSX5NUYnqcpga7yrHfj1nPrkr79mHVnpFsFUxT"
+}

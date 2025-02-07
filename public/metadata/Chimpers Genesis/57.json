@@ -1,0 +1,27 @@
+{
+  "name": "Akurai",
+  "created_by": "Timpers",
+  "description": "As a young chimpers, she inherited the wealth of her father, a prized amulet wielded only by the chosen ones. She left the world with a sought after treasure, a power that no other mortal could control. It changed her forever.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/57.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/57.gif",
+  "image_details": {
+    "bytes": 38796,
+    "format": "PNG",
+    "sha256": "04ac47366ce41b84ff68ee4d9628bc99cd40739e32ac9208e387d8b7a9186eb7",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=57",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/100.png",
+  "refreshedAt": "2024-12-24T10:07:39.125Z"
+}

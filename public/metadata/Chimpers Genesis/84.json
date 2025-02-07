@@ -1,0 +1,27 @@
+{
+  "name": "Otto",
+  "created_by": "Timpers",
+  "description": "Otto is the twin of Toto, extraordinary warriors admired across the land. But when they stumbled across a magical food supply in the mountains, things changed. They would return every passing week, consumed by the energy they could not break the curse.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/84.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/84.gif",
+  "image_details": {
+    "bytes": 37781,
+    "format": "PNG",
+    "sha256": "01d07e0d9776cfc88d793bfeddbd79a9e3ab5b28eecafcf0bd0cea46aeb7bab0",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=84",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/12.png",
+  "refreshedAt": "2024-12-24T10:07:58.711Z"
+}

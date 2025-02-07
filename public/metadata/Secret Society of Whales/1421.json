@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Hip Hop Artist"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Wizard Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Groucho Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmZEGJ6UeFdoxT8sJsv6tkaB1e8gpQpeMkCvy8sCJWcSqf"
+}

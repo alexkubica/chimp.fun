@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Purple"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Digital Marketer"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Headphones"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmXZTDdNw1go1LDagJXCmiky5N7w52Hd8u5nQVKMaXECq1"
+}

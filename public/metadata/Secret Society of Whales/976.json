@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bowler"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Winged Helmet"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Ice Grill"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmdetCdPd8uconfqPreiDQaHFmLmmJPLX5qNgs1sbBiWCv"
+}

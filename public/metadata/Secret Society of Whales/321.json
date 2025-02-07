@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Bunny Ears"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pimp Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Toothpick"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmS2zWLGnYxcdm78M6sGbgP39DRaEEVBG4E3vsCmb2UNu3"
+}

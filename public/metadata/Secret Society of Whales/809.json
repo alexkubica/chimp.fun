@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Barista"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pimp Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Rainbow Grill"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Jewels"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUB4N7RAzkCxMcfMfuX1tKu5woUfUPpnhu6gPDwRK2j2W"
+}

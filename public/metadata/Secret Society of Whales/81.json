@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sailor"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fez"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Toothpick"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Diamond Hands"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmP54Mg26CDzXrVq9gQpsvEyyJv1ywozRKrUfA2hLYXuUK"
+}

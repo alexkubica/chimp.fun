@@ -1,0 +1,37 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Venture Capitalist"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fez"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Tripping"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Staff"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmduRNnEF84GdYFiHaMzPeqD4KSdhSoPQqGhLSF9V9ZTUE"
+}

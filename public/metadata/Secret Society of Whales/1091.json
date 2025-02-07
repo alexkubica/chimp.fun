@@ -1,0 +1,37 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Tech CEO"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Winged Helmet"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Third Eye"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Money Bags"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmV4G6hkbqGKcbBSHXXzM3DB6JoDU8nXsUdYq1eBV8Kpsm"
+}

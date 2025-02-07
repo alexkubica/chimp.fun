@@ -1,0 +1,37 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Bowler"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Knight Helmet"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Jewels"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSWL7pcXX7yrhfFwyNy1JZRygjgFedbzFxa22kMyECeno"
+}

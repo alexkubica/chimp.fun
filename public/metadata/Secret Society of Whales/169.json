@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Raver"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Colored Lenses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmXbQBmCy1L47tpNctqPDEP4xXzMnKpfvY6WXodTgQsBxp"
+}

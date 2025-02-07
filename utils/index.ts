@@ -5,8 +5,15 @@ import { EtherscanProvider } from "ethers";
 import { Network } from "ethers";
 import { AbstractProvider, ethers } from "ethers";
 
-export const getCachePath = (collection: CollectionMetadata) => {
-  return `public/metadata/${collection.contract}`;
+export const getCachePath = (
+  collection: CollectionMetadata,
+  type: "filesystem" | "API" = "filesystem",
+) => {
+  return `${type === "filesystem" ? "public/" : ""}metadata/${collection.name}`;
+};
+
+export const getCacheUrlPath = (collection: CollectionMetadata) => {
+  return `metadata/${collection.name}`;
 };
 
 export const getEtherscanProvider = (chain: Chain) => {
@@ -62,7 +69,8 @@ export const fetchTokenMetadata = async (
   if (baseUrl) {
     try {
       console.log("Fetching cached metadata");
-      const cachedTokenMetadataUrl = `${baseUrl}/${getCachePath(collection)}/${tokenId}.json`;
+      const cachedTokenMetadataUrl = `${baseUrl}/${getCachePath(collection, "API")}/${tokenId}.json`;
+      console.log("Cached metadata URL", cachedTokenMetadataUrl);
       const cachedTokenMetadataResponse = await fetch(cachedTokenMetadataUrl);
 
       if (cachedTokenMetadataResponse.ok) {

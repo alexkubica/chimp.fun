@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Actress"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Diamond Hands"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmWDCxVxqLKCGuhAjvwWzXUzM9hxbSn7BbQVb3QMaNBuag"
+}

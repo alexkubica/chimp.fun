@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Tan"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Hip Hop Artist"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grill Smile"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmPJbK7iq4Sb2Mc39rD86r77tVM7ntEBTNiF9LApX4t1d1"
+}

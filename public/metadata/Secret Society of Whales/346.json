@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Day Trader"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Gold Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "VR"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grill Smile"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmYDntJYxSjVWS3tGHfufbfzoUtwQdEGo5dF2fApuyeFme"
+}

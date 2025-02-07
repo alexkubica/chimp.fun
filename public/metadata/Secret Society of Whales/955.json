@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Bandana"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Jewels"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSdY9ozZ9rM7gZr6zFoLNh8bWmPuNN4qR2HbnaavCM1b9"
+}

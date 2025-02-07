@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "3D Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Trident"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbiwaUEBBbmEWg5BWoWtRb31a4cFxWjjaz6vhBKmHN9P6"
+}

@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Knight Helmet"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Diamond"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qmc5oe2GymitCUw6F3EuLgT6AnR1sjEW2J6Mj8b4okH1Tc"
+}

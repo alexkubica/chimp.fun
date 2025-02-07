@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Fisherman"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Beanie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Stoned"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Staff"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmY3FZf7rp7Ysmw3RKSGKKR5nghm4sgNVtsJhf3KNiuPMe"
+}

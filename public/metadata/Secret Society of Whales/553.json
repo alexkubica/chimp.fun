@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Sailor"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pirate Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Toothpick"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Bag Holder"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSszA2f76aTWM9paoXcJ74NCwz1YsQBZXUnJRefLhFCta"
+}

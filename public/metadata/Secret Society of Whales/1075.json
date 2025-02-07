@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Student"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Battle Scar"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTHWRRG8bnT63F9nZHFCjGzxNZeCkmzPUMwhy2UwEyVRt"
+}

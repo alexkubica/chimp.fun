@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Wood"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fisherman Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grill Smile"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUNHHGX3jDM873ndbnbRe2L82mbCNtGrbnzHWHuf61AeS"
+}

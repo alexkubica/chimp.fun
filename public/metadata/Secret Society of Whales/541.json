@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Army"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Pilot"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Heart Eyes"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Lip Bite"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmYGePStfu3SzbUGASoMpKYFpXaLwrzLPortuhu5bfBJMJ"
+}

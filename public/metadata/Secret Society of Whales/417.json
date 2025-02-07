@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Green"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Headphones"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmNbVZtwixhwdE3cex9eWQphc9DbgKyjKytbJ5XcpAQTnb"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #4326",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/GOZ2JUe6-hjKVFDQ7qvAyWTFGTJ9NZLHCSNC5QGnqUk",
+  "image_url": "https://arweave.net/GOZ2JUe6-hjKVFDQ7qvAyWTFGTJ9NZLHCSNC5QGnqUk",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Omniscient Robe"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Crimson Red Cap"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Heretic"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Tactical Goggles"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Bloodthirsty"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "6 - Purple"
+    }
+  ],
+  "refreshedAt": "2024-12-23T12:04:45.649Z"
+}

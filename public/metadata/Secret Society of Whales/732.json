@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Dark Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Student"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Commie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Fish"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmSfwuJDmZXBhsLLVXxsbFEVwxMSdnX6He3r55Y7xfepw5"
+}

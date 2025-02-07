@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Red"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Nurse"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Fish"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmTE6L53FxHCXFXxaNSjxUAJ81weZH9nEDsaubCqML6eQr"
+}

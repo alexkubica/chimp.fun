@@ -1,0 +1,27 @@
+{
+  "name": "Asayaka",
+  "created_by": "Timpers",
+  "description": "A rival to the dark gods, Asayaka ordered the Chimpers to follow his command, he would establish a new imperium that led the world to a new future. His followers idolised him, with a belief that he was the true son of the light gods.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/37.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/37.gif",
+  "image_details": {
+    "bytes": 38530,
+    "format": "PNG",
+    "sha256": "4531cdea8cd85b7501e576a2a4eebbde41e6b4b86a066ef6bd7ccbad5998d7fa",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=37",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/83.png",
+  "refreshedAt": "2024-12-24T10:07:26.994Z"
+}

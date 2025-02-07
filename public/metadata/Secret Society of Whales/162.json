@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Mime"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Commie"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Toothpick"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Diamond Hands"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/Qmd7tfTmzCbsepjXyzMP8UWV245ecYUnH9uKVtjgR76qnJ"
+}

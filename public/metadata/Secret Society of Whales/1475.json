@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "SSoW Cap"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Ski Mask"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmasV6NGNFtHs96mv7W5atoyiLVsqsfDukwhcPbmknAiii"
+}

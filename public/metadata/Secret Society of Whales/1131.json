@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Crusader"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Bandana"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Chandelier"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Groucho Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unamused"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUMVD9fcDrKiKKHy2Yc6Zc4MYUDW3MN4HqzAskjje2Rmr"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Yasuke",
+  "created_by": "Timpers",
+  "description": "Yasuke is the son of the emperor and grew up surrounded by some of the most acclaimed samurai warriors. Upon learning the secrets of the ancient chronicles, he soon mastered the magical energy his father held.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/1.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/1.gif",
+  "image_details": {
+    "bytes": 40148,
+    "format": "PNG",
+    "sha256": "fa0cbaa80c627c70ddd75efb71b1406df18f16567651f528781093484f86b2f9",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=1",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/35.png",
+  "refreshedAt": "2024-12-24T10:07:05.071Z"
+}

@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Turquoise"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Salesman"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sad"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Cigar"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmRH6wK48qUXRpkBtgkkkz3DBKecCkopsbeS8FqeXmNMQo"
+}

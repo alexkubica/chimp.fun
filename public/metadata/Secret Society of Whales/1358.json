@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "White"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "SSoW Cap"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Unamused"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Unamused"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Money Bags"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmcrKcymr7pq3rJEaYpUsWfrDaa4W1RCxSoASHKAiCatqm"
+}

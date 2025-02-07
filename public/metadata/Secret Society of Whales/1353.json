@@ -1,0 +1,33 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Orange"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Light Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Actress"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Third Eye"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Haughty"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Staff"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUaJusUhLW8Stp9AASNqx4vH8vNN3J1H41kLLoT6p953u"
+}

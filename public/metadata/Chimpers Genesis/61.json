@@ -1,0 +1,27 @@
+{
+  "name": "Toyotomi",
+  "created_by": "Timpers",
+  "description": "From a dangerous planet unknown, he had a long simmering resentment for those who did not assimilate with their culture. They fought a war against the heretics, permanently alienating them from the world forever. They were their own rulers and enemies were met with a triumphant grin.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/61.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/61.gif",
+  "image_details": {
+    "bytes": 38177,
+    "format": "PNG",
+    "sha256": "6fecfd98adefe0f8a6c0157f5a3519d242efa58fda21bb6d6ea0fd8f18b04635",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=61",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/90.png",
+  "refreshedAt": "2024-12-24T10:07:41.750Z"
+}

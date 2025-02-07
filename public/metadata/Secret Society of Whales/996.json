@@ -1,0 +1,29 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Raver"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Angry"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Unshaved Toothpick"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Diamond Hands"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmYAV13GiPNXTYEcYVaSF2cvEEP2QUu82anAiF9o58ut1v"
+}

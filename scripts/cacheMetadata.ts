@@ -28,7 +28,7 @@ console.log("Start caching metadata for collections");
   for (const collection of collectionsMetadata) {
     console.log("Caching metadata for collection:", collection.name);
     const etherscanProvider = getEtherscanProvider(collection.chain);
-    const cachePath = getCachePath(collection);
+    const cachePath = getCachePath(collection, "filesystem");
     ensureFolder(cachePath);
 
     for (

@@ -1,0 +1,27 @@
+{
+  "name": "Ozawa",
+  "created_by": "Timpers",
+  "description": "Ozawa was known as an overlord, a sorcerer that promised glory and safety to those that followed him. He gained a reputation for making use of magic so destructive, that even other mages feared their use. Despite his legion, he still trusted nobody.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/26.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/26.gif",
+  "image_details": {
+    "bytes": 39444,
+    "format": "PNG",
+    "sha256": "f87272f262a49c127569c37c81cd94300e1ccbfa153b8449faeca5fad11d648c",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=26",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/78.png",
+  "refreshedAt": "2024-12-24T10:07:20.522Z"
+}

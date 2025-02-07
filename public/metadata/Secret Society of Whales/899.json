@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Light Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Fez"
+    },
+    {
+      "trait_type": "Blowhole Ring",
+      "value": "Silver Stud"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Bloodshot"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbdfRag3hiepuq1E85GmjA1iNTFcsMwBjNrvx5uPc1m6H"
+}

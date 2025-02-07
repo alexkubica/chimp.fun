@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Coral"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Black"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Grin"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Diamond Hands"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmS9teSej9bTPDEFa7EQHrqmE8TrVmNxdioS95jVSH5XPh"
+}

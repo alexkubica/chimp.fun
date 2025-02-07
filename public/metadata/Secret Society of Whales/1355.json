@@ -1,0 +1,25 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Gray"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Lightning"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Glasses"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Cheeky"
+    },
+    {
+      "trait_type": "Fin",
+      "value": "Trident"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmbgCUgVyMgmj93CFJX4Gm88zomedAEXu7J3aq9iLk4drW"
+}

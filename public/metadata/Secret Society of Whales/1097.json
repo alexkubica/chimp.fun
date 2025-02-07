@@ -1,0 +1,21 @@
+{
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Blue"
+    },
+    {
+      "trait_type": "Skin",
+      "value": "Mega Bot"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Jesters Hat"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Sleepy"
+    }
+  ],
+  "image": "https://gateway.pinata.cloud/ipfs/QmUkqfE1wJXAbGsGEJHYJHSfQt3aTggmLHsvvNeduApJQA"
+}

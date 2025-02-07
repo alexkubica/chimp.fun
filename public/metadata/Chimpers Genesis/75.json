@@ -1,0 +1,27 @@
+{
+  "name": "Tamago",
+  "created_by": "Timpers",
+  "description": "Upon the sacred mountains a primordial egg was discovered, yet the chimp inside never discarded it. Unwilling to befriend others, he would retreat and roll into safety. The indestructible shell resembled ancient battle armour, and it was believed that he was a chosen warrior.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/75.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/75.gif",
+  "image_details": {
+    "bytes": 37352,
+    "format": "PNG",
+    "sha256": "48f0e2299217cb5ee7efa76d77939f4a69de3af30a149b80e79672ec77b85436",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=75",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/94.png",
+  "refreshedAt": "2024-12-24T10:07:51.622Z"
+}

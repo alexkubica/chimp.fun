@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #2320",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/ton1Z11SeKzuvB1ae8BwnuqMutKN6l4N6iLMNdOCaHc",
+  "image_url": "https://arweave.net/ton1Z11SeKzuvB1ae8BwnuqMutKN6l4N6iLMNdOCaHc",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Haori"
+    },
+    {
+      "trait_type": "Head",
+      "value": "!"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Iconic Brown"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Resting"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Whiskers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:20:29.898Z"
+}

@@ -31,9 +31,9 @@ export default function Home() {
   const [finalResult, setFinalResult] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const collectionMetadata = collectionsMetadata[collectionIndex];
-  const minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
-  const maxTokenID =
+  let collectionMetadata = collectionsMetadata[collectionIndex];
+  let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
+  let maxTokenID =
     collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
 
   useEffect(() => {
@@ -261,9 +261,16 @@ export default function Home() {
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
       <select
-        onChange={(e) =>
-          setCollectionIndex(e.target.value as unknown as number)
-        }
+        onChange={(e) => {
+          setCollectionIndex(e.target.value as unknown as number);
+          collectionMetadata = collectionsMetadata[e.target.value];
+          minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
+          maxTokenID =
+            collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
+          if (tokenID < minTokenID || tokenID > maxTokenID) {
+            setTokenID(minTokenID);
+          }
+        }}
       >
         {collectionsMetadata.map((_, index) => {
           const collection = collectionsMetadata[index];

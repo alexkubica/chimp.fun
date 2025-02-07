@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #519",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/Vcf0SgxTeZWsqpeEcdyoVapGnFgnaAX8iqZlNqlAPdU",
+  "image_url": "https://arweave.net/Vcf0SgxTeZWsqpeEcdyoVapGnFgnaAX8iqZlNqlAPdU",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Cherry Blossom Pink"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "General Suit"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Ramen Hat"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Undead"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Dragonslayer Blade"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Classic Specs"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Bloodthirsty"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T00:16:27.456Z"
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Chimpers #1443",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/TPC42-vrLIQPwEeewebqX4T3pvnqc0goWsdzimNQZO8",
+  "image_url": "https://arweave.net/TPC42-vrLIQPwEeewebqX4T3pvnqc0goWsdzimNQZO8",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Papaya Orange"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Vigilant Wanderer"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Head",
+      "value": "Kamen"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Heretic"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Possessed"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Diamond Dust"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T09:55:16.255Z"
+}

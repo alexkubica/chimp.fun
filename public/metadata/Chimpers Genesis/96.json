@@ -1,0 +1,27 @@
+{
+  "name": "Tora",
+  "created_by": "Timpers",
+  "description": "After joining the sacred mages guild he developed into one of the most mysterious, but prolific magic keepers in the land. Only carrying his mask into battle, he became known as the tiger.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/96.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/96.gif",
+  "image_details": {
+    "bytes": 39367,
+    "format": "PNG",
+    "sha256": "7dfde134be386bea1adf011cc2ed4307656f8a591bdd908f1547c12b32959cac",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=96",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/4.png",
+  "refreshedAt": "2024-12-24T10:08:21.387Z"
+}

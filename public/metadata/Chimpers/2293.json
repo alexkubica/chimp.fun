@@ -1,0 +1,38 @@
+{
+  "name": "Chimpers #2293",
+  "created_by": "Timpers",
+  "description": "5,555 adventurous Chimpers inhabit the Chimpverse and they are ready to !CHIMP",
+  "image": "https://arweave.net/3yh89dnSYJCTIqyxXtz2YSPyJvc6ue1faHt6AIhf1qo",
+  "image_url": "https://arweave.net/3yh89dnSYJCTIqyxXtz2YSPyJvc6ue1faHt6AIhf1qo",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Forest green"
+    },
+    {
+      "trait_type": "Outfit",
+      "value": "Backpack Adventurer Blue"
+    },
+    {
+      "trait_type": "Face Extra",
+      "value": "Ninja Mask"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Cold Rogue"
+    },
+    {
+      "trait_type": "Back",
+      "value": "Rain Drizzle"
+    },
+    {
+      "trait_type": "Eyewear",
+      "value": "Shades"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "refreshedAt": "2024-12-23T11:19:50.295Z"
+}

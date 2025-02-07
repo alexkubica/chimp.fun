@@ -1,0 +1,27 @@
+{
+  "name": "Takeo",
+  "created_by": "Timpers",
+  "description": "Outcasts of society, Takeo and his friends strove for a better world. They looked towards the galaxy for hope, and they banded together as one unified force.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/8.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/8.gif",
+  "image_details": {
+    "bytes": 36983,
+    "format": "PNG",
+    "sha256": "47be0f3d1ca3c5c83dfca293463b8d33bff34f8051ed8ae0315ea92ca2562887",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=8",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/57.png",
+  "refreshedAt": "2024-12-24T10:07:09.033Z"
+}

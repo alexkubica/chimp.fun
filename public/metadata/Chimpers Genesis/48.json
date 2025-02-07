@@ -1,0 +1,27 @@
+{
+  "name": "Sensei",
+  "created_by": "Timpers",
+  "description": "Sensei was bequeathed with a magical stone in the mountains he was born in, he kept it a secret for decades as the power grew stronger within him every day. Many have attempted to remove him, unaccepting of his strength and will.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/48.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/48.gif",
+  "image_details": {
+    "bytes": 37680,
+    "format": "PNG",
+    "sha256": "c2204b0d4d5c952353772621b4e9380291199c2c9825d7f1049f2315c566bb15",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "7 - Brown"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=48",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/24.png",
+  "refreshedAt": "2024-12-24T10:07:33.390Z"
+}

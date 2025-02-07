@@ -1,0 +1,27 @@
+{
+  "name": "Eiko",
+  "created_by": "Timpers",
+  "description": "When Eiko travelled through a glitched intergalactic warp, it reset her character, everything that she had learned and knew was gone. At the gate, she was welcomed by a strange being, she grabbed the unfamiliar hand and there, her vision became clear. With this, she was able to deliver a new life.",
+  "image": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/79.gif",
+  "image_url": "https://ipfs.chimpers.xyz/ipfs/QmStnXkJ6466WL2D5z6UUsB5H9eReviGf63cr4Dpu3NReN/79.gif",
+  "image_details": {
+    "bytes": 38598,
+    "format": "PNG",
+    "sha256": "53882f48d5e30834dc1151a2dd209dfa1ccbd7910fd2010b4411924a0d92c019",
+    "width": 3000,
+    "height": 3000
+  },
+  "attributes": [
+    {
+      "trait_type": "Artist",
+      "value": "Timpers"
+    },
+    {
+      "trait_type": "Bandana",
+      "value": "None"
+    }
+  ],
+  "animation_url": "https://chimpers-collection-carousel.vercel.app/genesis?id=79",
+  "static_image": "https://arweave.net/iT1K0-D1kj2U1kR4cxq7nHqG0OGHxBMpOdCKL58iGpk/95.png",
+  "refreshedAt": "2024-12-24T10:07:54.768Z"
+}
