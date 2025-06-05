@@ -33,6 +33,7 @@ export default function Home() {
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
   const [finalResult, setFinalResult] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [overlayEnabled, setOverlayEnabled] = useState(true);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -101,15 +102,6 @@ export default function Home() {
       overlaySettings = reactionsMap[overlayNumber - 1];
 
       try {
-        await ffmpegRef.current.writeFile(
-          "reaction.png",
-          await fetchFile(`/reactions/${overlaySettings.filename}`),
-        );
-        await ffmpegRef.current.writeFile(
-          "credit.png",
-          await fetchFile(`/credit.png`),
-        );
-
         let filedata;
         setLoading(true);
         if (uploadedImageUri) {
@@ -134,25 +126,47 @@ export default function Home() {
         setImageExtension(imageExtension);
 
         await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
-
-        // kubica resize input image to 1080x1080 before overlaying
-
-        await ffmpegRef.current.exec([
-          "-i",
-          `input.${imageExtension}`, // Main input image
-          "-i",
-          "reaction.png", // First overlay
-          "-i",
-          "credit.png", // Second overlay
-          "-filter_complex",
-          `[0:v]scale=1080:1080[scaled_input]; \
+        await ffmpegRef.current.writeFile(
+          "reaction.png",
+          await fetchFile(`/reactions/${overlaySettings.filename}`),
+        );
+        let ffmpegArgs;
+        if (overlayEnabled) {
+          await ffmpegRef.current.writeFile(
+            "credit.png",
+            await fetchFile(`/credit.png`),
+          );
+          ffmpegArgs = [
+            "-i",
+            `input.${imageExtension}`,
+            "-i",
+            "reaction.png",
+            "-i",
+            "credit.png",
+            "-filter_complex",
+            `[0:v]scale=1080:1080[scaled_input]; \
    [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
    [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
    [2:v]scale=iw/1.5:-1[scaled2]; \
    [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
-          ...(isGIF ? ["-f", "gif"] : []),
-          `output.${imageExtension}`,
-        ]);
+            ...(isGIF ? ["-f", "gif"] : []),
+            `output.${imageExtension}`,
+          ];
+        } else {
+          ffmpegArgs = [
+            "-i",
+            `input.${imageExtension}`,
+            "-i",
+            "reaction.png",
+            "-filter_complex",
+            `[0:v]scale=1080:1080[scaled_input]; \
+   [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
+   [scaled_input][scaled1]overlay=${x}:${y}`,
+            ...(isGIF ? ["-f", "gif"] : []),
+            `output.${imageExtension}`,
+          ];
+        }
+        await ffmpegRef.current.exec(ffmpegArgs);
         console.log("FFmpeg command executed successfully");
 
         const data = await ffmpegRef.current.readFile(
@@ -162,7 +176,6 @@ export default function Home() {
           new Blob([data], { type: `image/${imageExtension}` }),
         );
 
-        // Update the state to trigger re-render
         setFinalResult(url);
         console.log("Image URL generated:", url);
       } catch (error) {
@@ -179,6 +192,7 @@ export default function Home() {
       scale,
       x,
       y,
+      overlayEnabled,
     ],
   );
 
@@ -367,7 +381,15 @@ export default function Home() {
       <div>
         <h2>Settings:</h2>
       </div>
-      {/* kubica add gif toggle */}
+      <div className="flex items-center gap-2 mb-2">
+        <input
+          type="checkbox"
+          id="overlayEnabled"
+          checked={overlayEnabled}
+          onChange={(e) => setOverlayEnabled(e.target.checked)}
+        />
+        <label htmlFor="overlayEnabled">Show credit overlay</label>
+      </div>
       <div className="flex gap-1 flex-col sm:flex-row ">
         <div className="flex flex-col gap-1">
           <label>X: </label>
@@ -473,7 +495,8 @@ export default function Home() {
         <div>BTC: bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk</div>
       </div>
       <div className="m-4">
-        Made with ❤️ by <a href="https://linktr.ee/alexkueth">Alex !CHIMP 🐒</a>
+        Made with ❤️ by{" "}
+        <a href="https://linktr.ee/mrcryptoalex">Alex !CHIMP 🐒</a>
       </div>
     </div>
   );
