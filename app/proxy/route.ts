@@ -1,6 +1,11 @@
 import axios from "axios";
 import { type NextRequest } from "next/server";
 
+type ResponseData = {
+  message?: string;
+  error?: string;
+};
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const url = searchParams.get("url") as string;
@@ -16,10 +21,7 @@ export async function GET(request: NextRequest) {
 
     return new Response(response.data, {
       headers: {
-        "Content-Type":
-          response.headers["content-type"] || "application/octet-stream",
-        "Access-Control-Allow-Origin": "*", // 🔥 Allow CORS
-        "Cache-Control": "public, max-age=3600",
+        "Content-Type": response.headers["content-type"],
       },
     });
   } catch (error) {
