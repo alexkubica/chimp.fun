@@ -15,11 +15,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // console.log('Fetching the resource:', url);
-    const response = await axios.get(url as string, {
+    const response = await axios.get(url, {
       responseType: "arraybuffer",
     });
-    // console.log('Fetched:', response);
+
     return new Response(response.data, {
       headers: {
         "Content-Type": response.headers["content-type"],
