@@ -1,11 +1,6 @@
 import axios from "axios";
 import { type NextRequest } from "next/server";
 
-type ResponseData = {
-  message?: string;
-  error?: string;
-};
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const url = searchParams.get("url") as string;
@@ -15,14 +10,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // console.log('Fetching the resource:', url);
-    const response = await axios.get(url as string, {
+    const response = await axios.get(url, {
       responseType: "arraybuffer",
     });
-    // console.log('Fetched:', response);
+
     return new Response(response.data, {
       headers: {
-        "Content-Type": response.headers["content-type"],
+        "Content-Type":
+          response.headers["content-type"] || "application/octet-stream",
+        "Access-Control-Allow-Origin": "*", // 🔥 Allow CORS
+        "Cache-Control": "public, max-age=3600",
       },
     });
   } catch (error) {
