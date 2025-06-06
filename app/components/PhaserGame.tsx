@@ -34,6 +34,13 @@ export default function PhaserGame({
     if (!mounted) return;
     if (typeof window === "undefined") return;
 
+    // Set up the window function to update points
+    (window as any).__SET_CHIMP_POINTS__ = (
+      callback: (prev: number) => number,
+    ) => {
+      setChimpPoints(callback);
+    };
+
     // Avoid duplicate game init on hot reload
     const container = document.getElementById("phaser-container");
     if (!container || gameRef.current) return;
@@ -368,7 +375,7 @@ export default function PhaserGame({
         update() {
           if (!this.chimp) return;
 
-          const speed = 3;
+          const speed = 12;
           let dx = 0,
             dy = 0;
           let moving = false;
@@ -508,6 +515,16 @@ export default function PhaserGame({
     }
   };
 
+  const handleRandomBg = () => {
+    if (sceneRef.current) {
+      if (sceneRef.current.bg) {
+        sceneRef.current.bg.destroy();
+      }
+      sceneRef.current.createBackground();
+    }
+    onRandomBg?.();
+  };
+
   return (
     <>
       {/* Title: always top center */}
@@ -567,7 +584,7 @@ export default function PhaserGame({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onRandomBg?.();
+              handleRandomBg();
             }}
             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
           >
@@ -622,7 +639,7 @@ export default function PhaserGame({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onRandomBg?.();
+              handleRandomBg();
             }}
             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
           >
