@@ -20,16 +20,20 @@ export default function GamePage() {
   };
 
   const handleRandomBg = () => {
-    if (gameRef.current?.scene?.scenes[0]) {
-      if (gameRef.current.scene.scenes[0].bg) {
-        gameRef.current.scene.scenes[0].bg.destroy();
+    const scene = (window as any).__PHASER_SCENE__;
+    if (scene) {
+      if (scene.bg) {
+        scene.bg.destroy();
       }
-      gameRef.current.scene.scenes[0].createBackground();
+      scene.createBackground();
     }
   };
 
   useEffect(() => {
     gameRef.current = (window as any).__PHASER_GAME__;
+    if (gameRef.current?.scene?.scenes[0]) {
+      (window as any).__PHASER_SCENE__ = gameRef.current.scene.scenes[0];
+    }
   }, []);
 
   return (

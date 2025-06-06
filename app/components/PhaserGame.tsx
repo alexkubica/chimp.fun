@@ -433,7 +433,7 @@ export default function PhaserGame({
     const container = document.getElementById("phaser-container");
 
     if (container && !(window as any).__PHASER_GAME__) {
-      (window as any).__PHASER_GAME__ = new Phaser.Game({
+      const game = new Phaser.Game({
         type: Phaser.AUTO,
         width: container.clientWidth,
         height: container.clientHeight,
@@ -444,6 +444,13 @@ export default function PhaserGame({
           autoCenter: Phaser.Scale.CENTER_BOTH,
         },
         scene: MainScene,
+      });
+      // Store a reference to the scene instance on window
+      game.events.on("ready", () => {
+        const scene = game.scene.getScene("MainScene");
+        if (scene) {
+          (window as any).__PHASER_SCENE__ = scene;
+        }
       });
     }
 
@@ -461,12 +468,24 @@ export default function PhaserGame({
     const id = Math.max(1, Math.min(5555, parseInt(chimpId) || 2956));
     setChimpId(String(id));
     onChimpChange?.(id);
+    if (
+      (window as any).__PHASER_SCENE__ &&
+      typeof (window as any).__PHASER_SCENE__.loadChimp === "function"
+    ) {
+      (window as any).__PHASER_SCENE__.loadChimp(id);
+    }
   };
 
   const handleRandomChimp = () => {
     const randomId = Math.floor(Math.random() * 5555) + 1;
     setChimpId(String(randomId));
     onRandomChimp?.();
+    if (
+      (window as any).__PHASER_SCENE__ &&
+      typeof (window as any).__PHASER_SCENE__.loadChimp === "function"
+    ) {
+      (window as any).__PHASER_SCENE__.loadChimp(randomId);
+    }
   };
 
   return (
