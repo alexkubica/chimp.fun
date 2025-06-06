@@ -1,40 +1,60 @@
 "use client";
 
 import PhaserGame from "../components/PhaserGame";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Phaser from "phaser";
+
+interface MainScene extends Phaser.Scene {
+  loadChimp: (id: number) => void;
+  createBackground: () => void;
+  bg: Phaser.GameObjects.TileSprite | null;
+}
 
 export default function GamePage() {
-  const gameRef = useRef<any>(null);
+  const gameRef = useRef<Phaser.Game | null>(null);
+  const sceneRef = useRef<MainScene | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleChimpChange = (id: number) => {
-    if (gameRef.current?.scene?.scenes[0]) {
-      gameRef.current.scene.scenes[0].loadChimp(id);
+    if (!mounted) return;
+    if (sceneRef.current) {
+      sceneRef.current.loadChimp(id);
     }
   };
 
   const handleRandomChimp = () => {
-    if (gameRef.current?.scene?.scenes[0]) {
+    if (!mounted) return;
+    if (sceneRef.current) {
       const randomId = Math.floor(Math.random() * 5555) + 1;
-      gameRef.current.scene.scenes[0].loadChimp(randomId);
+      sceneRef.current.loadChimp(randomId);
     }
   };
 
   const handleRandomBg = () => {
-    const scene = (window as any).__PHASER_SCENE__;
-    if (scene) {
-      if (scene.bg) {
-        scene.bg.destroy();
+    if (!mounted) return;
+    if (sceneRef.current) {
+      if (sceneRef.current.bg) {
+        sceneRef.current.bg.destroy();
       }
-      scene.createBackground();
+      sceneRef.current.createBackground();
     }
   };
 
   useEffect(() => {
+    if (!mounted) return;
+    if (typeof window === "undefined") return;
+
     gameRef.current = (window as any).__PHASER_GAME__;
     if (gameRef.current?.scene?.scenes[0]) {
-      (window as any).__PHASER_SCENE__ = gameRef.current.scene.scenes[0];
+      sceneRef.current = gameRef.current.scene.scenes[0] as MainScene;
     }
-  }, []);
+  }, [mounted]);
+
+  if (!mounted) return null;
 
   return (
     <main className="w-screen h-screen overflow-hidden bg-black">
