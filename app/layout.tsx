@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "chimp.fun",
+  icons: {
+    icon: "/icon.gif",
+  },
 };
 
 export default function RootLayout({
