@@ -9,7 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "chimp.fun",
   icons: {
-    icon: "/icon.gif",
+    icon: [{ url: "/icon.gif", type: "image/gif" }],
+    apple: [{ url: "/icon.gif", type: "image/gif" }],
   },
 };
 
