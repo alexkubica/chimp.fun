@@ -57,7 +57,7 @@ export default function PhaserGame({
         lastDirection: number = 1;
         currentAnimKeys: { run: string; rest: string } = { run: "", rest: "" };
         collectible: Phaser.GameObjects.Sprite | null = null;
-        static TOP_BOUNDARY = 64;
+        static TOP_BOUNDARY = 0;
         collectibleAssets = [
           {
             key: "collectible_punch",
@@ -375,7 +375,7 @@ export default function PhaserGame({
         update() {
           if (!this.chimp) return;
 
-          const speed = 12;
+          const speed = 4;
           let dx = 0,
             dy = 0;
           let moving = false;
