@@ -19,10 +19,11 @@ export const getCacheUrlPath = (collection: CollectionMetadata) => {
 export const getEtherscanProvider = (chain: Chain) => {
   let provider: AbstractProvider;
 
+  console.log("Creating provider for chain:", chain);
+
   if (chain === "polygon") {
-    provider = new ethers.EtherscanProvider(
-      "matic",
-      process.env.POLYGONSCAN_API_KEY,
+    provider = new ethers.JsonRpcProvider(
+      process.env.POLYGON_RPC_URL || "https://polygon-rpc.com",
     );
   } else if (chain === "ape") {
     const apeNetwork = new Network(
@@ -35,7 +36,12 @@ export const getEtherscanProvider = (chain: Chain) => {
 
     provider = new EtherscanProvider(apeNetwork, process.env.APESCAN_API_KEY);
   } else if (chain === "ethereum") {
-    provider = new EtherscanProvider("mainnet", process.env.ETHERSCAN_API_KEY);
+    console.log("Creating Ethereum mainnet provider");
+    // Use JsonRpcProvider for Ethereum mainnet
+    provider = new ethers.JsonRpcProvider(
+      process.env.ETHEREUM_RPC_URL || "https://eth.llamarpc.com",
+    );
+    console.log("Provider created:", !!provider);
   } else {
     throw new Error("Invalid chain");
   }
@@ -83,26 +89,35 @@ export const fetchTokenMetadata = async (
   }
 
   console.log("Fetching metadata from contract");
-  const ethersContract = new ethers.Contract(
-    collection.contract,
-    tokenURIABI,
-    provider,
-  );
-  let tokenURI = await ethersContract.tokenURI(tokenId);
+  try {
+    const ethersContract = new ethers.Contract(
+      collection.contract,
+      tokenURIABI,
+      provider,
+    );
+    console.log("Contract initialized, calling tokenURI");
+    let tokenURI = await ethersContract.tokenURI(tokenId);
+    console.log("TokenURI received:", tokenURI);
 
-  console.log("Fetching metadata from tokenURI", tokenURI);
+    console.log("Fetching metadata from tokenURI", tokenURI);
 
-  if (isIpfs(tokenURI)) {
-    tokenURI = getIpfsUrl(tokenURI);
+    if (isIpfs(tokenURI)) {
+      tokenURI = getIpfsUrl(tokenURI);
+    }
+    const tokenUriResponse = await fetch(tokenURI);
+    if (!tokenUriResponse.ok) {
+      throw new Error(
+        `Failed to fetch metadata: ${tokenUriResponse.statusText}`,
+      );
+    }
+
+    const tokenMetadata = await tokenUriResponse.json();
+    console.log("Fetched token metadata", tokenMetadata);
+    return tokenMetadata;
+  } catch (error) {
+    console.error("Error in fetchTokenMetadata:", error);
+    throw error;
   }
-  const tokenUriResponse = await fetch(tokenURI);
-  if (!tokenUriResponse.ok) {
-    throw new Error(`Failed to fetch metadata: ${tokenUriResponse.statusText}`);
-  }
-
-  const tokenMetadata = await tokenUriResponse.json();
-  console.log("Fetched token metadata", tokenMetadata);
-  return tokenMetadata;
 };
 
 export const getTokenImageUrl = (tokenMetadata: any) => {
