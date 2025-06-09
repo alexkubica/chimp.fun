@@ -354,6 +354,32 @@ export default function Home() {
         <a href="https://www.iloveimg.com/resize-image">this tool</a>.
       </small>
       <div id="gifContainer">
+        <div className="flex justify-center mb-2">
+          <button
+            className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+            onClick={async () => {
+              try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const clipboardItem of clipboardItems) {
+                  for (const type of clipboardItem.types) {
+                    if (type.startsWith("image/")) {
+                      const blob = await clipboardItem.getType(type);
+                      const file = new File([blob], "pasted-image", { type });
+                      setFile(file);
+                      return;
+                    }
+                  }
+                }
+                alert("No image found in clipboard");
+              } catch (err) {
+                console.error("Failed to read clipboard:", err);
+                alert("Failed to read clipboard");
+              }
+            }}
+          >
+            Paste Image From Clipboard
+          </button>
+        </div>
         <div className="relative max-w-[300px] max-h-[300px] w-full h-auto">
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 rounded-lg">
@@ -371,12 +397,59 @@ export default function Home() {
         </div>
       </div>
       <div>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={downloadOutput}
-        >
-          Download
-        </button>
+        <div className="flex gap-2 justify-center">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={downloadOutput}
+          >
+            Download
+          </button>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={async () => {
+              if (finalResult) {
+                try {
+                  const response = await fetch(finalResult);
+                  const blob = await response.blob();
+
+                  // Check if the browser supports writing this type to clipboard
+                  if (!navigator.clipboard.write) {
+                    alert(
+                      "Your browser does not support copying images to clipboard",
+                    );
+                    return;
+                  }
+
+                  // Try to write to clipboard
+                  try {
+                    await navigator.clipboard.write([
+                      new ClipboardItem({
+                        [blob.type]: blob,
+                      }),
+                    ]);
+                    alert("Image copied to clipboard successfully!");
+                  } catch (writeError) {
+                    // If direct write fails, offer to download instead
+                    if (
+                      confirm(
+                        "Your browser does not support copying this image type directly. Would you like to download it instead?",
+                      )
+                    ) {
+                      downloadOutput();
+                    }
+                  }
+                } catch (err) {
+                  console.error("Failed to copy image:", err);
+                  alert(
+                    "Failed to copy image. You can use the Download button instead.",
+                  );
+                }
+              }
+            }}
+          >
+            Copy Result To Clipboard
+          </button>
+        </div>
       </div>
       <div>
         <h2>Settings:</h2>
