@@ -29,6 +29,8 @@ export default function Home() {
   const [scale, setScale] = useState(0.8);
   const [overlayNumber, setOverlayNumber] = useState(18);
   const [ffmpegReady, setFfmpegReady] = useState(false);
+  const [ffmpegLoading, setFfmpegLoading] = useState(false);
+  const ffmpegLoadPromise = useRef<Promise<boolean> | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
   const [finalResult, setFinalResult] = useState<string | null>(null);
@@ -287,6 +289,43 @@ export default function Home() {
     [],
   );
 
+  const copyBlobToClipboard = async (blobUrl: string) => {
+    try {
+      const response = await fetch(blobUrl);
+      const blob = await response.blob();
+
+      if (blob.type === "image/gif") {
+        if (
+          confirm(
+            "Copying GIFs isn't supported by current browser. Would you like to download instead?",
+          )
+        ) {
+          downloadOutput();
+        }
+        return;
+      }
+
+      if (!navigator.clipboard.write) {
+        alert("Your browser does not support copying images to clipboard");
+        return;
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob,
+        }),
+      ]);
+      alert("Image copied to clipboard successfully!");
+    } catch (err) {
+      console.error("Failed to copy image:", err);
+      if (
+        confirm("Failed to copy image. Would you like to download it instead?")
+      ) {
+        downloadOutput();
+      }
+    }
+  };
+
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
@@ -406,44 +445,9 @@ export default function Home() {
           </button>
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={async () => {
+            onClick={() => {
               if (finalResult) {
-                try {
-                  const response = await fetch(finalResult);
-                  const blob = await response.blob();
-
-                  // Check if the browser supports writing this type to clipboard
-                  if (!navigator.clipboard.write) {
-                    alert(
-                      "Your browser does not support copying images to clipboard",
-                    );
-                    return;
-                  }
-
-                  // Try to write to clipboard
-                  try {
-                    await navigator.clipboard.write([
-                      new ClipboardItem({
-                        [blob.type]: blob,
-                      }),
-                    ]);
-                    alert("Image copied to clipboard successfully!");
-                  } catch (writeError) {
-                    // If direct write fails, offer to download instead
-                    if (
-                      confirm(
-                        "Your browser does not support copying this image type directly. Would you like to download it instead?",
-                      )
-                    ) {
-                      downloadOutput();
-                    }
-                  }
-                } catch (err) {
-                  console.error("Failed to copy image:", err);
-                  alert(
-                    "Failed to copy image. You can use the Download button instead.",
-                  );
-                }
+                copyBlobToClipboard(finalResult);
               }
             }}
           >
