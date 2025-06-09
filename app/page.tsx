@@ -23,6 +23,8 @@ export default function Home() {
   const [imageExtension, setImageExtension] = useState("gif");
   const [loading, setLoading] = useState(true);
   const [tokenID, setTokenID] = useState<string | number>(2956);
+  const [tempTokenID, setTempTokenID] = useState<string | number>(2956);
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const [collectionIndex, setCollectionIndex] = useState(0);
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
@@ -36,11 +38,19 @@ export default function Home() {
   const [finalResult, setFinalResult] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [overlayEnabled, setOverlayEnabled] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
   let maxTokenID =
     collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
+
+  useEffect(() => {
+    if (isFirstRender) {
+      setLoading(true);
+      setIsFirstRender(false);
+    }
+  }, [isFirstRender]);
 
   useEffect(() => {
     (async () => {
@@ -281,13 +291,39 @@ export default function Home() {
 
   const handleTokenIdChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setLoading(true);
-      setTokenID(e.target.value);
-      setFile(null);
-      setUploadedImageUri(null);
+      setTempTokenID(e.target.value);
     },
     [],
   );
+
+  const handleTokenIdSubmit = useCallback(() => {
+    const tokenIdNum = Number(tempTokenID);
+    if (
+      isNaN(tokenIdNum) ||
+      tokenIdNum < minTokenID ||
+      tokenIdNum > maxTokenID
+    ) {
+      setErrorMessage(
+        `Invalid Token ID, please choose between ${minTokenID} and ${maxTokenID}`,
+      );
+      return;
+    }
+    setErrorMessage(null);
+    setLoading(true);
+    setTokenID(tempTokenID);
+    setFile(null);
+    setUploadedImageUri(null);
+  }, [tempTokenID, minTokenID, maxTokenID]);
+
+  const handleRandomClick = useCallback(() => {
+    console.log("clicked random");
+    const randomId = Math.floor(Math.random() * maxTokenID) + 1;
+    setTempTokenID(randomId);
+    setTokenID(randomId);
+    setLoading(true);
+    setFile(null);
+    setUploadedImageUri(null);
+  }, [maxTokenID]);
 
   const copyBlobToClipboard = async (blobUrl: string) => {
     try {
@@ -363,19 +399,22 @@ export default function Home() {
           id="gifNumber"
           min={minTokenID}
           max={maxTokenID}
-          value={tokenID}
+          value={tempTokenID}
           onChange={handleTokenIdChange}
         />
+        <button
+          className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+          onClick={handleTokenIdSubmit}
+        >
+          OK
+        </button>
       </div>
+      {errorMessage && (
+        <div className="text-red-500 text-sm">{errorMessage}</div>
+      )}
       <button
         className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-        onClick={() => {
-          console.log("clicked random");
-          setTokenID(Math.floor(Math.random() * maxTokenID) + 1);
-          setLoading(true);
-          setFile(null);
-          setUploadedImageUri(null);
-        }}
+        onClick={handleRandomClick}
       >
         RANDOM 🎲
       </button>
