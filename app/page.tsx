@@ -36,6 +36,7 @@ export default function Home() {
   const [finalResult, setFinalResult] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [overlayEnabled, setOverlayEnabled] = useState(true);
+  const [xProfileUrl, setXProfileUrl] = useState<string>("");
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -326,6 +327,52 @@ export default function Home() {
     }
   };
 
+  const handleXProfileUrl = useCallback(async (url: string) => {
+    try {
+      setLoading(true);
+      // Extract username from URL
+      const username = url.split("/").pop()?.replace("@", "");
+      if (!username) {
+        throw new Error("Invalid X profile URL");
+      }
+
+      // First get the profile image URL from X API
+      const response = await fetch(
+        `/api/twitter-profile?username=${encodeURIComponent(username)}`,
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile data");
+      }
+
+      const data = await response.json();
+      if (!data.profileImageUrl) {
+        throw new Error("No profile image found");
+      }
+
+      // Now fetch the actual image
+      const imageResponse = await fetch(
+        `/proxy?url=${encodeURIComponent(data.profileImageUrl)}`,
+      );
+      if (!imageResponse.ok) {
+        throw new Error("Failed to fetch profile photo");
+      }
+
+      // Convert the response to a blob
+      const blob = await imageResponse.blob();
+      const file = new File([blob], `${username}-profile.jpg`, {
+        type: "image/jpeg",
+      });
+      setFile(file);
+    } catch (error) {
+      console.error("Error fetching X profile photo:", error);
+      alert(
+        "Failed to fetch X profile photo. Please check the URL and try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return (
     <div className="flex items-center justify-center flex-col gap-2 p-0">
       <h1>CHIMP.FUN 🐒</h1>
@@ -387,6 +434,21 @@ export default function Home() {
           type="file"
           onChange={handleFileChange}
         />
+      </div>
+      <div className="flex gap-1 justify-center align-center">
+        <input
+          className="border border-gray-300 rounded px-2 py-1"
+          type="text"
+          placeholder="X Profile URL (e.g. @username)"
+          value={xProfileUrl}
+          onChange={(e) => setXProfileUrl(e.target.value)}
+        />
+        <button
+          className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+          onClick={() => handleXProfileUrl(xProfileUrl)}
+        >
+          Paste X Profile
+        </button>
       </div>
       <small>
         For best results use a 1080x1080 image, you can use{" "}
