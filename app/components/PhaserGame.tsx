@@ -873,7 +873,6 @@ export default function PhaserGame({
           gameRef.current = null;
           sceneRef.current = null;
         }
-        window.removeEventListener("keydown", handleKeyDown);
         resizeObserver.disconnect();
       };
     });
