@@ -16,6 +16,7 @@ interface MainScene extends Phaser.Scene {
   bg: Phaser.GameObjects.TileSprite | null;
   chimp: Phaser.GameObjects.Sprite | null;
   updateBoundaries: () => void;
+  spawnCollectible: () => void;
 }
 
 export default function PhaserGame({
@@ -26,12 +27,13 @@ export default function PhaserGame({
   const [chimpId, setChimpId] = useState("2956");
   const [isZoomedOut, setIsZoomedOut] = useState(false);
   const [chimpPoints, setChimpPoints] = useState(0);
+  const pointsRef = useRef(0);
   const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [gameStatus, setGameStatus] = useState<
     "idle" | "countdown" | "running" | "finished"
   >("idle");
-  const [timer, setTimer] = useState(5);
+  const [timer, setTimer] = useState(30);
   const [countdownText, setCountdownText] = useState("");
   const [fps, setFps] = useState(0);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -79,7 +81,10 @@ export default function PhaserGame({
       callback: (prev: number) => number,
     ) => {
       if (gameStatus === "running") {
-        setChimpPoints(callback);
+        // Update both the ref and state
+        const newPoints = callback(pointsRef.current);
+        pointsRef.current = newPoints;
+        setChimpPoints(newPoints);
       }
     };
 
@@ -306,7 +311,10 @@ export default function PhaserGame({
             this.chimp.setPosition(spawnX, spawnY);
           }
 
-          this.spawnCollectible();
+          // Only spawn collectible if game is running
+          if ((window as any).__GAME_STATUS__ === "running") {
+            this.spawnCollectible();
+          }
 
           this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
             this.touchPointer = pointer;
@@ -551,7 +559,7 @@ export default function PhaserGame({
             .sprite(oldX, oldY, key, 0)
             .setScale(2)
             .setFlipX(oldFlipX)
-            .setDepth(1);
+            .setDepth(2);
 
           const runKey = `run_${key}`;
           const restKey = `rest_${key}`;
@@ -587,6 +595,10 @@ export default function PhaserGame({
         spawnCollectible() {
           if (this.collectible) {
             this.collectible.destroy();
+          }
+          // Only spawn if game is running
+          if ((window as any).__GAME_STATUS__ !== "running") {
+            return;
           }
           // Randomly pick an asset
           const asset = Phaser.Utils.Array.GetRandom(this.collectibleAssets);
@@ -729,33 +741,57 @@ export default function PhaserGame({
             dy = 0;
           let moving = false;
 
-          if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
-            dx -= speed;
-            moving = true;
-          }
-          if (this.cursors?.right.isDown || this.wasd?.right.isDown) {
-            dx += speed;
-            moving = true;
-          }
-          if (this.cursors?.up.isDown || this.wasd?.up.isDown) {
-            dy -= speed;
-            moving = true;
-          }
-          if (this.cursors?.down.isDown || this.wasd?.down.isDown) {
-            dy += speed;
-            moving = true;
-          }
+          // Allow movement in all states except countdown
+          if ((window as any).__GAME_STATUS__ !== "countdown") {
+            if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
+              dx -= speed;
+              moving = true;
+            }
+            if (this.cursors?.right.isDown || this.wasd?.right.isDown) {
+              dx += speed;
+              moving = true;
+            }
+            if (this.cursors?.up.isDown || this.wasd?.up.isDown) {
+              dy -= speed;
+              moving = true;
+            }
+            if (this.cursors?.down.isDown || this.wasd?.down.isDown) {
+              dy += speed;
+              moving = true;
+            }
 
-          if (this.touchPointer?.isDown) {
-            const angle = Phaser.Math.Angle.Between(
-              this.chimp.x,
-              this.chimp.y,
-              this.touchPointer.x,
-              this.touchPointer.y,
-            );
-            dx = Math.cos(angle) * speed;
-            dy = Math.sin(angle) * speed;
-            moving = true;
+            if (this.touchPointer?.isDown) {
+              const angle = Phaser.Math.Angle.Between(
+                this.chimp.x,
+                this.chimp.y,
+                this.touchPointer.x,
+                this.touchPointer.y,
+              );
+              dx = Math.cos(angle) * speed;
+              dy = Math.sin(angle) * speed;
+              moving = true;
+            }
+          } else {
+            // During countdown, only check for left/right movement to animate
+            if (
+              this.cursors?.left.isDown ||
+              this.wasd?.left.isDown ||
+              this.cursors?.right.isDown ||
+              this.wasd?.right.isDown
+            ) {
+              moving = true;
+              // Update direction for animation
+              if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
+                this.lastDirection = -1;
+                this.chimp?.setFlipX(true);
+              } else if (
+                this.cursors?.right.isDown ||
+                this.wasd?.right.isDown
+              ) {
+                this.lastDirection = 1;
+                this.chimp?.setFlipX(false);
+              }
+            }
           }
 
           // Get chimp's scaled dimensions
@@ -884,7 +920,8 @@ export default function PhaserGame({
             }
           }
 
-          if (dx !== 0) {
+          // Update direction based on movement
+          if ((window as any).__GAME_STATUS__ !== "countdown" && dx !== 0) {
             this.lastDirection = dx > 0 ? 1 : -1;
             this.chimp.setFlipX(this.lastDirection === -1);
           }
@@ -905,19 +942,35 @@ export default function PhaserGame({
             const minDistance =
               (96 * 2 + this.collectible.width * this.collectible.scaleX) / 2;
             if (distance < minDistance) {
+              // Emit a custom event for points update
+              this.events.emit("collectibleCollected");
+              // Small confetti for collectible pickup - intensity increases with points
+              const intensity = Math.min(1 + pointsRef.current * 0.1, 2); // Scale up to 2x intensity
+              confetti({
+                particleCount: Math.floor(30 * intensity),
+                spread: 360,
+                startVelocity: 20,
+                decay: 0.9,
+                gravity: 1,
+                drift: 0,
+                ticks: 100,
+                origin: { x: 0.5, y: 0.5 },
+                colors: [
+                  "#ff0000",
+                  "#00ff00",
+                  "#0000ff",
+                  "#ffff00",
+                  "#ff00ff",
+                  "#00ffff",
+                ],
+                scalar: 0.5,
+                shapes: ["circle"],
+              });
+              // Update game elements
               this.createBackground();
               this.spawnCollectible();
               // Use preloaded chimp
               this.loadChimp(this.nextChimpId);
-              // Only update points if the game is running
-              if (
-                typeof (window as any).__SET_CHIMP_POINTS__ === "function" &&
-                (window as any).__GAME_STATUS__ === "running"
-              ) {
-                (window as any).__SET_CHIMP_POINTS__(
-                  (prev: number) => prev + 1,
-                );
-              }
             }
           }
         }
@@ -958,6 +1011,14 @@ export default function PhaserGame({
           sceneRef.current = scene;
           // Force initial boundary update
           scene.updateBoundaries();
+
+          // Listen for collectible collection events
+          scene.events.on("collectibleCollected", () => {
+            if (gameStatus === "running") {
+              pointsRef.current += 1;
+              setChimpPoints(pointsRef.current);
+            }
+          });
         }
       });
 
@@ -1014,7 +1075,28 @@ export default function PhaserGame({
   useEffect(() => {
     if (typeof window !== "undefined") {
       (window as any).__GAME_STATUS__ = gameStatus;
+      if (gameStatus === "idle" || gameStatus === "countdown") {
+        // Reset points when game starts
+        pointsRef.current = 0;
+        setChimpPoints(0);
+      }
     }
+  }, [gameStatus]);
+
+  // Add points display update effect
+  useEffect(() => {
+    const updatePointsDisplay = () => {
+      if (gameStatus === "running") {
+        setChimpPoints(pointsRef.current);
+      }
+    };
+
+    // Update points display every 100ms during gameplay
+    const interval = setInterval(updatePointsDisplay, 100);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [gameStatus]);
 
   // Add timer update effect
@@ -1029,6 +1111,7 @@ export default function PhaserGame({
           if (prev <= 0) {
             setGameStatus("finished");
             (window as any).__GAME_STATUS__ = "finished";
+            // Big confetti for game end
             confetti({
               particleCount: 200,
               spread: 360,
@@ -1046,6 +1129,8 @@ export default function PhaserGame({
                 "#ff00ff",
                 "#00ffff",
               ],
+              shapes: ["circle", "square"],
+              scalar: 1.2,
             });
             return 0;
           }
@@ -1133,7 +1218,29 @@ export default function PhaserGame({
         {gameStatus === "idle" && (
           <button
             onClick={() => {
+              // Start game confetti
+              confetti({
+                particleCount: 100,
+                spread: 360,
+                startVelocity: 30,
+                decay: 0.9,
+                gravity: 1,
+                drift: 0,
+                ticks: 200,
+                origin: { x: 0.5, y: 0.5 },
+                colors: [
+                  "#ff0000",
+                  "#00ff00",
+                  "#0000ff",
+                  "#ffff00",
+                  "#ff00ff",
+                  "#00ffff",
+                ],
+                scalar: 0.7,
+                shapes: ["circle", "square"],
+              });
               setGameStatus("countdown");
+              pointsRef.current = 0;
               setChimpPoints(0);
               (window as any).__GAME_STATUS__ = "countdown";
               let count = 3;
@@ -1145,10 +1252,36 @@ export default function PhaserGame({
                   setCountdownText(count.toString());
                 } else if (count === 0) {
                   setCountdownText("!CHIMP");
+                  // Timer start confetti
+                  confetti({
+                    particleCount: 150,
+                    spread: 360,
+                    startVelocity: 35,
+                    decay: 0.9,
+                    gravity: 1,
+                    drift: 0,
+                    ticks: 200,
+                    origin: { x: 0.5, y: 0.5 },
+                    colors: [
+                      "#ff0000",
+                      "#00ff00",
+                      "#0000ff",
+                      "#ffff00",
+                      "#ff00ff",
+                      "#00ffff",
+                    ],
+                    scalar: 0.8,
+                    shapes: ["circle", "square"],
+                  });
+                  // Allow movement immediately when !CHIMP appears
+                  (window as any).__GAME_STATUS__ = "running";
+                  // Spawn initial collectible
+                  if (sceneRef.current) {
+                    sceneRef.current.spawnCollectible();
+                  }
                   setTimeout(() => {
                     setGameStatus("running");
-                    (window as any).__GAME_STATUS__ = "running";
-                    setTimer(5);
+                    setTimer(30);
                   }, 800);
                 }
               }, 800);
@@ -1190,11 +1323,12 @@ export default function PhaserGame({
                 fontFamily: '"Press Start 2P", monospace',
               }}
             >
-              Score: {chimpPoints}
+              Score: {pointsRef.current}
             </div>
             <button
               onClick={() => {
                 setGameStatus("countdown");
+                pointsRef.current = 0;
                 setChimpPoints(0);
                 (window as any).__GAME_STATUS__ = "countdown";
                 let count = 3;
@@ -1209,7 +1343,7 @@ export default function PhaserGame({
                     setTimeout(() => {
                       setGameStatus("running");
                       (window as any).__GAME_STATUS__ = "running";
-                      setTimer(5);
+                      setTimer(30);
                     }, 800);
                   }
                 }, 800);
@@ -1321,15 +1455,17 @@ export default function PhaserGame({
       )}
       {/* Points: always bottom center */}
       <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2 w-auto">
-        <div
-          className="text-base font-extrabold text-yellow-300 drop-shadow-lg select-none pointer-events-none tracking-widest px-2 py-1 rounded bg-black/60"
-          style={{
-            fontFamily:
-              '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
-          }}
-        >
-          {chimpPoints} !CHIMP POINTS
-        </div>
+        {gameStatus === "running" && (
+          <div
+            className="text-base font-extrabold text-yellow-300 drop-shadow-lg select-none pointer-events-none tracking-widest px-2 py-1 rounded bg-black/60"
+            style={{
+              fontFamily:
+                '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
+            }}
+          >
+            {pointsRef.current} !CHIMP POINTS
+          </div>
+        )}
       </div>
       {/* Game container */}
       <div id="phaser-container" className="fixed inset-0 w-full h-full" />
