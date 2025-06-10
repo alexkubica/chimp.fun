@@ -34,7 +34,7 @@ export default function PhaserGame({
   const [gameStatus, setGameStatus] = useState<
     "idle" | "countdown" | "running" | "finished"
   >("idle");
-  const [timer, setTimer] = useState(30);
+  const [timer, setTimer] = useState(1);
   const [countdownText, setCountdownText] = useState("");
   const [fps, setFps] = useState(0);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -1293,7 +1293,8 @@ export default function PhaserGame({
                   }
                   setTimeout(() => {
                     setGameStatus("running");
-                    setTimer(30);
+                    (window as any).__GAME_STATUS__ = "running";
+                    setTimer(1);
                   }, 800);
                 }
               }, 800);
@@ -1356,7 +1357,7 @@ export default function PhaserGame({
                       setTimeout(() => {
                         setGameStatus("running");
                         (window as any).__GAME_STATUS__ = "running";
-                        setTimer(30);
+                        setTimer(1);
                       }, 800);
                     }
                   }, 800);
@@ -1365,16 +1366,37 @@ export default function PhaserGame({
               >
                 PLAY AGAIN
               </button>
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `I !CHIMPED ${pointsRef.current} points within 30 seconds in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay at 👉 https://chimp.fun/game !CHIMP 🙉`,
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={async () => {
+                  const tweetText = `I !CHIMPED ${pointsRef.current} points within 30 seconds in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
+                  const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+                  const isMobile = /iPhone|iPad|iPod|Android/i.test(
+                    navigator.userAgent,
+                  );
+                  if (navigator.share && isMobile) {
+                    try {
+                      await navigator.share({
+                        text: tweetText,
+                        url: "https://chimp.fun/game",
+                      });
+                    } catch (err: unknown) {
+                      if (
+                        !err ||
+                        (typeof err === "object" &&
+                          "name" in err &&
+                          (err as any).name !== "AbortError")
+                      ) {
+                        window.open(tweetUrl, "_blank", "noopener,noreferrer");
+                      }
+                    }
+                  } else {
+                    window.open(tweetUrl, "_blank", "noopener,noreferrer");
+                  }
+                }}
                 className="px-6 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8] text-xl font-bold transition-colors text-center"
               >
                 Share Score 🐦
-              </a>
+              </button>
             </div>
           </div>
         )}
