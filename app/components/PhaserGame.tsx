@@ -134,7 +134,7 @@ export default function PhaserGame({
         static MAX_ZOOM = 2;
         static MIN_ZOOM = 0.5;
         static MIN_COLLECTIBLE_DISTANCE = 200;
-        static BOUNDARY_PADDING_X = 10; // X-axis padding
+        static BOUNDARY_PADDING_X = 20; // X-axis padding
         static BOUNDARY_PADDING_Y = 5; // Y-axis padding
         collectibleAssets = [
           {
@@ -202,7 +202,7 @@ export default function PhaserGame({
           const height = MainScene.MIN_BOUNDARY_HEIGHT;
           const x = (this.scale.width - width) / 2;
           const y = (this.scale.height - height) / 2;
-          this.circleBoundary.lineStyle(8, 0xff0000, 0.8);
+          this.circleBoundary.lineStyle(8, 0xff0000, 0);
           this.circleBoundary.strokeRect(x, y, width, height);
 
           // Set up camera with slightly larger bounds to allow 1px buffer
@@ -252,6 +252,30 @@ export default function PhaserGame({
             frameRate: 12,
             repeat: -1,
           });
+
+          // Spawn player at random position within boundaries
+          const spawnX = Phaser.Math.Between(
+            x +
+              ((this.chimp?.width ?? 96) * (this.chimp?.scaleX ?? 2)) / 2 +
+              MainScene.BOUNDARY_PADDING_X,
+            x +
+              width -
+              ((this.chimp?.width ?? 96) * (this.chimp?.scaleX ?? 2)) / 2 -
+              MainScene.BOUNDARY_PADDING_X,
+          );
+          const spawnY = Phaser.Math.Between(
+            y +
+              ((this.chimp?.height ?? 96) * (this.chimp?.scaleY ?? 2)) / 2 +
+              MainScene.BOUNDARY_PADDING_Y,
+            y +
+              height -
+              ((this.chimp?.height ?? 96) * (this.chimp?.scaleY ?? 2)) / 2 -
+              MainScene.BOUNDARY_PADDING_Y,
+          );
+          if (this.chimp) {
+            this.chimp.setPosition(spawnX, spawnY);
+          }
+
           this.spawnCollectible();
 
           this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -309,7 +333,7 @@ export default function PhaserGame({
 
               if (this.circleBoundary) {
                 this.circleBoundary.clear();
-                this.circleBoundary.lineStyle(8, 0xff0000, 0.8);
+                this.circleBoundary.lineStyle(8, 0xff0000, 0);
                 this.circleBoundary.strokeRect(newX, newY, newWidth, newHeight);
               }
 
@@ -573,7 +597,7 @@ export default function PhaserGame({
           // Update boundary graphics
           if (this.circleBoundary) {
             this.circleBoundary.clear();
-            this.circleBoundary.lineStyle(8, 0xff0000, 0.8);
+            this.circleBoundary.lineStyle(8, 0xff0000, 0);
             this.circleBoundary.strokeRect(x, y, width, height);
           }
 
@@ -685,6 +709,11 @@ export default function PhaserGame({
           const chimpWidth = this.chimp.width * this.chimp.scaleX;
           const chimpHeight = this.chimp.height * this.chimp.scaleY;
 
+          // Calculate overflow as percentage of player dimensions
+          const boundaryOverflowX = chimpWidth * 0.35;
+          const boundaryOverflowYTop = chimpHeight * 0.1;
+          const boundaryOverflowYBottom = chimpHeight * 0.07;
+
           // Calculate rectangle boundaries with padding
           const width = MainScene.MIN_BOUNDARY_WIDTH;
           const height = MainScene.MIN_BOUNDARY_HEIGHT;
@@ -695,16 +724,30 @@ export default function PhaserGame({
           let newX = this.chimp.x + dx;
           let newY = this.chimp.y + dy;
 
-          // Clamp position to boundaries with padding
+          // Clamp position to boundaries with padding and overflow
           newX = Phaser.Math.Clamp(
             newX,
-            x + chimpWidth / 2 + MainScene.BOUNDARY_PADDING_X,
-            x + width - chimpWidth / 2 - MainScene.BOUNDARY_PADDING_X,
+            x +
+              chimpWidth / 2 +
+              MainScene.BOUNDARY_PADDING_X -
+              boundaryOverflowX,
+            x +
+              width -
+              chimpWidth / 2 -
+              MainScene.BOUNDARY_PADDING_X +
+              boundaryOverflowX,
           );
           newY = Phaser.Math.Clamp(
             newY,
-            y + chimpHeight / 2 + MainScene.BOUNDARY_PADDING_Y,
-            y + height - chimpHeight / 2 - MainScene.BOUNDARY_PADDING_Y,
+            y +
+              chimpHeight / 2 +
+              MainScene.BOUNDARY_PADDING_Y -
+              boundaryOverflowYTop,
+            y +
+              height -
+              chimpHeight / 2 -
+              MainScene.BOUNDARY_PADDING_Y +
+              boundaryOverflowYBottom,
           );
 
           // Only update position if it changed
@@ -1034,21 +1077,10 @@ export default function PhaserGame({
           </div>
         </div>
       )}
-      {/* Points: bottom on mobile, top left on desktop */}
-      <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2 w-auto sm:hidden">
+      {/* Points: always bottom center */}
+      <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2 w-auto">
         <div
           className="text-base font-extrabold text-yellow-300 drop-shadow-lg select-none pointer-events-none tracking-widest px-2 py-1 rounded bg-black/60"
-          style={{
-            fontFamily:
-              '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
-          }}
-        >
-          {chimpPoints} !CHIMP POINTS
-        </div>
-      </div>
-      <div className="absolute top-2 left-2 z-50 flex flex-col items-start hidden sm:flex">
-        <div
-          className="text-base sm:text-2xl font-extrabold text-yellow-300 drop-shadow-lg select-none pointer-events-none tracking-widest px-1 py-0.5 rounded bg-black/40"
           style={{
             fontFamily:
               '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
