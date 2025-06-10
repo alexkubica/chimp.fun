@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Fragment } from "react";
 import { debounce } from "lodash";
 import confetti from "canvas-confetti";
 import type { MutableRefObject, Dispatch, SetStateAction } from "react";
@@ -241,6 +241,144 @@ function ChimpHUD({
   );
 }
 
+// Update HudToggleButton to only show the cog icon
+function HudToggleButton({
+  open,
+  onClick,
+}: {
+  open: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className="p-2 rounded-full bg-gray-300 text-gray-800 hover:bg-gray-400 transition-colors shadow"
+      onClick={onClick}
+      type="button"
+      aria-label="Toggle HUD controls"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="w-7 h-7"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.142-.854-.108-1.204l-.527-.738a1.125 1.125 0 01.12-1.45l.774-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.806.272 1.203.107.397-.165.71-.505.781-.929l.149-.894z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    </button>
+  );
+}
+
+function SettingsContainer({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-lg p-6 pointer-events-auto">
+      {children}
+    </div>
+  );
+}
+
+function ChimpHudControls({
+  chimpId,
+  setChimpId,
+  handleChimpChange,
+  isZoomedOut,
+  toggleZoom,
+  handleRandomChimp,
+  handleRandomBg,
+  isDesktop,
+  gameStatus,
+}: {
+  chimpId: string;
+  setChimpId: (id: string) => void;
+  handleChimpChange: () => void;
+  isZoomedOut: boolean;
+  toggleZoom: () => void;
+  handleRandomChimp: () => void;
+  handleRandomBg: () => void;
+  isDesktop: boolean;
+  gameStatus: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2 w-full items-center">
+      <div
+        className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"}`}
+      >
+        <input
+          type="number"
+          min="1"
+          max="5555"
+          value={chimpId}
+          onChange={(e) => setChimpId(e.target.value)}
+          onKeyDown={(e) => {
+            const currentValue = parseInt(chimpId) || 2956;
+            if (e.key === "ArrowUp") {
+              e.preventDefault();
+              setChimpId(String(Math.min(5555, currentValue + 1)));
+            } else if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setChimpId(String(Math.max(1, currentValue - 1)));
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              handleChimpChange();
+            }
+          }}
+          className="w-20 px-2 py-1 border rounded text-base sm:text-lg"
+        />
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleChimpChange();
+          }}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
+        >
+          PICK
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleZoom();
+          }}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
+        >
+          {isZoomedOut ? "🔍" : "👁️"}
+        </button>
+      </div>
+      <div
+        className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"}`}
+      >
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRandomChimp();
+          }}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
+        >
+          🎲 !CHIMP
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRandomBg();
+          }}
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
+        >
+          🎲 BG
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function PhaserGame({
   onChimpChange,
   onRandomChimp,
@@ -267,6 +405,7 @@ export default function PhaserGame({
   const lastTimeRef = useRef(performance.now());
   const lastRenderTimeRef = useRef(performance.now());
   const animationFrameRef = useRef<number>();
+  const [showHud, setShowHud] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1436,8 +1575,8 @@ export default function PhaserGame({
         >
           CHIMP.FUN
         </div>
-        {/* Desktop HUD: show only on sm and up */}
-        <div className="mt-4 sm:mt-8 flex-col items-center gap-2 pointer-events-auto hidden sm:flex">
+        {/* Always show START/timer HUD centered under title */}
+        <div className="mt-4 flex flex-col items-center gap-2 pointer-events-auto">
           <ChimpHUD
             gameStatus={gameStatus}
             timer={timer}
@@ -1451,137 +1590,42 @@ export default function PhaserGame({
             sceneRef={sceneRef}
             confetti={confetti}
           />
-        </div>
-        {/* Mobile HUD: show only on mobile, always visible, directly under title */}
-        <div className="mt-4 flex-col items-center gap-2 pointer-events-auto sm:hidden flex">
-          <ChimpHUD
-            gameStatus={gameStatus}
-            timer={timer}
-            countdownText={countdownText}
-            pointsRef={pointsRef}
-            setGameStatus={setGameStatus}
-            setChimpPoints={setChimpPoints}
-            setCountdownText={setCountdownText}
-            setTimer={setTimer}
-            countdownIntervalRef={countdownIntervalRef}
-            sceneRef={sceneRef}
-            confetti={confetti}
-          />
-          {/* Render countdown and finished UI below HUD and random buttons on mobile */}
+          {/* Show countdown if in countdown state */}
           {gameStatus === "countdown" && (
             <ChimpCountdown countdownText={countdownText} />
           )}
-          {gameStatus === "finished" && (
-            <ChimpScoreShare
-              points={pointsRef.current}
-              setGameStatus={setGameStatus}
-              setChimpPoints={setChimpPoints}
-              setCountdownText={setCountdownText}
-              setTimer={setTimer}
-              countdownIntervalRef={countdownIntervalRef}
-            />
+          {/* Show SettingsContainer under START/timer HUD when toggled */}
+          {showHud && (
+            <SettingsContainer>
+              <ChimpHudControls
+                chimpId={chimpId}
+                setChimpId={setChimpId}
+                handleChimpChange={handleChimpChange}
+                isZoomedOut={isZoomedOut}
+                toggleZoom={toggleZoom}
+                handleRandomChimp={handleRandomChimp}
+                handleRandomBg={handleRandomBg}
+                isDesktop={isDesktop}
+                gameStatus={gameStatus}
+              />
+            </SettingsContainer>
           )}
         </div>
-      </div>
-      {/* Settings: below title on mobile, top right on desktop */}
-      <div
-        className={`${isDesktop ? "absolute top-2 right-2" : "relative mt-2"} z-50 ${isDesktop ? "w-auto" : "w-[95vw]"} max-w-full flex flex-col gap-2 ${isDesktop ? "items-end" : "justify-center"} ${isDesktop ? "hidden sm:flex" : "sm:hidden"}`}
-      >
-        <div
-          className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"} ${gameStatus === "running" || gameStatus === "countdown" ? "!hidden" : ""}`}
-        >
-          <input
-            type="number"
-            min="1"
-            max="5555"
-            value={chimpId}
-            onChange={(e) => setChimpId(e.target.value)}
-            onKeyDown={(e) => {
-              const currentValue = parseInt(chimpId) || 2956;
-              if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setChimpId(String(Math.min(5555, currentValue + 1)));
-              } else if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setChimpId(String(Math.max(1, currentValue - 1)));
-              } else if (e.key === "Enter") {
-                e.preventDefault();
-                handleChimpChange();
-              }
-            }}
-            className="w-20 px-2 py-1 border rounded text-base sm:text-lg"
+        {/* Desktop cog button: top right, only on desktop */}
+        <div className="hidden sm:block fixed top-2 right-2 z-50 pointer-events-auto">
+          <HudToggleButton
+            open={showHud}
+            onClick={() => setShowHud((v) => !v)}
           />
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleChimpChange();
-            }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
-          >
-            PICK
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleZoom();
-            }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
-          >
-            {isZoomedOut ? "🔍" : "👁️"}
-          </button>
         </div>
-        {!isDesktop && (
-          <div
-            className={`flex flex-row gap-2 w-full justify-center ${gameStatus === "running" || gameStatus === "countdown" ? "!hidden" : ""}`}
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRandomChimp();
-              }}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
-            >
-              🎲 !CHIMP
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRandomBg();
-              }}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
-            >
-              🎲 BG
-            </button>
-          </div>
-        )}
+        {/* Mobile cog button: top right, only on mobile */}
+        <div className="sm:hidden fixed top-2 right-2 z-50 pointer-events-auto">
+          <HudToggleButton
+            open={showHud}
+            onClick={() => setShowHud((v) => !v)}
+          />
+        </div>
       </div>
-      {/* Random buttons: only show on desktop */}
-      {isDesktop && (
-        <div
-          className={`absolute top-14 right-2 z-50 flex flex-col gap-2 w-auto max-w-full items-end hidden sm:flex ${gameStatus === "running" || gameStatus === "countdown" ? "!hidden" : ""}`}
-        >
-          <div className="flex flex-row gap-2 w-full justify-end">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRandomChimp();
-              }}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
-            >
-              🎲 !CHIMP
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRandomBg();
-              }}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
-            >
-              🎲 BG
-            </button>
-          </div>
-        </div>
-      )}
       {/* Points: always bottom center */}
       <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2 w-auto">
         {gameStatus === "running" && (
