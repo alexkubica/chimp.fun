@@ -1218,15 +1218,19 @@ export default function PhaserGame({
               moving = true;
             }
           } else {
-            // During countdown, only check for left/right movement to animate
+            // During countdown, check for any movement key to animate running
             if (
               this.cursors?.left.isDown ||
               this.wasd?.left.isDown ||
               this.cursors?.right.isDown ||
-              this.wasd?.right.isDown
+              this.wasd?.right.isDown ||
+              this.cursors?.up.isDown ||
+              this.wasd?.up.isDown ||
+              this.cursors?.down.isDown ||
+              this.wasd?.down.isDown
             ) {
               moving = true;
-              // Update direction for animation
+              // Only update direction for left/right
               if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
                 this.lastDirection = -1;
                 this.chimp?.setFlipX(true);
