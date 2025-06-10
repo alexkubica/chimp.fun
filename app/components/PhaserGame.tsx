@@ -59,6 +59,7 @@ function ChimpScoreShare({
   setCountdownText,
   setTimer,
   countdownIntervalRef,
+  sceneRef,
 }: {
   points: number;
   setGameStatus: Dispatch<
@@ -68,6 +69,7 @@ function ChimpScoreShare({
   setCountdownText: Dispatch<SetStateAction<string>>;
   setTimer: Dispatch<SetStateAction<number>>;
   countdownIntervalRef: MutableRefObject<NodeJS.Timeout | null>;
+  sceneRef: MutableRefObject<any>;
 }) {
   return (
     <div className="flex flex-col items-center gap-2 mt-2">
@@ -988,38 +990,42 @@ export default function PhaserGame({
           const cameraRight = cameraLeft + cameraWidth;
           const cameraBottom = cameraTop + cameraHeight;
 
-          // Helper to clamp collectible so at least 50% is visible in camera
-          function getRandomCollectiblePosition() {
-            // Allow up to 50% of collectible to overflow off any edge
-            const overflow = 0.5;
-            const minVisible = 0.5;
-            const colW = collectibleSize;
-            const colH = collectibleSize;
-            const minX = cameraLeft - colW * overflow + (colW * minVisible) / 2;
-            const maxX =
-              cameraRight + colW * overflow - (colW * minVisible) / 2;
-            const minY = cameraTop - colH * overflow + (colH * minVisible) / 2;
-            const maxY =
-              cameraBottom + colH * overflow - (colH * minVisible) / 2;
-            return {
-              x: Phaser.Math.Between(minX, maxX),
-              y: Phaser.Math.Between(minY, maxY),
-            };
-          }
-
           if (firstSpawn && this.chimp) {
-            // Place collectible fully visible and near the chimp (easy)
+            // Place collectible fully visible and near the chimp (easy), but not on top
             const offset = 200;
-            randomX = Phaser.Math.Clamp(
-              this.chimp.x + offset,
-              cameraLeft + collectibleSize / 2,
-              cameraRight - collectibleSize / 2,
-            );
-            randomY = Phaser.Math.Clamp(
-              this.chimp.y,
-              cameraTop + collectibleSize / 2,
-              cameraBottom - collectibleSize / 2,
-            );
+            // Try to place at a safe distance (minDistance)
+            let tries = 0;
+            let validPosition = false;
+            let safeX = this.chimp.x + offset;
+            let safeY = this.chimp.y;
+            const minDistance = 150; // Minimum distance from chimp for first spawn
+            while (!validPosition && tries < 50) {
+              // Try a random direction around the chimp
+              const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
+              safeX = this.chimp.x + Math.cos(angle) * offset;
+              safeY = this.chimp.y + Math.sin(angle) * offset;
+              // Clamp to camera view
+              safeX = Phaser.Math.Clamp(
+                safeX,
+                cameraLeft + collectibleSize / 2,
+                cameraRight - collectibleSize / 2,
+              );
+              safeY = Phaser.Math.Clamp(
+                safeY,
+                cameraTop + collectibleSize / 2,
+                cameraBottom - collectibleSize / 2,
+              );
+              const distance = Phaser.Math.Distance.Between(
+                safeX,
+                safeY,
+                this.chimp.x,
+                this.chimp.y,
+              );
+              validPosition = distance >= minDistance;
+              tries++;
+            }
+            randomX = safeX;
+            randomY = safeY;
             this._hasSpawnedFirstCollectible = true;
             // Only create collectible if it doesn't exist
             if (!this.collectible) {
@@ -1039,9 +1045,21 @@ export default function PhaserGame({
             let tries = 0;
             let validPosition = false;
             while (!validPosition && tries < 50) {
-              const pos = getRandomCollectiblePosition();
-              randomX = pos.x;
-              randomY = pos.y;
+              // Inline getRandomCollectiblePosition logic
+              const overflow = 0.5;
+              const minVisible = 0.5;
+              const colW = collectibleSize;
+              const colH = collectibleSize;
+              const minX =
+                cameraLeft - colW * overflow + (colW * minVisible) / 2;
+              const maxX =
+                cameraRight + colW * overflow - (colW * minVisible) / 2;
+              const minY =
+                cameraTop - colH * overflow + (colH * minVisible) / 2;
+              const maxY =
+                cameraBottom + colH * overflow - (colH * minVisible) / 2;
+              randomX = Phaser.Math.Between(minX, maxX);
+              randomY = Phaser.Math.Between(minY, maxY);
               if (this.chimp) {
                 const distance = Phaser.Math.Distance.Between(
                   randomX,
@@ -1377,49 +1395,52 @@ export default function PhaserGame({
           }
 
           // --- Collectible collision optimization ---
-          if (this._collectibleCooldown > 0) {
-            this._collectibleCooldown -= delta;
-          }
-          if (
-            this.collectible &&
-            this.chimp &&
-            this._collectibleCooldown <= 0
-          ) {
-            const distance = Phaser.Math.Distance.Between(
-              this.chimp.x,
-              this.chimp.y,
-              this.collectible.x,
-              this.collectible.y,
-            );
-            const minDistance =
-              (96 * 2 + this.collectible.width * this.collectible.scaleX) / 2;
-            if (distance < minDistance) {
-              this._collectibleCooldown = 300; // 300ms cooldown
-              this.events.emit("collectibleCollected");
-              const intensity = Math.min(1 + pointsRef.current * 0.1, 2);
-              confetti({
-                particleCount: Math.floor(30 * intensity),
-                spread: 360,
-                startVelocity: 20,
-                decay: 0.9,
-                gravity: 1,
-                drift: 0,
-                ticks: 100,
-                origin: { x: 0.5, y: 0.5 },
-                colors: [
-                  "#ff0000",
-                  "#00ff00",
-                  "#0000ff",
-                  "#ffff00",
-                  "#ff00ff",
-                  "#00ffff",
-                ],
-                scalar: 0.5,
-                shapes: ["circle"],
-              });
-              this.createBackground();
-              this.spawnCollectible();
-              this.loadChimp(this.nextChimpId);
+          // Only allow collectible collision and point increment when running
+          if ((window as any).__GAME_STATUS__ === "running") {
+            if (this._collectibleCooldown > 0) {
+              this._collectibleCooldown -= delta;
+            }
+            if (
+              this.collectible &&
+              this.chimp &&
+              this._collectibleCooldown <= 0
+            ) {
+              const distance = Phaser.Math.Distance.Between(
+                this.chimp.x,
+                this.chimp.y,
+                this.collectible.x,
+                this.collectible.y,
+              );
+              const minDistance =
+                (96 * 2 + this.collectible.width * this.collectible.scaleX) / 2;
+              if (distance < minDistance) {
+                this._collectibleCooldown = 300; // 300ms cooldown
+                this.events.emit("collectibleCollected");
+                const intensity = Math.min(1 + pointsRef.current * 0.1, 2);
+                confetti({
+                  particleCount: Math.floor(30 * intensity),
+                  spread: 360,
+                  startVelocity: 20,
+                  decay: 0.9,
+                  gravity: 1,
+                  drift: 0,
+                  ticks: 100,
+                  origin: { x: 0.5, y: 0.5 },
+                  colors: [
+                    "#ff0000",
+                    "#00ff00",
+                    "#0000ff",
+                    "#ffff00",
+                    "#ff00ff",
+                    "#00ffff",
+                  ],
+                  scalar: 0.5,
+                  shapes: ["circle"],
+                });
+                this.createBackground();
+                this.spawnCollectible();
+                this.loadChimp(this.nextChimpId);
+              }
             }
           }
           // Store last position
@@ -1535,6 +1556,15 @@ export default function PhaserGame({
         if (sceneRef.current) {
           sceneRef.current._hasSpawnedFirstCollectible = false;
         }
+      }
+      if (gameStatus === "countdown" && sceneRef.current) {
+        // Only spawn the first collectible once per countdown
+        sceneRef.current._hasSpawnedFirstCollectible = false;
+        if (sceneRef.current.collectible) {
+          sceneRef.current.collectible.destroy();
+          sceneRef.current.collectible = null;
+        }
+        sceneRef.current.spawnCollectible(true);
       }
       if (gameStatus === "finished" && sceneRef.current) {
         // Clear collectible when game finishes
@@ -1712,6 +1742,7 @@ export default function PhaserGame({
               setCountdownText={setCountdownText}
               setTimer={setTimer}
               countdownIntervalRef={countdownIntervalRef}
+              sceneRef={sceneRef}
             />
           )}
           {/* Show SettingsContainer under START/timer HUD when toggled */}
