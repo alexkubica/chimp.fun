@@ -106,35 +106,14 @@ function ChimpScoreShare({
           PLAY AGAIN
         </button>
         <button
-          onClick={async () => {
+          onClick={() => {
             const tweetText = `I !CHIMPED ${points} points within 30 seconds in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
             const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(
-              navigator.userAgent,
-            );
-            if (navigator.share && isMobile) {
-              try {
-                await navigator.share({
-                  text: tweetText,
-                  url: "https://chimp.fun/game",
-                });
-              } catch (err: unknown) {
-                if (
-                  !err ||
-                  (typeof err === "object" &&
-                    "name" in err &&
-                    (err as any).name !== "AbortError")
-                ) {
-                  window.open(tweetUrl, "_blank", "noopener,noreferrer");
-                }
-              }
-            } else {
-              window.open(tweetUrl, "_blank", "noopener,noreferrer");
-            }
+            window.open(tweetUrl, "_blank", "noopener,noreferrer");
           }}
           className="px-6 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8] text-xl font-bold transition-colors text-center"
         >
-          Share Score 🐦
+          Share Score ��
         </button>
       </div>
     </div>
