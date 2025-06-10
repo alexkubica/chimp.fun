@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { debounce } from "lodash";
 
 interface PhaserGameProps {
   onChimpChange?: (id: number) => void;
@@ -12,6 +13,8 @@ interface MainScene extends Phaser.Scene {
   loadChimp: (id: number) => void;
   createBackground: () => void;
   bg: Phaser.GameObjects.TileSprite | null;
+  chimp: Phaser.GameObjects.Sprite | null;
+  updateBoundaries: () => void;
 }
 
 export default function PhaserGame({
@@ -20,14 +23,27 @@ export default function PhaserGame({
   onRandomBg,
 }: PhaserGameProps) {
   const [chimpId, setChimpId] = useState("2956");
+  const [isZoomedOut, setIsZoomedOut] = useState(false);
   const [chimpPoints, setChimpPoints] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneRef = useRef<MainScene | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setMounted(true);
+
+    const checkIfDesktop = () => {
+      setIsDesktop(window.matchMedia("(min-width: 768px)").matches);
+    };
+
+    checkIfDesktop();
+    window.addEventListener("resize", checkIfDesktop);
+
+    return () => {
+      window.removeEventListener("resize", checkIfDesktop);
+    };
   }, []);
 
   useEffect(() => {
@@ -41,6 +57,52 @@ export default function PhaserGame({
       setChimpPoints(callback);
     };
 
+    // Add keyboard event listener for zoom
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "+" || e.key === "-")) {
+        e.preventDefault();
+        if (sceneRef.current && sceneRef.current.cameras.main) {
+          const camera = sceneRef.current.cameras.main;
+          const currentZoom = camera.zoom;
+          const newZoom =
+            e.key === "+"
+              ? Math.min(currentZoom * 1.2, 2)
+              : Math.max(currentZoom / 1.2, 0.5);
+
+          // Calculate boundary dimensions
+          const width = 2000; // MIN_BOUNDARY_WIDTH
+          const height = 1500; // MIN_BOUNDARY_HEIGHT
+          const x = (sceneRef.current.scale.width - width) / 2;
+          const y = (sceneRef.current.scale.height - height) / 2;
+
+          // Calculate camera dimensions at new zoom
+          const cameraWidth = camera.width / newZoom;
+          const cameraHeight = camera.height / newZoom;
+
+          // Calculate target position to center on player if possible
+          let targetX = x + width / 2;
+          let targetY = y + height / 2;
+
+          const scene = sceneRef.current as MainScene;
+          if (scene.chimp) {
+            // Try to center on player
+            targetX = scene.chimp.x - cameraWidth / 2;
+            targetY = scene.chimp.y - cameraHeight / 2;
+
+            // Clamp to boundaries
+            targetX = Phaser.Math.Clamp(targetX, x, x + width - cameraWidth);
+            targetY = Phaser.Math.Clamp(targetY, y, y + height - cameraHeight);
+          }
+
+          // Apply zoom and position
+          camera.zoomTo(newZoom, 200, Phaser.Math.Easing.Quadratic.InOut);
+          camera.setScroll(targetX, targetY);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     // Avoid duplicate game init on hot reload
     const container = document.getElementById("phaser-container");
     if (!container || gameRef.current) return;
@@ -50,14 +112,30 @@ export default function PhaserGame({
       // Phaser game definition
       class MainScene extends Phaser.Scene {
         chimp: Phaser.GameObjects.Sprite | null = null;
-        cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
-        wasd: any;
+        cursors: Phaser.Types.Input.Keyboard.CursorKeys | null = null;
+        wasd: {
+          up: Phaser.Input.Keyboard.Key;
+          down: Phaser.Input.Keyboard.Key;
+          left: Phaser.Input.Keyboard.Key;
+          right: Phaser.Input.Keyboard.Key;
+        } | null = null;
         touchPointer: Phaser.Input.Pointer | null = null;
         bg: Phaser.GameObjects.TileSprite | null = null;
         lastDirection: number = 1;
-        currentAnimKeys: { run: string; rest: string } = { run: "", rest: "" };
+        currentAnimKeys: { run: string; rest: string } = {
+          run: "",
+          rest: "",
+        };
         collectible: Phaser.GameObjects.Sprite | null = null;
-        static TOP_BOUNDARY = 0;
+        circleBoundary: Phaser.GameObjects.Graphics | null = null;
+        static TOP_BOUNDARY = 50;
+        static MIN_BOUNDARY_WIDTH = 2000;
+        static MIN_BOUNDARY_HEIGHT = 2000;
+        static MAX_ZOOM = 2;
+        static MIN_ZOOM = 0.5;
+        static MIN_COLLECTIBLE_DISTANCE = 200;
+        static BOUNDARY_PADDING_X = 10; // X-axis padding
+        static BOUNDARY_PADDING_Y = 5; // Y-axis padding
         collectibleAssets = [
           {
             key: "collectible_punch",
@@ -110,6 +188,51 @@ export default function PhaserGame({
 
         create() {
           this.createBackground();
+          this.cursors = this.input.keyboard?.createCursorKeys() ?? null;
+          this.wasd = this.input.keyboard?.addKeys({
+            up: Phaser.Input.Keyboard.KeyCodes.W,
+            down: Phaser.Input.Keyboard.KeyCodes.S,
+            left: Phaser.Input.Keyboard.KeyCodes.A,
+            right: Phaser.Input.Keyboard.KeyCodes.D,
+          }) as any;
+
+          // Create rectangle boundary with fixed size
+          this.circleBoundary = this.add.graphics();
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+          this.circleBoundary.lineStyle(8, 0xff0000, 0.8);
+          this.circleBoundary.strokeRect(x, y, width, height);
+
+          // Set up camera with slightly larger bounds to allow 1px buffer
+          this.cameras.main.setBounds(x - 1, y - 1, width + 2, height + 2);
+          this.cameras.main.setZoom(1);
+          this.cameras.main.setFollowOffset(0, 0);
+          this.cameras.main.setLerp(0.1);
+
+          // Handle device pixel ratio and browser zoom
+          const updatePixelRatio = () => {
+            const pixelRatio = window.devicePixelRatio || 1;
+            this.scale.setZoom(1 / pixelRatio);
+          };
+          updatePixelRatio();
+
+          // Add zoom change handler
+          window.addEventListener("resize", () => {
+            updatePixelRatio();
+            this.updateBoundaries();
+          });
+
+          // Add orientation change handler
+          window.addEventListener("orientationchange", () => {
+            // Wait for the orientation change to complete
+            setTimeout(() => {
+              this.scale.refresh();
+              this.updateBoundaries();
+            }, 100);
+          });
+
           // Create collectible animations
           this.anims.create({
             key: "punch_anim",
@@ -130,16 +253,6 @@ export default function PhaserGame({
             repeat: -1,
           });
           this.spawnCollectible();
-          // Only set up keyboard if input is available
-          if (this.input && this.input.keyboard) {
-            this.cursors = this.input.keyboard.createCursorKeys();
-            this.wasd = this.input.keyboard.addKeys({
-              up: Phaser.Input.Keyboard.KeyCodes.W,
-              down: Phaser.Input.Keyboard.KeyCodes.S,
-              left: Phaser.Input.Keyboard.KeyCodes.A,
-              right: Phaser.Input.Keyboard.KeyCodes.D,
-            });
-          }
 
           this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
             this.touchPointer = pointer;
@@ -147,6 +260,65 @@ export default function PhaserGame({
           this.input.on("pointerup", () => {
             this.touchPointer = null;
           });
+
+          // Add debounced resize handler
+          const debouncedResize = debounce(
+            (gameSize: { width: number; height: number }) => {
+              if (this.bg) {
+                const newX = (gameSize.width - width) / 2;
+                const newY = (gameSize.height - height) / 2;
+                this.bg.setPosition(newX, newY);
+              }
+              if (this.chimp) {
+                const relativeX = this.chimp.x / this.scale.width;
+                const relativeY = this.chimp.y / this.scale.height;
+                this.chimp.x = Phaser.Math.Clamp(
+                  relativeX * gameSize.width,
+                  (this.chimp.width * this.chimp.scaleX) / 2,
+                  gameSize.width - (this.chimp.width * this.chimp.scaleX) / 2,
+                );
+                this.chimp.y = Phaser.Math.Clamp(
+                  relativeY * gameSize.height,
+                  MainScene.TOP_BOUNDARY +
+                    (this.chimp.height * this.chimp.scaleY) / 2,
+                  gameSize.height - (this.chimp.height * this.chimp.scaleY) / 2,
+                );
+              }
+              if (this.collectible) {
+                const colWidth =
+                  this.collectible.width * this.collectible.scaleX;
+                const colHeight =
+                  this.collectible.height * this.collectible.scaleY;
+                this.collectible.x = Phaser.Math.Clamp(
+                  this.collectible.x,
+                  colWidth / 2,
+                  gameSize.width - colWidth / 2,
+                );
+                this.collectible.y = Phaser.Math.Clamp(
+                  this.collectible.y,
+                  MainScene.TOP_BOUNDARY + colHeight / 2,
+                  gameSize.height - colHeight / 2,
+                );
+              }
+
+              // Update boundary
+              const newWidth = MainScene.MIN_BOUNDARY_WIDTH;
+              const newHeight = MainScene.MIN_BOUNDARY_HEIGHT;
+              const newX = (gameSize.width - newWidth) / 2;
+              const newY = (gameSize.height - newHeight) / 2;
+
+              if (this.circleBoundary) {
+                this.circleBoundary.clear();
+                this.circleBoundary.lineStyle(8, 0xff0000, 0.8);
+                this.circleBoundary.strokeRect(newX, newY, newWidth, newHeight);
+              }
+
+              this.cameras.main.setBounds(newX, newY, newWidth, newHeight);
+            },
+            100,
+          );
+
+          this.scale.on("resize", debouncedResize, this);
         }
 
         createBackground() {
@@ -215,17 +387,25 @@ export default function PhaserGame({
             (tileTexture as any).refresh();
           }
 
+          // Calculate boundary dimensions
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+
+          // Create background covering the entire boundary area
           this.bg = this.add
-            .tileSprite(0, 0, this.scale.width, this.scale.height, tileKey)
+            .tileSprite(x, y, width, height, tileKey)
             .setOrigin(0)
-            //   .setAlpha(0.15)
             .setDepth(0);
 
           this.scale.on(
             "resize",
             (gameSize: { width: number; height: number }) => {
               if (this.bg) {
-                this.bg.setSize(gameSize.width, gameSize.height);
+                const newX = (gameSize.width - width) / 2;
+                const newY = (gameSize.height - height) / 2;
+                this.bg.setPosition(newX, newY);
               }
               if (this.chimp) {
                 // Calculate relative position
@@ -338,38 +518,130 @@ export default function PhaserGame({
           const asset = Phaser.Utils.Array.GetRandom(this.collectibleAssets);
           const collectibleSize = asset.frameWidth / 3;
           const chimpWidth = 96 * 2;
-          const minDistanceFromChimp = 200;
           let validPosition = false;
           let randomX = 0;
           let randomY = 0;
           let tries = 0;
+
+          // Calculate boundary dimensions
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+
           while (!validPosition && tries < 50) {
             randomX = Phaser.Math.Between(
-              collectibleSize / 2,
-              this.scale.width - collectibleSize / 2,
+              x + collectibleSize / 2,
+              x + width - collectibleSize / 2,
             );
             randomY = Phaser.Math.Between(
-              MainScene.TOP_BOUNDARY + collectibleSize / 2,
-              this.scale.height - collectibleSize / 2,
+              y + collectibleSize / 2,
+              y + height - collectibleSize / 2,
             );
+
             if (this.chimp) {
-              const distance = Phaser.Math.Distance.Between(
-                randomX,
-                randomY,
-                this.chimp.x,
-                this.chimp.y,
-              );
-              validPosition = distance > minDistanceFromChimp;
+              const distanceX = Math.abs(randomX - this.chimp.x);
+              const distanceY = Math.abs(randomY - this.chimp.y);
+              validPosition =
+                distanceX >= MainScene.MIN_COLLECTIBLE_DISTANCE &&
+                distanceY >= MainScene.MIN_COLLECTIBLE_DISTANCE;
             } else {
               validPosition = true;
             }
             tries++;
           }
+
           this.collectible = this.add
             .sprite(randomX, randomY, asset.sprite)
             .setScale(1 / 3)
             .setDepth(1);
           this.collectible.play(asset.anim);
+        }
+
+        updateBoundaries() {
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+
+          // Store current world positions before updating
+          const chimpWorldX = this.chimp?.x ?? x + width / 2;
+          const chimpWorldY = this.chimp?.y ?? y + height / 2;
+          const collectibleWorldX = this.collectible?.x ?? x + width / 2;
+          const collectibleWorldY = this.collectible?.y ?? y + height / 2;
+
+          // Update boundary graphics
+          if (this.circleBoundary) {
+            this.circleBoundary.clear();
+            this.circleBoundary.lineStyle(8, 0xff0000, 0.8);
+            this.circleBoundary.strokeRect(x, y, width, height);
+          }
+
+          // Update camera bounds and ensure it's properly positioned
+          this.cameras.main.setBounds(x - 1, y - 1, width + 2, height + 2);
+
+          // Force camera to update its viewport
+          const camera = this.cameras.main;
+          const cameraWidth = camera.width / camera.zoom;
+          const cameraHeight = camera.height / camera.zoom;
+
+          // Calculate optimal camera position
+          let targetX = x + width / 2;
+          let targetY = y + height / 2;
+
+          if (this.chimp) {
+            // Try to center on player
+            targetX = this.chimp.x - cameraWidth / 2;
+            targetY = this.chimp.y - cameraHeight / 2;
+
+            // Clamp to boundaries
+            targetX = Phaser.Math.Clamp(targetX, x, x + width - cameraWidth);
+            targetY = Phaser.Math.Clamp(targetY, y, y + height - cameraHeight);
+          }
+
+          // Update camera position
+          camera.setScroll(targetX, targetY);
+
+          // Update background position
+          if (this.bg) {
+            this.bg.setPosition(x, y);
+          }
+
+          // Ensure chimp stays within bounds with different X and Y padding
+          if (this.chimp) {
+            const chimpWidth = this.chimp.width * this.chimp.scaleX;
+            const chimpHeight = this.chimp.height * this.chimp.scaleY;
+
+            // Use stored world position and clamp it
+            this.chimp.x = Phaser.Math.Clamp(
+              chimpWorldX,
+              x + chimpWidth / 2 + MainScene.BOUNDARY_PADDING_X,
+              x + width - chimpWidth / 2 - MainScene.BOUNDARY_PADDING_X,
+            );
+            this.chimp.y = Phaser.Math.Clamp(
+              chimpWorldY,
+              y + chimpHeight / 2 + MainScene.BOUNDARY_PADDING_Y,
+              y + height - chimpHeight / 2 - MainScene.BOUNDARY_PADDING_Y,
+            );
+          }
+
+          // Ensure collectible stays within bounds with different X and Y padding
+          if (this.collectible) {
+            const colWidth = this.collectible.width * this.collectible.scaleX;
+            const colHeight = this.collectible.height * this.collectible.scaleY;
+
+            // Use stored world position and clamp it
+            this.collectible.x = Phaser.Math.Clamp(
+              collectibleWorldX,
+              x + colWidth / 2 + MainScene.BOUNDARY_PADDING_X,
+              x + width - colWidth / 2 - MainScene.BOUNDARY_PADDING_X,
+            );
+            this.collectible.y = Phaser.Math.Clamp(
+              collectibleWorldY,
+              y + colHeight / 2 + MainScene.BOUNDARY_PADDING_Y,
+              y + height - colHeight / 2 - MainScene.BOUNDARY_PADDING_Y,
+            );
+          }
         }
 
         update() {
@@ -380,19 +652,19 @@ export default function PhaserGame({
             dy = 0;
           let moving = false;
 
-          if (this.cursors?.left.isDown || this.wasd.left.isDown) {
+          if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
             dx -= speed;
             moving = true;
           }
-          if (this.cursors?.right.isDown || this.wasd.right.isDown) {
+          if (this.cursors?.right.isDown || this.wasd?.right.isDown) {
             dx += speed;
             moving = true;
           }
-          if (this.cursors?.up.isDown || this.wasd.up.isDown) {
+          if (this.cursors?.up.isDown || this.wasd?.up.isDown) {
             dy -= speed;
             moving = true;
           }
-          if (this.cursors?.down.isDown || this.wasd.down.isDown) {
+          if (this.cursors?.down.isDown || this.wasd?.down.isDown) {
             dy += speed;
             moving = true;
           }
@@ -409,25 +681,112 @@ export default function PhaserGame({
             moving = true;
           }
 
-          // Calculate new position
-          const newX = this.chimp.x + dx;
-          const newY = this.chimp.y + dy;
-
           // Get chimp's scaled dimensions
           const chimpWidth = this.chimp.width * this.chimp.scaleX;
           const chimpHeight = this.chimp.height * this.chimp.scaleY;
 
-          // Apply boundaries
-          this.chimp.x = Phaser.Math.Clamp(
+          // Calculate rectangle boundaries with padding
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+
+          // Calculate new position with padding
+          let newX = this.chimp.x + dx;
+          let newY = this.chimp.y + dy;
+
+          // Clamp position to boundaries with padding
+          newX = Phaser.Math.Clamp(
             newX,
-            chimpWidth / 2,
-            this.scale.width - chimpWidth / 2,
+            x + chimpWidth / 2 + MainScene.BOUNDARY_PADDING_X,
+            x + width - chimpWidth / 2 - MainScene.BOUNDARY_PADDING_X,
           );
-          this.chimp.y = Phaser.Math.Clamp(
+          newY = Phaser.Math.Clamp(
             newY,
-            MainScene.TOP_BOUNDARY + chimpHeight / 2,
-            this.scale.height - chimpHeight / 2,
+            y + chimpHeight / 2 + MainScene.BOUNDARY_PADDING_Y,
+            y + height - chimpHeight / 2 - MainScene.BOUNDARY_PADDING_Y,
           );
+
+          // Only update position if it changed
+          if (newX !== this.chimp.x || newY !== this.chimp.y) {
+            this.chimp.x = newX;
+            this.chimp.y = newY;
+          }
+
+          // Update camera position
+          const camera = this.cameras.main;
+          const cameraWidth = camera.width / camera.zoom;
+          const cameraHeight = camera.height / camera.zoom;
+
+          // Calculate camera bounds with padding
+          const cameraMinX = x + cameraWidth / 2;
+          const cameraMaxX = x + width - cameraWidth / 2;
+          const cameraMinY = y + cameraHeight / 2;
+          const cameraMaxY = y + height - cameraHeight / 2;
+
+          // Calculate screen margins for smooth transition
+          const margin = 100; // pixels from edge to start following
+          const playerScreenX = camera.getWorldPoint(this.chimp.x, 0).x;
+          const playerScreenY = camera.getWorldPoint(0, this.chimp.y).y;
+          const isNearScreenEdge =
+            playerScreenX < margin ||
+            playerScreenX > camera.width - margin ||
+            playerScreenY < margin ||
+            playerScreenY > camera.height - margin;
+
+          if (camera.zoom < 1) {
+            // When zoomed out, use smooth following near edges
+            if (isNearScreenEdge) {
+              // Calculate target position that keeps player within margins
+              const targetX = Phaser.Math.Clamp(
+                this.chimp.x - cameraWidth / 2,
+                x,
+                x + width - cameraWidth,
+              );
+              const targetY = Phaser.Math.Clamp(
+                this.chimp.y - cameraHeight / 2,
+                y,
+                y + height - cameraHeight,
+              );
+
+              // Smoothly move camera to target position
+              camera.scrollX = Phaser.Math.Linear(camera.scrollX, targetX, 0.1);
+              camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 0.1);
+            } else {
+              // When player is in center, smoothly return to centered view
+              const centerX = x + (width - cameraWidth) / 2;
+              const centerY = y + (height - cameraHeight) / 2;
+              camera.scrollX = Phaser.Math.Linear(
+                camera.scrollX,
+                centerX,
+                0.05,
+              );
+              camera.scrollY = Phaser.Math.Linear(
+                camera.scrollY,
+                centerY,
+                0.05,
+              );
+            }
+          } else {
+            // Normal zoomed in behavior
+            if (cameraMinX <= cameraMaxX && cameraMinY <= cameraMaxY) {
+              camera.startFollow(this.chimp, true);
+            } else {
+              camera.stopFollow();
+              camera.setScroll(
+                Phaser.Math.Clamp(
+                  this.chimp.x - cameraWidth / 2,
+                  x,
+                  x + width - cameraWidth,
+                ),
+                Phaser.Math.Clamp(
+                  this.chimp.y - cameraHeight / 2,
+                  y,
+                  y + height - cameraHeight,
+                ),
+              );
+            }
+          }
 
           if (dx !== 0) {
             this.lastDirection = dx > 0 ? 1 : -1;
@@ -471,6 +830,19 @@ export default function PhaserGame({
         scale: {
           mode: Phaser.Scale.RESIZE,
           autoCenter: Phaser.Scale.CENTER_BOTH,
+          width: "100%",
+          height: "100%",
+          min: {
+            width: 320,
+            height: 480,
+          },
+          max: {
+            width: 2000,
+            height: 2000,
+          },
+          autoRound: true,
+          expandParent: true,
+          resizeInterval: 0, // Immediate resize
         },
         scene: MainScene,
       });
@@ -482,18 +854,49 @@ export default function PhaserGame({
         const scene = game.scene.getScene("MainScene") as MainScene;
         if (scene) {
           sceneRef.current = scene;
+          // Force initial boundary update
+          scene.updateBoundaries();
         }
       });
-    });
 
-    return () => {
-      if (gameRef.current) {
-        gameRef.current.destroy(true);
-        gameRef.current = null;
-        sceneRef.current = null;
-      }
-    };
+      // Add resize observer for more reliable resize handling
+      const resizeObserver = new ResizeObserver(() => {
+        if (sceneRef.current) {
+          sceneRef.current.updateBoundaries();
+        }
+      });
+      resizeObserver.observe(container);
+
+      return () => {
+        if (gameRef.current) {
+          gameRef.current.destroy(true);
+          gameRef.current = null;
+          sceneRef.current = null;
+        }
+        window.removeEventListener("keydown", handleKeyDown);
+        resizeObserver.disconnect();
+      };
+    });
   }, [mounted]);
+
+  const toggleZoom = () => {
+    if (sceneRef.current && sceneRef.current.cameras.main) {
+      setIsZoomedOut(!isZoomedOut);
+      const camera = sceneRef.current.cameras.main;
+      const currentZoom = camera.zoom;
+
+      // Calculate the zoom level needed to fit the boundary width to screen width
+      const boundaryWidth = 2000; // MainScene.MIN_BOUNDARY_WIDTH
+      const screenWidth = sceneRef.current.scale.width;
+      const fitZoom = screenWidth / boundaryWidth;
+
+      // Use the larger of the fit zoom or minimum zoom
+      const targetZoom = !isZoomedOut ? Math.max(fitZoom, 0.5) : 1;
+      const clampedZoom = Phaser.Math.Clamp(targetZoom, 0.5, 2);
+
+      camera.zoomTo(clampedZoom, 1000, Phaser.Math.Easing.Quadratic.InOut);
+    }
+  };
 
   if (!mounted) return null;
 
@@ -538,63 +941,12 @@ export default function PhaserGame({
         CHIMP.FUN
       </div>
       {/* Settings: below title on mobile, top right on desktop */}
-      <div className="absolute top-16 left-1/2 z-50 -translate-x-1/2 w-[95vw] max-w-full flex flex-col gap-2 justify-center sm:hidden">
-        <div className="flex flex-row gap-2 w-full justify-center">
-          <input
-            type="number"
-            min="1"
-            max="5555"
-            value={chimpId}
-            onChange={(e) => setChimpId(e.target.value)}
-            onKeyDown={(e) => {
-              const currentValue = parseInt(chimpId) || 2956;
-              if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setChimpId(String(Math.min(5555, currentValue + 1)));
-              } else if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setChimpId(String(Math.max(1, currentValue - 1)));
-              } else if (e.key === "Enter") {
-                e.preventDefault();
-                handleChimpChange();
-              }
-            }}
-            className="w-20 px-2 py-1 border rounded text-base"
-          />
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleChimpChange();
-            }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
-          >
-            PICK
-          </button>
-        </div>
-        <div className="flex flex-row gap-2 w-full justify-center">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRandomChimp();
-            }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
-          >
-            🎲 !CHIMP
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRandomBg();
-            }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
-          >
-            🎲 BG
-          </button>
-        </div>
-      </div>
-      {/* Settings: top right on desktop */}
-      <div className="absolute top-2 right-2 z-50 flex flex-col gap-2 w-auto max-w-full items-end hidden sm:flex">
-        <div className="flex flex-row gap-2 w-full justify-end">
+      <div
+        className={`absolute ${isDesktop ? "top-2 right-2" : "top-16 left-1/2 -translate-x-1/2"} z-50 ${isDesktop ? "w-auto" : "w-[95vw]"} max-w-full flex flex-col gap-2 ${isDesktop ? "items-end" : "justify-center"} ${isDesktop ? "hidden sm:flex" : "sm:hidden"}`}
+      >
+        <div
+          className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"}`}
+        >
           <input
             type="number"
             min="1"
@@ -625,28 +977,64 @@ export default function PhaserGame({
           >
             PICK
           </button>
-        </div>
-        <div className="flex flex-row gap-2 w-full justify-end">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleRandomChimp();
+              toggleZoom();
             }}
             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
           >
-            🎲 !CHIMP
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRandomBg();
-            }}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
-          >
-            🎲 BG
+            {isZoomedOut ? "🔍" : "👁️"}
           </button>
         </div>
+        {!isDesktop && (
+          <div className="flex flex-row gap-2 w-full justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRandomChimp();
+              }}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
+            >
+              🎲 !CHIMP
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRandomBg();
+              }}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base"
+            >
+              🎲 BG
+            </button>
+          </div>
+        )}
       </div>
+      {/* Random buttons: only show on desktop */}
+      {isDesktop && (
+        <div className="absolute top-14 right-2 z-50 flex flex-col gap-2 w-auto max-w-full items-end hidden sm:flex">
+          <div className="flex flex-row gap-2 w-full justify-end">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRandomChimp();
+              }}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
+            >
+              🎲 !CHIMP
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRandomBg();
+              }}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
+            >
+              🎲 BG
+            </button>
+          </div>
+        </div>
+      )}
       {/* Points: bottom on mobile, top left on desktop */}
       <div className="fixed bottom-2 left-1/2 z-50 -translate-x-1/2 w-auto sm:hidden">
         <div
@@ -656,7 +1044,7 @@ export default function PhaserGame({
               '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
           }}
         >
-          {chimpPoints} !CHIMP
+          {chimpPoints} !CHIMP POINTS
         </div>
       </div>
       <div className="absolute top-2 left-2 z-50 flex flex-col items-start hidden sm:flex">
@@ -667,9 +1055,11 @@ export default function PhaserGame({
               '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
           }}
         >
-          {chimpPoints} !CHIMP
+          {chimpPoints} !CHIMP POINTS
         </div>
       </div>
+      {/* Game container */}
+      <div id="phaser-container" className="fixed inset-0 w-full h-full" />
     </>
   );
 }
