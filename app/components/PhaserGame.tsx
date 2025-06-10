@@ -17,6 +17,7 @@ interface MainScene extends Phaser.Scene {
   chimp: Phaser.GameObjects.Sprite | null;
   updateBoundaries: () => void;
   spawnCollectible: () => void;
+  collectible: Phaser.GameObjects.Sprite | null;
 }
 
 export default function PhaserGame({
@@ -1014,7 +1015,7 @@ export default function PhaserGame({
 
           // Listen for collectible collection events
           scene.events.on("collectibleCollected", () => {
-            if (gameStatus === "running") {
+            if ((window as any).__GAME_STATUS__ === "running") {
               pointsRef.current += 1;
               setChimpPoints(pointsRef.current);
             }
@@ -1079,6 +1080,17 @@ export default function PhaserGame({
         // Reset points when game starts
         pointsRef.current = 0;
         setChimpPoints(0);
+      }
+      if (gameStatus === "finished" && sceneRef.current) {
+        // Clear collectible when game finishes
+        if (sceneRef.current.collectible) {
+          sceneRef.current.collectible.destroy();
+          sceneRef.current.collectible = null;
+        }
+      }
+      if (gameStatus === "running" && sceneRef.current) {
+        // Spawn collectible when game starts running
+        sceneRef.current.spawnCollectible();
       }
     }
   }, [gameStatus]);
