@@ -83,6 +83,9 @@ export default function PhaserGame({
       }
     };
 
+    // Set initial game status
+    (window as any).__GAME_STATUS__ = gameStatus;
+
     // Add keyboard event listener for zoom
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && (e.key === "+" || e.key === "-")) {
@@ -1007,6 +1010,13 @@ export default function PhaserGame({
     };
   }, []);
 
+  // Add game status update effect
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__GAME_STATUS__ = gameStatus;
+    }
+  }, [gameStatus]);
+
   // Add timer update effect
   useEffect(() => {
     if (gameStatus === "running") {
@@ -1020,9 +1030,22 @@ export default function PhaserGame({
             setGameStatus("finished");
             (window as any).__GAME_STATUS__ = "finished";
             confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 },
+              particleCount: 200,
+              spread: 360,
+              startVelocity: 45,
+              decay: 0.9,
+              gravity: 1,
+              drift: 0,
+              ticks: 200,
+              origin: { x: 0.5, y: 0.5 },
+              colors: [
+                "#ff0000",
+                "#00ff00",
+                "#0000ff",
+                "#ffff00",
+                "#ff00ff",
+                "#00ffff",
+              ],
             });
             return 0;
           }
@@ -1112,6 +1135,7 @@ export default function PhaserGame({
             onClick={() => {
               setGameStatus("countdown");
               setChimpPoints(0);
+              (window as any).__GAME_STATUS__ = "countdown";
               let count = 3;
               setCountdownText(count.toString());
 
@@ -1125,9 +1149,9 @@ export default function PhaserGame({
                     setGameStatus("running");
                     (window as any).__GAME_STATUS__ = "running";
                     setTimer(5);
-                  }, 500);
+                  }, 800);
                 }
-              }, 500);
+              }, 800);
             }}
             className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
           >
@@ -1172,6 +1196,7 @@ export default function PhaserGame({
               onClick={() => {
                 setGameStatus("countdown");
                 setChimpPoints(0);
+                (window as any).__GAME_STATUS__ = "countdown";
                 let count = 3;
                 setCountdownText(count.toString());
 
@@ -1185,9 +1210,9 @@ export default function PhaserGame({
                       setGameStatus("running");
                       (window as any).__GAME_STATUS__ = "running";
                       setTimer(5);
-                    }, 500);
+                    }, 800);
                   }
-                }, 500);
+                }, 800);
               }}
               className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
             >
