@@ -365,6 +365,36 @@ function ChimpHudControls({
   );
 }
 
+// Helper to get random collectible position with at least minVisible percent on screen
+function getRandomCollectiblePosition({
+  cameraLeft,
+  cameraRight,
+  cameraTop,
+  cameraBottom,
+  collectibleSize,
+  minVisible = 0.25,
+  overflow = 0.5,
+}: {
+  cameraLeft: number;
+  cameraRight: number;
+  cameraTop: number;
+  cameraBottom: number;
+  collectibleSize: number;
+  minVisible?: number;
+  overflow?: number;
+}) {
+  const colW = collectibleSize;
+  const colH = collectibleSize;
+  const minX = cameraLeft - colW * overflow + (colW * minVisible) / 2;
+  const maxX = cameraRight + colW * overflow - (colW * minVisible) / 2;
+  const minY = cameraTop - colH * overflow + (colH * minVisible) / 2;
+  const maxY = cameraBottom + colH * overflow - (colH * minVisible) / 2;
+  return {
+    x: Phaser.Math.Between(minX, maxX),
+    y: Phaser.Math.Between(minY, maxY),
+  };
+}
+
 export default function PhaserGame({
   onChimpChange,
   onRandomChimp,
@@ -1045,21 +1075,18 @@ export default function PhaserGame({
             let tries = 0;
             let validPosition = false;
             while (!validPosition && tries < 50) {
-              // Inline getRandomCollectiblePosition logic
-              const overflow = 0.5;
-              const minVisible = 0.5;
-              const colW = collectibleSize;
-              const colH = collectibleSize;
-              const minX =
-                cameraLeft - colW * overflow + (colW * minVisible) / 2;
-              const maxX =
-                cameraRight + colW * overflow - (colW * minVisible) / 2;
-              const minY =
-                cameraTop - colH * overflow + (colH * minVisible) / 2;
-              const maxY =
-                cameraBottom + colH * overflow - (colH * minVisible) / 2;
-              randomX = Phaser.Math.Between(minX, maxX);
-              randomY = Phaser.Math.Between(minY, maxY);
+              // Use helper for readable bounds logic
+              const { x: posX, y: posY } = getRandomCollectiblePosition({
+                cameraLeft,
+                cameraRight,
+                cameraTop,
+                cameraBottom,
+                collectibleSize,
+                minVisible: 0.25, // 25% visible
+                overflow: 0.5,
+              });
+              randomX = posX;
+              randomY = posY;
               if (this.chimp) {
                 const distance = Phaser.Math.Distance.Between(
                   randomX,
