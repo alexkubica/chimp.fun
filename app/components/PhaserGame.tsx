@@ -113,7 +113,7 @@ function ChimpScoreShare({
           }}
           className="px-6 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8] text-xl font-bold transition-colors text-center"
         >
-          Share Score ��
+          Share Score 🐦
         </button>
       </div>
     </div>
@@ -957,7 +957,10 @@ export default function PhaserGame({
 
         spawnCollectible(firstSpawn = false) {
           if (this.collectible) {
-            this.collectible.destroy();
+            // Only destroy collectible if not first spawn
+            if (!firstSpawn) {
+              this.collectible.destroy();
+            }
           }
           // Only spawn if game is running or during countdown for first spawn
           if ((window as any).__GAME_STATUS__ !== "running" && !firstSpawn) {
@@ -967,10 +970,8 @@ export default function PhaserGame({
           const asset = Phaser.Utils.Array.GetRandom(this.collectibleAssets);
           const collectibleSize = asset.frameWidth / 3;
           const chimpWidth = 96 * 2;
-          let validPosition = false;
           let randomX = 0;
           let randomY = 0;
-          let tries = 0;
 
           // Calculate boundary dimensions
           const width = MainScene.MIN_BOUNDARY_WIDTH;
@@ -978,37 +979,69 @@ export default function PhaserGame({
           const x = (this.scale.width - width) / 2;
           const y = (this.scale.height - height) / 2;
 
+          // Camera visible area
+          const camera = this.cameras.main;
+          const cameraWidth = camera.width / camera.zoom;
+          const cameraHeight = camera.height / camera.zoom;
+          const cameraLeft = camera.scrollX;
+          const cameraTop = camera.scrollY;
+          const cameraRight = cameraLeft + cameraWidth;
+          const cameraBottom = cameraTop + cameraHeight;
+
+          // Helper to clamp collectible so at least 50% is visible in camera
+          function getRandomCollectiblePosition() {
+            // Allow up to 50% of collectible to overflow off any edge
+            const overflow = 0.5;
+            const minVisible = 0.5;
+            const colW = collectibleSize;
+            const colH = collectibleSize;
+            const minX = cameraLeft - colW * overflow + (colW * minVisible) / 2;
+            const maxX =
+              cameraRight + colW * overflow - (colW * minVisible) / 2;
+            const minY = cameraTop - colH * overflow + (colH * minVisible) / 2;
+            const maxY =
+              cameraBottom + colH * overflow - (colH * minVisible) / 2;
+            return {
+              x: Phaser.Math.Between(minX, maxX),
+              y: Phaser.Math.Between(minY, maxY),
+            };
+          }
+
           if (firstSpawn && this.chimp) {
-            // Place collectible near the chimp and always visible on camera
-            // Place it 200px to the right, but clamp to boundary
+            // Place collectible fully visible and near the chimp (easy)
+            const offset = 200;
             randomX = Phaser.Math.Clamp(
-              this.chimp.x + 200,
-              x + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_X,
-              x + width - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_X,
+              this.chimp.x + offset,
+              cameraLeft + collectibleSize / 2,
+              cameraRight - collectibleSize / 2,
             );
             randomY = Phaser.Math.Clamp(
               this.chimp.y,
-              y + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_Y,
-              y + height - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_Y,
+              cameraTop + collectibleSize / 2,
+              cameraBottom - collectibleSize / 2,
             );
-            validPosition = true;
             this._hasSpawnedFirstCollectible = true;
+            // Only create collectible if it doesn't exist
+            if (!this.collectible) {
+              this.collectible = this.add
+                .sprite(randomX, randomY, asset.sprite)
+                .setScale(1 / 3)
+                .setDepth(1);
+              this.collectible.play(asset.anim);
+            }
+            return;
           } else {
             // Increase difficulty: as points increase, increase min distance
             let minDistance = MainScene.MIN_COLLECTIBLE_DISTANCE;
             if (typeof pointsRef !== "undefined" && pointsRef.current) {
               minDistance += Math.min(pointsRef.current * 20, 400); // up to +400px
             }
+            let tries = 0;
+            let validPosition = false;
             while (!validPosition && tries < 50) {
-              randomX = Phaser.Math.Between(
-                x + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_X,
-                x + width - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_X,
-              );
-              randomY = Phaser.Math.Between(
-                y + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_Y,
-                y + height - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_Y,
-              );
-
+              const pos = getRandomCollectiblePosition();
+              randomX = pos.x;
+              randomY = pos.y;
               if (this.chimp) {
                 const distance = Phaser.Math.Distance.Between(
                   randomX,
@@ -1513,8 +1546,10 @@ export default function PhaserGame({
         sceneRef.current._hasSpawnedFirstCollectible = false;
       }
       if (gameStatus === "running" && sceneRef.current) {
-        // Spawn collectible when game starts running
-        sceneRef.current.spawnCollectible();
+        // Spawn collectible when game starts running, but only if one does not exist
+        if (!sceneRef.current.collectible) {
+          sceneRef.current.spawnCollectible();
+        }
       }
     }
   }, [gameStatus]);
