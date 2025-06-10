@@ -5,6 +5,13 @@ import { debounce } from "lodash";
 import confetti from "canvas-confetti";
 import type { MutableRefObject, Dispatch, SetStateAction } from "react";
 
+// Extend Window interface for joystick
+declare global {
+  interface Window {
+    __JOYSTICK_DIR__?: { dx: number; dy: number };
+  }
+}
+
 interface PhaserGameProps {
   onChimpChange?: (id: number) => void;
   onRandomChimp?: () => void;
@@ -395,6 +402,138 @@ function getRandomCollectiblePosition({
   };
 }
 
+// Joystick component for mobile controls
+function Joystick({
+  onMove,
+  onEnd,
+}: {
+  onMove: (dx: number, dy: number) => void;
+  onEnd: () => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [basePos, setBasePos] = useState<{ x: number; y: number } | null>(null); // null = default bottom right
+  const baseRef = useRef<HTMLDivElement>(null);
+  const stickRef = useRef<HTMLDivElement>(null);
+  const radius = 48;
+
+  // Helper to get relative coords for a given base position
+  function getRelativeCoordsFromBase(
+    touch: Touch,
+    base: { x: number; y: number },
+  ) {
+    const x = touch.clientX - base.x;
+    const y = touch.clientY - base.y;
+    return { x, y };
+  }
+
+  useEffect(() => {
+    function handleTouchStartDoc(e: TouchEvent) {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        setBasePos({ x: touch.clientX, y: touch.clientY });
+        setDragging(true);
+        setPos({ x: 0, y: 0 });
+      }
+    }
+    function handleTouchMoveDoc(e: TouchEvent) {
+      if (!dragging || !basePos) return;
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const { x, y } = getRelativeCoordsFromBase(touch, {
+          x: basePos.x,
+          y: basePos.y,
+        });
+        // Clamp to radius
+        const dist = Math.sqrt(x * x + y * y);
+        let nx = x,
+          ny = y;
+        if (dist > radius) {
+          nx = (x / dist) * radius;
+          ny = (y / dist) * radius;
+        }
+        setPos({ x: nx, y: ny });
+        handleMove(nx, ny);
+      }
+    }
+    function handleTouchEndDoc() {
+      setDragging(false);
+      setBasePos(null); // Reset to default
+      setPos({ x: 0, y: 0 });
+      onEnd();
+    }
+    document.addEventListener("touchstart", handleTouchStartDoc);
+    document.addEventListener("touchmove", handleTouchMoveDoc);
+    document.addEventListener("touchend", handleTouchEndDoc);
+    document.addEventListener("touchcancel", handleTouchEndDoc);
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStartDoc);
+      document.removeEventListener("touchmove", handleTouchMoveDoc);
+      document.removeEventListener("touchend", handleTouchEndDoc);
+      document.removeEventListener("touchcancel", handleTouchEndDoc);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dragging, basePos]);
+
+  function handleMove(x: number, y: number) {
+    // Normalize to [-1, 1]
+    const dx = x / radius;
+    const dy = y / radius;
+    onMove(dx, dy);
+  }
+
+  // Joystick base position: default bottom right, or at touch position
+  let containerStyle: React.CSSProperties;
+  if (basePos) {
+    containerStyle = {
+      touchAction: "none",
+      width: 120,
+      height: 120,
+      position: "fixed",
+      left: basePos.x - 60,
+      top: basePos.y - 60,
+      zIndex: 100,
+      pointerEvents: "auto",
+    };
+  } else {
+    containerStyle = {
+      touchAction: "none",
+      width: 120,
+      height: 120,
+      position: "fixed",
+      right: 24,
+      bottom: 24,
+      zIndex: 100,
+      pointerEvents: "auto",
+    };
+  }
+
+  return (
+    <div ref={baseRef} className="z-50 select-none" style={containerStyle}>
+      <div
+        className="absolute left-1/2 top-1/2 bg-gray-700/70 rounded-full"
+        style={{
+          width: radius * 2,
+          height: radius * 2,
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+      <div
+        ref={stickRef}
+        className="absolute left-1/2 top-1/2 bg-blue-400/90 rounded-full shadow-lg"
+        style={{
+          width: 48,
+          height: 48,
+          transform: `translate(-50%, -50%) translate(${pos.x}px, ${pos.y}px)`,
+          transition: dragging
+            ? "none"
+            : "transform 0.2s cubic-bezier(.4,2,.6,1)",
+        }}
+      />
+    </div>
+  );
+}
+
 export default function PhaserGame({
   onChimpChange,
   onRandomChimp,
@@ -422,20 +561,30 @@ export default function PhaserGame({
   const lastRenderTimeRef = useRef(performance.now());
   const animationFrameRef = useRef<number>();
   const [showHud, setShowHud] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  // Joystick state for mobile
+  const joystickDir = useRef({ dx: 0, dy: 0 });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setMounted(true);
 
-    const checkIfDesktop = () => {
+    const checkIfMobile = () => {
+      // Use user agent and screen size for mobile detection
+      const ua = navigator.userAgent;
+      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen =
+        window.innerWidth <= 800 || window.innerHeight <= 800;
+      const isMobileUA =
+        /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(ua);
+      setIsMobile((isTouch && isSmallScreen) || isMobileUA);
       setIsDesktop(window.matchMedia("(min-width: 768px)").matches);
     };
 
-    checkIfDesktop();
-    window.addEventListener("resize", checkIfDesktop);
-
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
     return () => {
-      window.removeEventListener("resize", checkIfDesktop);
+      window.removeEventListener("resize", checkIfMobile);
     };
   }, []);
 
@@ -1244,6 +1393,16 @@ export default function PhaserGame({
               dy = Math.sin(angle) * speed;
               moving = true;
             }
+            // Joystick movement for mobile
+            if (
+              window.__JOYSTICK_DIR__ &&
+              (window.__JOYSTICK_DIR__.dx !== 0 ||
+                window.__JOYSTICK_DIR__.dy !== 0)
+            ) {
+              dx = window.__JOYSTICK_DIR__.dx * speed;
+              dy = window.__JOYSTICK_DIR__.dy * speed;
+              moving = true;
+            }
           } else {
             // During countdown, check for any movement key to animate running
             if (
@@ -1732,6 +1891,16 @@ export default function PhaserGame({
     onRandomBg?.();
   };
 
+  // Joystick handlers
+  function handleJoystickMove(dx: number, dy: number) {
+    joystickDir.current = { dx, dy };
+    (window as any).__JOYSTICK_DIR__ = { dx, dy };
+  }
+  function handleJoystickEnd() {
+    joystickDir.current = { dx: 0, dy: 0 };
+    (window as any).__JOYSTICK_DIR__ = { dx: 0, dy: 0 };
+  }
+
   return (
     <>
       {/* Title and HUD: always top center, stacked on desktop */}
@@ -1829,6 +1998,10 @@ export default function PhaserGame({
       <div className="fixed bottom-2 left-2 z-50 text-white font-mono bg-black/60 px-2 py-1 rounded">
         FPS: {fps}
       </div>
+      {/* Mobile Joystick */}
+      {isMobile && (
+        <Joystick onMove={handleJoystickMove} onEnd={handleJoystickEnd} />
+      )}
     </>
   );
 }
