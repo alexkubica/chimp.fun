@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { debounce } from "lodash";
 import confetti from "canvas-confetti";
+import type { MutableRefObject, Dispatch, SetStateAction } from "react";
 
 interface PhaserGameProps {
   onChimpChange?: (id: number) => void;
@@ -16,8 +17,228 @@ interface MainScene extends Phaser.Scene {
   bg: Phaser.GameObjects.TileSprite | null;
   chimp: Phaser.GameObjects.Sprite | null;
   updateBoundaries: () => void;
-  spawnCollectible: () => void;
+  spawnCollectible: (firstSpawn?: boolean) => void;
   collectible: Phaser.GameObjects.Sprite | null;
+}
+
+interface ChimpHUDProps {
+  gameStatus: "idle" | "countdown" | "running" | "finished";
+  timer: number;
+  countdownText: string;
+  pointsRef: MutableRefObject<number>;
+  setGameStatus: Dispatch<
+    SetStateAction<"idle" | "countdown" | "running" | "finished">
+  >;
+  setChimpPoints: Dispatch<SetStateAction<number>>;
+  setCountdownText: Dispatch<SetStateAction<string>>;
+  setTimer: Dispatch<SetStateAction<number>>;
+  countdownIntervalRef: MutableRefObject<NodeJS.Timeout | null>;
+  sceneRef: MutableRefObject<any>;
+  confetti: (...args: any[]) => void;
+}
+
+function ChimpCountdown({ countdownText }: { countdownText: string }) {
+  return (
+    <div
+      className="text-6xl font-bold text-white drop-shadow-lg mt-2"
+      style={{
+        fontFamily: '"Press Start 2P", monospace',
+        animation: "bounce 0.5s infinite",
+      }}
+    >
+      {countdownText}
+    </div>
+  );
+}
+
+function ChimpScoreShare({
+  points,
+  setGameStatus,
+  setChimpPoints,
+  setCountdownText,
+  setTimer,
+  countdownIntervalRef,
+}: {
+  points: number;
+  setGameStatus: Dispatch<
+    SetStateAction<"idle" | "countdown" | "running" | "finished">
+  >;
+  setChimpPoints: Dispatch<SetStateAction<number>>;
+  setCountdownText: Dispatch<SetStateAction<string>>;
+  setTimer: Dispatch<SetStateAction<number>>;
+  countdownIntervalRef: MutableRefObject<NodeJS.Timeout | null>;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2 mt-2">
+      <div
+        className="text-4xl font-bold text-white drop-shadow-lg"
+        style={{ fontFamily: '"Press Start 2P", monospace' }}
+      >
+        Score: {points}
+      </div>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={() => {
+            setGameStatus("countdown");
+            setChimpPoints(0);
+            (window as any).__GAME_STATUS__ = "countdown";
+            let count = 3;
+            setCountdownText(count.toString());
+            if (countdownIntervalRef.current)
+              clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = setInterval(() => {
+              count--;
+              if (count > 0) {
+                setCountdownText(count.toString());
+              } else if (count === 0) {
+                setCountdownText("!CHIMP");
+                setTimeout(() => {
+                  setGameStatus("running");
+                  (window as any).__GAME_STATUS__ = "running";
+                  setTimer(30);
+                }, 800);
+              }
+            }, 800);
+          }}
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
+        >
+          PLAY AGAIN
+        </button>
+        <button
+          onClick={async () => {
+            const tweetText = `I !CHIMPED ${points} points within 30 seconds in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
+            const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(
+              navigator.userAgent,
+            );
+            if (navigator.share && isMobile) {
+              try {
+                await navigator.share({
+                  text: tweetText,
+                  url: "https://chimp.fun/game",
+                });
+              } catch (err: unknown) {
+                if (
+                  !err ||
+                  (typeof err === "object" &&
+                    "name" in err &&
+                    (err as any).name !== "AbortError")
+                ) {
+                  window.open(tweetUrl, "_blank", "noopener,noreferrer");
+                }
+              }
+            } else {
+              window.open(tweetUrl, "_blank", "noopener,noreferrer");
+            }
+          }}
+          className="px-6 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8] text-xl font-bold transition-colors text-center"
+        >
+          Share Score 🐦
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ChimpHUD({
+  gameStatus,
+  timer,
+  countdownText,
+  pointsRef,
+  setGameStatus,
+  setChimpPoints,
+  setCountdownText,
+  setTimer,
+  countdownIntervalRef,
+  sceneRef,
+  confetti,
+}: ChimpHUDProps) {
+  return (
+    <>
+      {gameStatus === "idle" && (
+        <button
+          onClick={() => {
+            confetti({
+              particleCount: 100,
+              spread: 360,
+              startVelocity: 30,
+              decay: 0.9,
+              gravity: 1,
+              drift: 0,
+              ticks: 200,
+              origin: { x: 0.5, y: 0.5 },
+              colors: [
+                "#ff0000",
+                "#00ff00",
+                "#0000ff",
+                "#ffff00",
+                "#ff00ff",
+                "#00ffff",
+              ],
+              scalar: 0.7,
+              shapes: ["circle", "square"],
+            });
+            setGameStatus("countdown");
+            pointsRef.current = 0;
+            setChimpPoints(0);
+            (window as any).__GAME_STATUS__ = "countdown";
+            let count = 3;
+            setCountdownText(count.toString());
+            if (countdownIntervalRef.current)
+              clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = setInterval(() => {
+              count--;
+              if (count > 0) {
+                setCountdownText(count.toString());
+              } else if (count === 0) {
+                setCountdownText("!CHIMP");
+                confetti({
+                  particleCount: 150,
+                  spread: 360,
+                  startVelocity: 35,
+                  decay: 0.9,
+                  gravity: 1,
+                  drift: 0,
+                  ticks: 200,
+                  origin: { x: 0.5, y: 0.5 },
+                  colors: [
+                    "#ff0000",
+                    "#00ff00",
+                    "#0000ff",
+                    "#ffff00",
+                    "#ff00ff",
+                    "#00ffff",
+                  ],
+                  scalar: 0.8,
+                  shapes: ["circle", "square"],
+                });
+                (window as any).__GAME_STATUS__ = "running";
+                if (sceneRef.current) {
+                  sceneRef.current.spawnCollectible();
+                }
+                setTimeout(() => {
+                  setGameStatus("running");
+                  (window as any).__GAME_STATUS__ = "running";
+                  setTimer(30);
+                }, 800);
+              }
+            }, 800);
+          }}
+          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
+        >
+          START
+        </button>
+      )}
+      {gameStatus === "running" && (
+        <div
+          className="text-4xl font-bold text-white drop-shadow-lg"
+          style={{ fontFamily: '"Press Start 2P", monospace' }}
+        >
+          {timer.toFixed(3)}
+        </div>
+      )}
+    </>
+  );
 }
 
 export default function PhaserGame({
@@ -34,7 +255,7 @@ export default function PhaserGame({
   const [gameStatus, setGameStatus] = useState<
     "idle" | "countdown" | "running" | "finished"
   >("idle");
-  const [timer, setTimer] = useState(1);
+  const [timer, setTimer] = useState(30);
   const [countdownText, setCountdownText] = useState("");
   const [fps, setFps] = useState(0);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -289,32 +510,14 @@ export default function PhaserGame({
             repeat: -1,
           });
 
-          // Spawn player at random position within boundaries
-          const spawnX = Phaser.Math.Between(
-            x +
-              ((this.chimp?.width ?? 96) * (this.chimp?.scaleX ?? 2)) / 2 +
-              MainScene.BOUNDARY_PADDING_X,
-            x +
-              width -
-              ((this.chimp?.width ?? 96) * (this.chimp?.scaleX ?? 2)) / 2 -
-              MainScene.BOUNDARY_PADDING_X,
-          );
-          const spawnY = Phaser.Math.Between(
-            y +
-              ((this.chimp?.height ?? 96) * (this.chimp?.scaleY ?? 2)) / 2 +
-              MainScene.BOUNDARY_PADDING_Y,
-            y +
-              height -
-              ((this.chimp?.height ?? 96) * (this.chimp?.scaleY ?? 2)) / 2 -
-              MainScene.BOUNDARY_PADDING_Y,
-          );
+          // Always spawn player at center of boundary
           if (this.chimp) {
-            this.chimp.setPosition(spawnX, spawnY);
+            this.chimp.setPosition(x + width / 2, y + height / 2);
           }
 
           // Only spawn collectible if game is running
           if ((window as any).__GAME_STATUS__ === "running") {
-            this.spawnCollectible();
+            this.spawnCollectible(true); // pass true for first spawn
           }
 
           this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -593,7 +796,7 @@ export default function PhaserGame({
           this.currentAnimKeys = { run: runKey, rest: restKey };
         }
 
-        spawnCollectible() {
+        spawnCollectible(firstSpawn = false) {
           if (this.collectible) {
             this.collectible.destroy();
           }
@@ -616,26 +819,33 @@ export default function PhaserGame({
           const x = (this.scale.width - width) / 2;
           const y = (this.scale.height - height) / 2;
 
-          while (!validPosition && tries < 50) {
-            randomX = Phaser.Math.Between(
-              x + collectibleSize / 2,
-              x + width - collectibleSize / 2,
-            );
-            randomY = Phaser.Math.Between(
-              y + collectibleSize / 2,
-              y + height - collectibleSize / 2,
-            );
+          if (firstSpawn && this.chimp) {
+            // Place collectible near the chimp and visible on camera
+            randomX = this.chimp.x + 200;
+            randomY = this.chimp.y;
+            validPosition = true;
+          } else {
+            while (!validPosition && tries < 50) {
+              randomX = Phaser.Math.Between(
+                x + collectibleSize / 2,
+                x + width - collectibleSize / 2,
+              );
+              randomY = Phaser.Math.Between(
+                y + collectibleSize / 2,
+                y + height - collectibleSize / 2,
+              );
 
-            if (this.chimp) {
-              const distanceX = Math.abs(randomX - this.chimp.x);
-              const distanceY = Math.abs(randomY - this.chimp.y);
-              validPosition =
-                distanceX >= MainScene.MIN_COLLECTIBLE_DISTANCE &&
-                distanceY >= MainScene.MIN_COLLECTIBLE_DISTANCE;
-            } else {
-              validPosition = true;
+              if (this.chimp) {
+                const distanceX = Math.abs(randomX - this.chimp.x);
+                const distanceY = Math.abs(randomY - this.chimp.y);
+                validPosition =
+                  distanceX >= MainScene.MIN_COLLECTIBLE_DISTANCE &&
+                  distanceY >= MainScene.MIN_COLLECTIBLE_DISTANCE;
+              } else {
+                validPosition = true;
+              }
+              tries++;
             }
-            tries++;
           }
 
           this.collectible = this.add
@@ -731,13 +941,14 @@ export default function PhaserGame({
           }
         }
 
-        update() {
+        update(time: number, delta: number) {
           if (!this.chimp) return;
 
           // Increment frame count for FPS calculation
           frameCountRef.current++;
 
-          const speed = 4;
+          const baseSpeed = 400; // pixels per second
+          const speed = (baseSpeed * delta) / 1000;
           let dx = 0,
             dy = 0;
           let moving = false;
@@ -1214,200 +1425,70 @@ export default function PhaserGame({
 
   return (
     <>
-      {/* Title: always top center */}
-      <div
-        className="absolute top-4 left-1/2 z-50 -translate-x-1/2 text-3xl sm:text-5xl font-extrabold text-white drop-shadow-lg select-none pointer-events-none tracking-widest px-2 text-center w-[98vw] max-w-full"
-        style={{
-          fontFamily:
-            '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
-        }}
-      >
-        CHIMP.FUN
+      {/* Title and HUD: always top center, stacked on desktop */}
+      <div className="fixed top-0 left-0 w-full z-50 flex flex-col items-center pointer-events-none">
+        <div
+          className="mt-4 text-3xl sm:text-5xl font-extrabold text-white drop-shadow-lg select-none pointer-events-none tracking-widest px-2 text-center w-[98vw] max-w-full"
+          style={{
+            fontFamily:
+              '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
+          }}
+        >
+          CHIMP.FUN
+        </div>
+        {/* Desktop HUD: show only on sm and up */}
+        <div className="mt-4 sm:mt-8 flex-col items-center gap-2 pointer-events-auto hidden sm:flex">
+          <ChimpHUD
+            gameStatus={gameStatus}
+            timer={timer}
+            countdownText={countdownText}
+            pointsRef={pointsRef}
+            setGameStatus={setGameStatus}
+            setChimpPoints={setChimpPoints}
+            setCountdownText={setCountdownText}
+            setTimer={setTimer}
+            countdownIntervalRef={countdownIntervalRef}
+            sceneRef={sceneRef}
+            confetti={confetti}
+          />
+        </div>
+        {/* Mobile HUD: show only on mobile, always visible, directly under title */}
+        <div className="mt-4 flex-col items-center gap-2 pointer-events-auto sm:hidden flex">
+          <ChimpHUD
+            gameStatus={gameStatus}
+            timer={timer}
+            countdownText={countdownText}
+            pointsRef={pointsRef}
+            setGameStatus={setGameStatus}
+            setChimpPoints={setChimpPoints}
+            setCountdownText={setCountdownText}
+            setTimer={setTimer}
+            countdownIntervalRef={countdownIntervalRef}
+            sceneRef={sceneRef}
+            confetti={confetti}
+          />
+          {/* Render countdown and finished UI below HUD and random buttons on mobile */}
+          {gameStatus === "countdown" && (
+            <ChimpCountdown countdownText={countdownText} />
+          )}
+          {gameStatus === "finished" && (
+            <ChimpScoreShare
+              points={pointsRef.current}
+              setGameStatus={setGameStatus}
+              setChimpPoints={setChimpPoints}
+              setCountdownText={setCountdownText}
+              setTimer={setTimer}
+              countdownIntervalRef={countdownIntervalRef}
+            />
+          )}
+        </div>
       </div>
-
-      {/* Timer and Start Button */}
-      <div className="absolute top-20 left-1/2 z-50 -translate-x-1/2 flex flex-col items-center gap-2">
-        {gameStatus === "idle" && (
-          <button
-            onClick={() => {
-              // Start game confetti
-              confetti({
-                particleCount: 100,
-                spread: 360,
-                startVelocity: 30,
-                decay: 0.9,
-                gravity: 1,
-                drift: 0,
-                ticks: 200,
-                origin: { x: 0.5, y: 0.5 },
-                colors: [
-                  "#ff0000",
-                  "#00ff00",
-                  "#0000ff",
-                  "#ffff00",
-                  "#ff00ff",
-                  "#00ffff",
-                ],
-                scalar: 0.7,
-                shapes: ["circle", "square"],
-              });
-              setGameStatus("countdown");
-              pointsRef.current = 0;
-              setChimpPoints(0);
-              (window as any).__GAME_STATUS__ = "countdown";
-              let count = 3;
-              setCountdownText(count.toString());
-
-              countdownIntervalRef.current = setInterval(() => {
-                count--;
-                if (count > 0) {
-                  setCountdownText(count.toString());
-                } else if (count === 0) {
-                  setCountdownText("!CHIMP");
-                  // Timer start confetti
-                  confetti({
-                    particleCount: 150,
-                    spread: 360,
-                    startVelocity: 35,
-                    decay: 0.9,
-                    gravity: 1,
-                    drift: 0,
-                    ticks: 200,
-                    origin: { x: 0.5, y: 0.5 },
-                    colors: [
-                      "#ff0000",
-                      "#00ff00",
-                      "#0000ff",
-                      "#ffff00",
-                      "#ff00ff",
-                      "#00ffff",
-                    ],
-                    scalar: 0.8,
-                    shapes: ["circle", "square"],
-                  });
-                  // Allow movement immediately when !CHIMP appears
-                  (window as any).__GAME_STATUS__ = "running";
-                  // Spawn initial collectible
-                  if (sceneRef.current) {
-                    sceneRef.current.spawnCollectible();
-                  }
-                  setTimeout(() => {
-                    setGameStatus("running");
-                    (window as any).__GAME_STATUS__ = "running";
-                    setTimer(1);
-                  }, 800);
-                }
-              }, 800);
-            }}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
-          >
-            START
-          </button>
-        )}
-
-        {gameStatus === "countdown" && (
-          <div
-            className="text-6xl font-bold text-white drop-shadow-lg"
-            style={{
-              fontFamily: '"Press Start 2P", monospace',
-              animation: "bounce 0.5s infinite",
-            }}
-          >
-            {countdownText}
-          </div>
-        )}
-
-        {gameStatus === "running" && (
-          <div
-            className="text-4xl font-bold text-white drop-shadow-lg"
-            style={{
-              fontFamily: '"Press Start 2P", monospace',
-            }}
-          >
-            {timer.toFixed(3)}
-          </div>
-        )}
-
-        {gameStatus === "finished" && (
-          <div className="flex flex-col items-center gap-2">
-            <div
-              className="text-4xl font-bold text-white drop-shadow-lg"
-              style={{
-                fontFamily: '"Press Start 2P", monospace',
-              }}
-            >
-              Score: {pointsRef.current}
-            </div>
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  setGameStatus("countdown");
-                  pointsRef.current = 0;
-                  setChimpPoints(0);
-                  (window as any).__GAME_STATUS__ = "countdown";
-                  let count = 3;
-                  setCountdownText(count.toString());
-
-                  countdownIntervalRef.current = setInterval(() => {
-                    count--;
-                    if (count > 0) {
-                      setCountdownText(count.toString());
-                    } else if (count === 0) {
-                      setCountdownText("!CHIMP");
-                      setTimeout(() => {
-                        setGameStatus("running");
-                        (window as any).__GAME_STATUS__ = "running";
-                        setTimer(1);
-                      }, 800);
-                    }
-                  }, 800);
-                }}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
-              >
-                PLAY AGAIN
-              </button>
-              <button
-                onClick={async () => {
-                  const tweetText = `I !CHIMPED ${pointsRef.current} points within 30 seconds in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
-                  const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-                  const isMobile = /iPhone|iPad|iPod|Android/i.test(
-                    navigator.userAgent,
-                  );
-                  if (navigator.share && isMobile) {
-                    try {
-                      await navigator.share({
-                        text: tweetText,
-                        url: "https://chimp.fun/game",
-                      });
-                    } catch (err: unknown) {
-                      if (
-                        !err ||
-                        (typeof err === "object" &&
-                          "name" in err &&
-                          (err as any).name !== "AbortError")
-                      ) {
-                        window.open(tweetUrl, "_blank", "noopener,noreferrer");
-                      }
-                    }
-                  } else {
-                    window.open(tweetUrl, "_blank", "noopener,noreferrer");
-                  }
-                }}
-                className="px-6 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8] text-xl font-bold transition-colors text-center"
-              >
-                Share Score 🐦
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
       {/* Settings: below title on mobile, top right on desktop */}
       <div
-        className={`absolute ${isDesktop ? "top-2 right-2" : "top-16 left-1/2 -translate-x-1/2"} z-50 ${isDesktop ? "w-auto" : "w-[95vw]"} max-w-full flex flex-col gap-2 ${isDesktop ? "items-end" : "justify-center"} ${isDesktop ? "hidden sm:flex" : "sm:hidden"} ${gameStatus === "running" || gameStatus === "countdown" ? "!hidden" : ""}`}
+        className={`${isDesktop ? "absolute top-2 right-2" : "relative mt-2"} z-50 ${isDesktop ? "w-auto" : "w-[95vw]"} max-w-full flex flex-col gap-2 ${isDesktop ? "items-end" : "justify-center"} ${isDesktop ? "hidden sm:flex" : "sm:hidden"}`}
       >
         <div
-          className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"}`}
+          className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"} ${gameStatus === "running" || gameStatus === "countdown" ? "!hidden" : ""}`}
         >
           <input
             type="number"
@@ -1450,7 +1531,9 @@ export default function PhaserGame({
           </button>
         </div>
         {!isDesktop && (
-          <div className="flex flex-row gap-2 w-full justify-center">
+          <div
+            className={`flex flex-row gap-2 w-full justify-center ${gameStatus === "running" || gameStatus === "countdown" ? "!hidden" : ""}`}
+          >
             <button
               onClick={(e) => {
                 e.stopPropagation();
