@@ -558,6 +558,7 @@ export default function PhaserGame({
         private _collectibleCooldown: number = 0;
         private _lastCameraZoom: number = 1;
         private _cameraFollowState: WeakMap<any, boolean> = new WeakMap();
+        private _hasCenteredChimpInitially: boolean = false;
 
         constructor() {
           super({ key: "MainScene" });
@@ -901,13 +902,31 @@ export default function PhaserGame({
 
         replaceChimp(key: string) {
           const oldFlipX = this.chimp?.flipX ?? false;
-          const oldX = this.chimp?.x ?? this.scale.width / 2;
-          const oldY = this.chimp?.y ?? this.scale.height / 2;
 
           if (this.chimp) this.chimp.destroy();
 
+          // Calculate center of boundary
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+          const centerX = x + width / 2;
+          const centerY = y + height / 2;
+
+          // Only center on initial load, otherwise keep previous position
+          let chimpX: number;
+          let chimpY: number;
+          if (!this._hasCenteredChimpInitially) {
+            chimpX = centerX;
+            chimpY = centerY;
+            this._hasCenteredChimpInitially = true;
+          } else {
+            chimpX = this.chimp?.x ?? centerX;
+            chimpY = this.chimp?.y ?? centerY;
+          }
+
           this.chimp = this.add
-            .sprite(oldX, oldY, key, 0)
+            .sprite(chimpX, chimpY, key, 0)
             .setScale(2)
             .setFlipX(oldFlipX)
             .setDepth(2);
@@ -946,6 +965,9 @@ export default function PhaserGame({
           if (this.cameras && this.cameras.main && this._cameraFollowState) {
             this._cameraFollowState.set(this.cameras.main, false);
           }
+
+          // Ensure chimp and camera are centered and clamped
+          this.updateBoundaries();
         }
 
         spawnCollectible(firstSpawn = false) {
