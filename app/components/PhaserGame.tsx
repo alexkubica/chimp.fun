@@ -1404,7 +1404,15 @@ export default function PhaserGame({
               moving = true;
             }
           } else {
-            // During countdown, check for any movement key to animate running
+            // During countdown, check for any movement key or joystick to animate running
+            let joystickActive =
+              window.__JOYSTICK_DIR__ &&
+              (window.__JOYSTICK_DIR__.dx !== 0 ||
+                window.__JOYSTICK_DIR__.dy !== 0);
+            const joystickDx =
+              joystickActive && window.__JOYSTICK_DIR__
+                ? window.__JOYSTICK_DIR__.dx
+                : 0;
             if (
               this.cursors?.left.isDown ||
               this.wasd?.left.isDown ||
@@ -1413,16 +1421,22 @@ export default function PhaserGame({
               this.cursors?.up.isDown ||
               this.wasd?.up.isDown ||
               this.cursors?.down.isDown ||
-              this.wasd?.down.isDown
+              this.wasd?.down.isDown ||
+              joystickActive
             ) {
               moving = true;
-              // Only update direction for left/right
-              if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
+              // Only update direction for left/right or joystick X
+              if (
+                this.cursors?.left.isDown ||
+                this.wasd?.left.isDown ||
+                (joystickActive && joystickDx < 0)
+              ) {
                 this.lastDirection = -1;
                 this.chimp?.setFlipX(true);
               } else if (
                 this.cursors?.right.isDown ||
-                this.wasd?.right.isDown
+                this.wasd?.right.isDown ||
+                (joystickActive && joystickDx > 0)
               ) {
                 this.lastDirection = 1;
                 this.chimp?.setFlipX(false);
