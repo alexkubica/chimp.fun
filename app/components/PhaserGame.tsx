@@ -551,6 +551,14 @@ export default function PhaserGame({
           },
         ];
 
+        // --- Optimization state fields ---
+        private _lastPos: { x: number; y: number } = { x: 0, y: 0 };
+        private _lastAnim: string = "";
+        private _lastMoving: boolean = false;
+        private _collectibleCooldown: number = 0;
+        private _lastCameraZoom: number = 1;
+        private _cameraFollowState: WeakMap<any, boolean> = new WeakMap();
+
         constructor() {
           super({ key: "MainScene" });
         }
@@ -933,6 +941,11 @@ export default function PhaserGame({
 
           this.chimp.play(restKey);
           this.currentAnimKeys = { run: runKey, rest: restKey };
+
+          // Reset camera follow state so camera follows new chimp
+          if (this.cameras && this.cameras.main && this._cameraFollowState) {
+            this._cameraFollowState.set(this.cameras.main, false);
+          }
         }
 
         spawnCollectible(firstSpawn = false) {
@@ -1086,6 +1099,14 @@ export default function PhaserGame({
           // Increment frame count for FPS calculation
           frameCountRef.current++;
 
+          // --- Optimization state ---
+          if (!this._lastPos)
+            this._lastPos = { x: this.chimp.x, y: this.chimp.y };
+          if (!this._lastAnim) this._lastAnim = "";
+          if (!this._lastMoving) this._lastMoving = false;
+          if (!this._collectibleCooldown) this._collectibleCooldown = 0;
+
+          // --- Movement logic ---
           const baseSpeed = 400; // pixels per second
           const speed = (baseSpeed * delta) / 1000;
           let dx = 0,
@@ -1110,7 +1131,6 @@ export default function PhaserGame({
               dy += speed;
               moving = true;
             }
-
             if (this.touchPointer?.isDown) {
               const angle = Phaser.Math.Angle.Between(
                 this.chimp.x,
@@ -1191,84 +1211,106 @@ export default function PhaserGame({
           );
 
           // Only update position if it changed
-          if (newX !== this.chimp.x || newY !== this.chimp.y) {
+          const posChanged = newX !== this.chimp.x || newY !== this.chimp.y;
+          if (posChanged) {
             this.chimp.x = newX;
             this.chimp.y = newY;
           }
 
-          // Update camera position
+          // --- Camera optimization ---
+          // Only update camera if player moved or zoom changed
+          if (!this._lastCameraZoom)
+            this._lastCameraZoom = this.cameras.main.zoom;
           const camera = this.cameras.main;
-          const cameraWidth = camera.width / camera.zoom;
-          const cameraHeight = camera.height / camera.zoom;
-
-          // Calculate camera bounds with padding
-          const cameraMinX = x + cameraWidth / 2;
-          const cameraMaxX = x + width - cameraWidth / 2;
-          const cameraMinY = y + cameraHeight / 2;
-          const cameraMaxY = y + height - cameraHeight / 2;
-
-          // Calculate screen margins for smooth transition
-          const margin = 100; // pixels from edge to start following
-          const playerScreenX = camera.getWorldPoint(this.chimp.x, 0).x;
-          const playerScreenY = camera.getWorldPoint(0, this.chimp.y).y;
-          const isNearScreenEdge =
-            playerScreenX < margin ||
-            playerScreenX > camera.width - margin ||
-            playerScreenY < margin ||
-            playerScreenY > camera.height - margin;
-
-          if (camera.zoom < 1) {
-            // When zoomed out, use smooth following near edges
-            if (isNearScreenEdge) {
-              // Calculate target position that keeps player within margins
-              const targetX = Phaser.Math.Clamp(
-                this.chimp.x - cameraWidth / 2,
-                x,
-                x + width - cameraWidth,
-              );
-              const targetY = Phaser.Math.Clamp(
-                this.chimp.y - cameraHeight / 2,
-                y,
-                y + height - cameraHeight,
-              );
-
-              // Smoothly move camera to target position
-              camera.scrollX = Phaser.Math.Linear(camera.scrollX, targetX, 0.1);
-              camera.scrollY = Phaser.Math.Linear(camera.scrollY, targetY, 0.1);
-            } else {
-              // When player is in center, smoothly return to centered view
-              const centerX = x + (width - cameraWidth) / 2;
-              const centerY = y + (height - cameraHeight) / 2;
-              camera.scrollX = Phaser.Math.Linear(
-                camera.scrollX,
-                centerX,
-                0.05,
-              );
-              camera.scrollY = Phaser.Math.Linear(
-                camera.scrollY,
-                centerY,
-                0.05,
-              );
-            }
-          } else {
-            // Normal zoomed in behavior
-            if (cameraMinX <= cameraMaxX && cameraMinY <= cameraMaxY) {
-              camera.startFollow(this.chimp, true);
-            } else {
-              camera.stopFollow();
-              camera.setScroll(
-                Phaser.Math.Clamp(
+          const cameraZoomChanged = camera.zoom !== this._lastCameraZoom;
+          if (posChanged || cameraZoomChanged) {
+            const cameraWidth = camera.width / camera.zoom;
+            const cameraHeight = camera.height / camera.zoom;
+            const cameraMinX = x + cameraWidth / 2;
+            const cameraMaxX = x + width - cameraWidth / 2;
+            const cameraMinY = y + cameraHeight / 2;
+            const cameraMaxY = y + height - cameraHeight / 2;
+            const margin = 100;
+            const playerScreenX = camera.getWorldPoint(this.chimp.x, 0).x;
+            const playerScreenY = camera.getWorldPoint(0, this.chimp.y).y;
+            const isNearScreenEdge =
+              playerScreenX < margin ||
+              playerScreenX > camera.width - margin ||
+              playerScreenY < margin ||
+              playerScreenY > camera.height - margin;
+            if (camera.zoom < 1) {
+              if (isNearScreenEdge) {
+                const targetX = Phaser.Math.Clamp(
                   this.chimp.x - cameraWidth / 2,
                   x,
                   x + width - cameraWidth,
-                ),
-                Phaser.Math.Clamp(
+                );
+                const targetY = Phaser.Math.Clamp(
                   this.chimp.y - cameraHeight / 2,
                   y,
                   y + height - cameraHeight,
-                ),
-              );
+                );
+                camera.scrollX = Phaser.Math.Linear(
+                  camera.scrollX,
+                  targetX,
+                  0.1,
+                );
+                camera.scrollY = Phaser.Math.Linear(
+                  camera.scrollY,
+                  targetY,
+                  0.1,
+                );
+              } else {
+                const centerX = x + (width - cameraWidth) / 2;
+                const centerY = y + (height - cameraHeight) / 2;
+                camera.scrollX = Phaser.Math.Linear(
+                  camera.scrollX,
+                  centerX,
+                  0.05,
+                );
+                camera.scrollY = Phaser.Math.Linear(
+                  camera.scrollY,
+                  centerY,
+                  0.05,
+                );
+              }
+              this._cameraFollowState.set(camera, false);
+            } else {
+              if (cameraMinX <= cameraMaxX && cameraMinY <= cameraMaxY) {
+                if (!this._cameraFollowState.get(camera)) {
+                  camera.startFollow(this.chimp, true);
+                  this._cameraFollowState.set(camera, true);
+                }
+              } else {
+                if (this._cameraFollowState.get(camera)) {
+                  camera.stopFollow();
+                  this._cameraFollowState.set(camera, false);
+                }
+                camera.setScroll(
+                  Phaser.Math.Clamp(
+                    this.chimp.x - cameraWidth / 2,
+                    x,
+                    x + width - cameraWidth,
+                  ),
+                  Phaser.Math.Clamp(
+                    this.chimp.y - cameraHeight / 2,
+                    y,
+                    y + height - cameraHeight,
+                  ),
+                );
+              }
             }
+            this._lastCameraZoom = camera.zoom;
+          }
+
+          // --- Animation optimization ---
+          const animKey = moving
+            ? this.currentAnimKeys.run
+            : this.currentAnimKeys.rest;
+          if (this._lastAnim !== animKey || this._lastMoving !== moving) {
+            this.chimp.play(animKey, true);
+            this._lastAnim = animKey;
+            this._lastMoving = moving;
           }
 
           // Update direction based on movement
@@ -1277,13 +1319,15 @@ export default function PhaserGame({
             this.chimp.setFlipX(this.lastDirection === -1);
           }
 
-          this.chimp.play(
-            moving ? this.currentAnimKeys.run : this.currentAnimKeys.rest,
-            true,
-          );
-
-          // Check for collision with collectible
-          if (this.collectible && this.chimp) {
+          // --- Collectible collision optimization ---
+          if (this._collectibleCooldown > 0) {
+            this._collectibleCooldown -= delta;
+          }
+          if (
+            this.collectible &&
+            this.chimp &&
+            this._collectibleCooldown <= 0
+          ) {
             const distance = Phaser.Math.Distance.Between(
               this.chimp.x,
               this.chimp.y,
@@ -1293,10 +1337,9 @@ export default function PhaserGame({
             const minDistance =
               (96 * 2 + this.collectible.width * this.collectible.scaleX) / 2;
             if (distance < minDistance) {
-              // Emit a custom event for points update
+              this._collectibleCooldown = 300; // 300ms cooldown
               this.events.emit("collectibleCollected");
-              // Small confetti for collectible pickup - intensity increases with points
-              const intensity = Math.min(1 + pointsRef.current * 0.1, 2); // Scale up to 2x intensity
+              const intensity = Math.min(1 + pointsRef.current * 0.1, 2);
               confetti({
                 particleCount: Math.floor(30 * intensity),
                 spread: 360,
@@ -1317,13 +1360,14 @@ export default function PhaserGame({
                 scalar: 0.5,
                 shapes: ["circle"],
               });
-              // Update game elements
               this.createBackground();
               this.spawnCollectible();
-              // Use preloaded chimp
               this.loadChimp(this.nextChimpId);
             }
           }
+          // Store last position
+          this._lastPos.x = this.chimp.x;
+          this._lastPos.y = this.chimp.y;
         }
       }
 
