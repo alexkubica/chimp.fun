@@ -19,6 +19,7 @@ interface MainScene extends Phaser.Scene {
   updateBoundaries: () => void;
   spawnCollectible: (firstSpawn?: boolean) => void;
   collectible: Phaser.GameObjects.Sprite | null;
+  _hasSpawnedFirstCollectible: boolean;
 }
 
 interface ChimpHUDProps {
@@ -182,6 +183,13 @@ function ChimpHUD({
             pointsRef.current = 0;
             setChimpPoints(0);
             (window as any).__GAME_STATUS__ = "countdown";
+            // Spawn the first collectible during countdown
+            if (
+              sceneRef.current &&
+              !sceneRef.current._hasSpawnedFirstCollectible
+            ) {
+              sceneRef.current.spawnCollectible(true);
+            }
             let count = 3;
             setCountdownText(count.toString());
             if (countdownIntervalRef.current)
@@ -213,9 +221,6 @@ function ChimpHUD({
                   shapes: ["circle", "square"],
                 });
                 (window as any).__GAME_STATUS__ = "running";
-                if (sceneRef.current) {
-                  sceneRef.current.spawnCollectible();
-                }
                 setTimeout(() => {
                   setGameStatus("running");
                   (window as any).__GAME_STATUS__ = "running";
@@ -559,6 +564,7 @@ export default function PhaserGame({
         private _lastCameraZoom: number = 1;
         private _cameraFollowState: WeakMap<any, boolean> = new WeakMap();
         private _hasCenteredChimpInitially: boolean = false;
+        _hasSpawnedFirstCollectible: boolean = false;
 
         constructor() {
           super({ key: "MainScene" });
@@ -974,8 +980,8 @@ export default function PhaserGame({
           if (this.collectible) {
             this.collectible.destroy();
           }
-          // Only spawn if game is running
-          if ((window as any).__GAME_STATUS__ !== "running") {
+          // Only spawn if game is running or during countdown for first spawn
+          if ((window as any).__GAME_STATUS__ !== "running" && !firstSpawn) {
             return;
           }
           // Randomly pick an asset
@@ -994,27 +1000,44 @@ export default function PhaserGame({
           const y = (this.scale.height - height) / 2;
 
           if (firstSpawn && this.chimp) {
-            // Place collectible near the chimp and visible on camera
-            randomX = this.chimp.x + 200;
-            randomY = this.chimp.y;
+            // Place collectible near the chimp and always visible on camera
+            // Place it 200px to the right, but clamp to boundary
+            randomX = Phaser.Math.Clamp(
+              this.chimp.x + 200,
+              x + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_X,
+              x + width - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_X,
+            );
+            randomY = Phaser.Math.Clamp(
+              this.chimp.y,
+              y + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_Y,
+              y + height - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_Y,
+            );
             validPosition = true;
+            this._hasSpawnedFirstCollectible = true;
           } else {
+            // Increase difficulty: as points increase, increase min distance
+            let minDistance = MainScene.MIN_COLLECTIBLE_DISTANCE;
+            if (typeof pointsRef !== "undefined" && pointsRef.current) {
+              minDistance += Math.min(pointsRef.current * 20, 400); // up to +400px
+            }
             while (!validPosition && tries < 50) {
               randomX = Phaser.Math.Between(
-                x + collectibleSize / 2,
-                x + width - collectibleSize / 2,
+                x + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_X,
+                x + width - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_X,
               );
               randomY = Phaser.Math.Between(
-                y + collectibleSize / 2,
-                y + height - collectibleSize / 2,
+                y + collectibleSize / 2 + MainScene.BOUNDARY_PADDING_Y,
+                y + height - collectibleSize / 2 - MainScene.BOUNDARY_PADDING_Y,
               );
 
               if (this.chimp) {
-                const distanceX = Math.abs(randomX - this.chimp.x);
-                const distanceY = Math.abs(randomY - this.chimp.y);
-                validPosition =
-                  distanceX >= MainScene.MIN_COLLECTIBLE_DISTANCE &&
-                  distanceY >= MainScene.MIN_COLLECTIBLE_DISTANCE;
+                const distance = Phaser.Math.Distance.Between(
+                  randomX,
+                  randomY,
+                  this.chimp.x,
+                  this.chimp.y,
+                );
+                validPosition = distance >= minDistance;
               } else {
                 validPosition = true;
               }
@@ -1496,6 +1519,10 @@ export default function PhaserGame({
         // Reset points when game starts
         pointsRef.current = 0;
         setChimpPoints(0);
+        // Reset collectible spawn flag
+        if (sceneRef.current) {
+          sceneRef.current._hasSpawnedFirstCollectible = false;
+        }
       }
       if (gameStatus === "finished" && sceneRef.current) {
         // Clear collectible when game finishes
@@ -1503,6 +1530,8 @@ export default function PhaserGame({
           sceneRef.current.collectible.destroy();
           sceneRef.current.collectible = null;
         }
+        // Reset collectible spawn flag
+        sceneRef.current._hasSpawnedFirstCollectible = false;
       }
       if (gameStatus === "running" && sceneRef.current) {
         // Spawn collectible when game starts running
