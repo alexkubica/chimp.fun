@@ -128,6 +128,7 @@ export default function PhaserGame({
         };
         collectible: Phaser.GameObjects.Sprite | null = null;
         circleBoundary: Phaser.GameObjects.Graphics | null = null;
+        nextChimpId: number = 0;
         static TOP_BOUNDARY = 50;
         static MIN_BOUNDARY_WIDTH = 2000;
         static MIN_BOUNDARY_HEIGHT = 2000;
@@ -475,6 +476,8 @@ export default function PhaserGame({
 
           if (this.textures.exists(key)) {
             this.replaceChimp(key);
+            // Preload next chimp
+            this.preloadNextChimp();
             return;
           }
 
@@ -485,9 +488,27 @@ export default function PhaserGame({
 
           this.load.once("complete", () => {
             this.replaceChimp(key);
+            // Preload next chimp
+            this.preloadNextChimp();
           });
 
           this.load.start();
+        }
+
+        preloadNextChimp() {
+          // Generate next random chimp ID
+          this.nextChimpId = Math.floor(Math.random() * 5555) + 1;
+          const nextKey = `chimp_${this.nextChimpId}`;
+          const nextUrl = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${this.nextChimpId}.png?v6`;
+
+          // Only load if not already loaded
+          if (!this.textures.exists(nextKey)) {
+            this.load.spritesheet(nextKey, nextUrl, {
+              frameWidth: 96,
+              frameHeight: 96,
+            });
+            this.load.start();
+          }
         }
 
         replaceChimp(key: string) {
@@ -854,6 +875,8 @@ export default function PhaserGame({
             if (distance < minDistance) {
               this.createBackground();
               this.spawnCollectible();
+              // Use preloaded chimp
+              this.loadChimp(this.nextChimpId);
               if (typeof (window as any).__SET_CHIMP_POINTS__ === "function") {
                 (window as any).__SET_CHIMP_POINTS__(
                   (prev: number) => prev + 1,
