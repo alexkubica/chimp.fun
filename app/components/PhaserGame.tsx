@@ -1689,6 +1689,17 @@ export default function PhaserGame({
           {gameStatus === "countdown" && (
             <ChimpCountdown countdownText={countdownText} />
           )}
+          {/* Show score and share when finished */}
+          {gameStatus === "finished" && (
+            <ChimpScoreShare
+              points={chimpPoints}
+              setGameStatus={setGameStatus}
+              setChimpPoints={setChimpPoints}
+              setCountdownText={setCountdownText}
+              setTimer={setTimer}
+              countdownIntervalRef={countdownIntervalRef}
+            />
+          )}
           {/* Show SettingsContainer under START/timer HUD when toggled */}
           {showHud && (
             <SettingsContainer>
