@@ -272,9 +272,45 @@ function HudToggleButton({
   );
 }
 
-function SettingsContainer({ children }: { children: React.ReactNode }) {
+function SettingsContainer({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
+  // Close on outside click
+  const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(
+    function handleOutsideClick() {
+      function onClick(e: MouseEvent) {
+        if (
+          containerRef.current &&
+          !containerRef.current.contains(e.target as Node)
+        ) {
+          onClose();
+        }
+      }
+      document.addEventListener("mousedown", onClick);
+      return () => document.removeEventListener("mousedown", onClick);
+    },
+    [onClose],
+  );
+
   return (
-    <div className="bg-white rounded-lg p-6 pointer-events-auto">
+    <div
+      ref={containerRef}
+      className="fixed top-0 right-0 z-[100] bg-white rounded-lg p-6 pointer-events-auto shadow-xl min-w-[320px] max-w-[90vw] mt-4 mr-4"
+      style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 text-2xl font-bold text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer p-1"
+        aria-label="Close settings"
+        type="button"
+      >
+        ❌
+      </button>
       {children}
     </div>
   );
@@ -346,6 +382,11 @@ function ChimpHudControls({
         >
           PICK
         </button>
+      </div>
+      {/* Zoom button below id picker */}
+      <div
+        className={`flex flex-row gap-2 w-full ${isDesktop ? "justify-end" : "justify-center"}`}
+      >
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -353,7 +394,7 @@ function ChimpHudControls({
           }}
           className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-base sm:text-lg"
         >
-          {isZoomedOut ? "🔍" : "👁️"}
+          {isZoomedOut ? "Zoom In" : "Zoom Out"}
         </button>
       </div>
       <div
@@ -529,7 +570,7 @@ export default function PhaserGame({
   // Joystick state for mobile
   const joystickDir = useRef({ dx: 0, dy: 0 });
   // In PhaserGame component state
-  const [showFps, setShowFps] = useState(false);
+  const [showFps, setShowFps] = useState(true);
   const [showJoystick, setShowJoystick] = useState(false);
   // Joystick UI state
   const [joystickDragging, setJoystickDragging] = useState(false);
@@ -2014,7 +2055,7 @@ export default function PhaserGame({
           )}
           {/* Show SettingsContainer under START/timer HUD when toggled */}
           {showHud && (
-            <SettingsContainer>
+            <SettingsContainer onClose={() => setShowHud(false)}>
               <ChimpHudControls
                 chimpId={chimpId}
                 setChimpId={setChimpId}
