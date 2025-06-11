@@ -1,133 +1,157 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export default function BannerPage() {
-  const [clickCount, setClickCount] = useState(0);
-  const [hoverCount, setHoverCount] = useState(0);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isInitialPosition, setIsInitialPosition] = useState(true);
-  const [isDesktop, setIsDesktop] = useState(false);
+  // Banner sources
+  const bannerSources = {
+    official: [
+      "Untitled_Artwork-9.png",
+      "Untitled_Artwork-1.png",
+      "Untitled_Artwork-2.png",
+      "Untitled_Artwork-3.png",
+      "Untitled_Artwork-4.png",
+      "Untitled_Artwork-5.png",
+      "Untitled_Artwork-6.png",
+      "Untitled_Artwork-7.png",
+      "Untitled_Artwork-8.png",
+      "OB 5.png",
+      "OB 6.png",
+      "OB 7.png",
+      "OB 8.png",
+      "OB 9.png",
+      "OB 4.png",
+      "OB 10.png",
+      "OB 3.PNG",
+      "OB 2.PNG",
+      "OB 1.JPG",
+    ],
+    community: [
+      "CB 12.PNG",
+      "CB 11.PNG",
+      "CB 13.PNG",
+      "CB 20.PNG",
+      "CB 19.PNG",
+      "CB 18.PNG",
+      "CB 17.PNG",
+      "CB 10.PNG",
+      "CB 14.PNG",
+      "CB 15.PNG",
+      "CB 16.PNG",
+      "CB 9.PNG",
+      "CB 2.PNG",
+      "CB 3.PNG",
+      "CB 4.PNG",
+      "CB 5.PNG",
+      "CB 6.PNG",
+      "CB 7.PNG",
+      "CB 8.PNG",
+      "CB 1.PNG",
+    ],
+  };
 
+  const collections = [
+    { label: "Chimpers", value: "chimpers" },
+    // Future: add more collections here
+  ];
+  const [bannerType, setBannerType] = useState<"official" | "community">(
+    Math.random() < 0.5 ? "official" : "community",
+  );
+  const [collection, setCollection] = useState("chimpers");
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Pick a random banner on load or when type changes
   useEffect(() => {
-    const checkIfDesktop = () => {
-      setIsDesktop(window.matchMedia("(min-width: 768px)").matches);
-    };
+    const banners = bannerSources[bannerType];
+    setCurrentIndex(Math.floor(Math.random() * banners.length));
+  }, [bannerType]);
 
-    checkIfDesktop();
-    window.addEventListener("resize", checkIfDesktop);
+  const banners = useMemo(() => bannerSources[bannerType], [bannerType]);
+  const currentBanner = banners[currentIndex];
+  const bannerPath = `/chimpers-x-banners/${bannerType === "official" ? "officials" : "community"}/${currentBanner}`;
 
-    return () => window.removeEventListener("resize", checkIfDesktop);
-  }, []);
-
-  const calculateNewPosition = (currentX: number, currentY: number) => {
-    // Calculate safe boundaries for the link
-    const linkWidth = 100;
-    const linkHeight = 30;
-    const padding = 50;
-    const warningHeight = 30;
-    const warningWidth = 120;
-
-    const containerWidth = Math.max(linkWidth, warningWidth);
-    const containerHeight = linkHeight + warningHeight;
-
-    const maxY = window.innerHeight - containerHeight - padding * 2;
-
-    // Fixed x position
-    const newX = currentX;
-
-    // Calculate new y position based on sequence
-    let newY;
-    if (clickCount === 1) {
-      // First click - move down
-      newY = currentY + 100;
-    } else if (clickCount === 2) {
-      // Second click - move down again
-      newY = currentY + 100;
-    } else if (clickCount === 3) {
-      // Third click - move up
-      newY = currentY - 50;
-    } else {
-      // After third click - stay in place
-      newY = currentY;
-    }
-
-    // Ensure the container stays within screen bounds
-    // const adjustedY = Math.max(
-    //   containerHeight / 2 + padding,
-    //   Math.min(maxY + containerHeight / 2, newY + containerHeight / 2)
-    // );
-
-    // return { x: newX, y: adjustedY };
-    return { x: newX, y: newY };
-  };
-
-  const handleInteraction = (e: React.MouseEvent, isClick: boolean) => {
-    e.preventDefault();
-
-    if (clickCount >= 3) {
-      if (isClick) {
-        window.open("https://x.com/rafalors", "_blank");
-      }
-      return;
-    }
-
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-
-    if (newCount === 1) {
-      setIsInitialPosition(false);
-    }
-
-    setPosition(calculateNewPosition(position.x, position.y));
-  };
+  function handlePrev() {
+    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
+  }
+  function handleNext() {
+    setCurrentIndex((prev) => (prev + 1) % banners.length);
+  }
+  function handleRandom() {
+    setCurrentIndex(Math.floor(Math.random() * banners.length));
+  }
 
   return (
-    <main className="h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
-      <h1 className="text-4xl font-bold mb-2">COMING SOON!</h1>
-      <p className="text-xl mb-8">
-        for now here&apos;s{" "}
-        <span
-          className={`relative inline-block ${
-            isInitialPosition ? "relative" : "fixed"
-          }`}
-          style={
-            !isInitialPosition
-              ? {
-                  left: `${position.x}px`,
-                  top: `${position.y}px`,
-                  transform: "translate(-50%, -50%)",
-                  zIndex: 50,
-                }
-              : undefined
-          }
-        >
-          {clickCount >= 3 && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-2 py-1 text-red-600 font-bold text-sm rounded whitespace-nowrap overflow-hidden">
-              don&apos;t click it!
-            </div>
-          )}
-          <a
-            href="https://x.com/rafalors"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline transition-all duration-300"
-            onClick={(e) => handleInteraction(e, true)}
-            onMouseEnter={(e) => handleInteraction(e, false)}
+    <main className="min-h-screen flex flex-col items-center justify-start p-4 bg-gray-50">
+      <h1 className="text-3xl md:text-5xl font-bold mb-4 mt-6 text-center">
+        CHIMP.FUN Banner Maker
+      </h1>
+      <div className="flex flex-col md:flex-row gap-4 mb-6 w-full max-w-xl justify-center items-center">
+        <div>
+          <label className="block text-sm font-medium mb-1">Collection</label>
+          <select
+            className="border rounded px-3 py-2 w-40"
+            value={collection}
+            onChange={(e) => setCollection(e.target.value)}
+            disabled
           >
-            banana rafa
-          </a>
-        </span>
-      </p>
-      <div className="relative w-full max-w-2xl h-[calc(100vh-12rem)]">
-        <Image
-          src="/banana-rafa.jpeg"
-          alt="Banana Rafa"
-          fill
-          className="object-contain"
-          priority
-        />
+            {collections.map((col) => (
+              <option key={col.value} value={col.value}>
+                {col.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Banner Type</label>
+          <select
+            className="border rounded px-3 py-2 w-40"
+            value={bannerType}
+            onChange={(e) =>
+              setBannerType(e.target.value as "official" | "community")
+            }
+          >
+            <option value="official">Official</option>
+            <option value="community">Community</option>
+          </select>
+        </div>
+      </div>
+      <div className="flex flex-col items-center w-full max-w-2xl">
+        <div className="relative flex items-center justify-center w-full h-64 md:h-96 bg-white rounded-lg shadow mb-4">
+          <button
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 rounded-full p-2 text-2xl"
+            onClick={handlePrev}
+            aria-label="Previous banner"
+          >
+            &#8592;
+          </button>
+          <div className="flex-1 flex items-center justify-center h-full">
+            <Image
+              src={bannerPath}
+              alt={currentBanner}
+              width={800}
+              height={400}
+              className="object-contain max-h-full max-w-full rounded"
+              priority
+            />
+          </div>
+          <button
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 rounded-full p-2 text-2xl"
+            onClick={handleNext}
+            aria-label="Next banner"
+          >
+            &#8594;
+          </button>
+        </div>
+        <button
+          className="mb-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 rounded font-bold text-lg shadow"
+          onClick={handleRandom}
+        >
+          <span role="img" aria-label="cube" className="mr-2">
+            🧊
+          </span>
+          Random
+        </button>
       </div>
     </main>
   );
