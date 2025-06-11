@@ -570,9 +570,9 @@ export default function PhaserGame({
   // Joystick state for mobile
   const joystickDir = useRef({ dx: 0, dy: 0 });
   // In PhaserGame component state
-  const [showFps, setShowFps] = useState(true);
-  const [showJoystick, setShowJoystick] = useState(true);
-  const [showDestinationPin, setShowDestinationPin] = useState(true);
+  const [showFps, setShowFps] = useState(false);
+  const [showJoystick, setShowJoystick] = useState(false);
+  const [showDestinationPin, setShowDestinationPin] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -701,6 +701,9 @@ export default function PhaserGame({
         _hasSpawnedFirstCollectible: boolean = false;
         lastTouchMove: { dx: number; dy: number; speed: number } | null = null;
         touchReached: boolean = false;
+        // Add state for pin stop logic
+        private _stoppedAtPin: boolean = false;
+        private _lastPinPos: { x: number; y: number } | null = null;
 
         constructor() {
           super({ key: "MainScene" });
@@ -1345,6 +1348,20 @@ export default function PhaserGame({
             dy = 0;
           let moving = false;
 
+          // Helper to check if pointer is far enough from chimp
+          function isPointerFarEnough(
+            chimp: Phaser.GameObjects.Sprite,
+            pin: { x: number; y: number },
+          ) {
+            const dist = Phaser.Math.Distance.Between(
+              chimp.x,
+              chimp.y,
+              pin.x,
+              pin.y,
+            );
+            return dist >= 5;
+          }
+
           // Allow movement in all states except countdown
           if ((window as any).__GAME_STATUS__ !== "countdown") {
             if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
@@ -1403,22 +1420,57 @@ export default function PhaserGame({
                 targetY,
               );
               const TOUCH_THRESHOLD = 0;
-              if (dist > TOUCH_THRESHOLD) {
-                dx = Math.cos(angle) * speed;
-                dy = Math.sin(angle) * speed;
-                moving = true;
-              } else {
-                dx = 0;
-                dy = 0;
-                moving = false;
-                // Optionally snap chimp to pointer if within threshold
-                this.chimp.x = targetX;
-                this.chimp.y = targetY;
+
+              // Pin stop logic
+              if (this._stoppedAtPin) {
+                // Only resume if pointer is far enough from chimp
+                if (
+                  isPointerFarEnough(this.chimp, { x: targetX, y: targetY })
+                ) {
+                  this._stoppedAtPin = false;
+                  this._lastPinPos = null;
+                } else {
+                  dx = 0;
+                  dy = 0;
+                  moving = false;
+                  // Optionally snap chimp to pointer if within threshold
+                  this.chimp.x = targetX;
+                  this.chimp.y = targetY;
+                }
+              }
+              if (!this._stoppedAtPin) {
+                if (dist > TOUCH_THRESHOLD) {
+                  dx = Math.cos(angle) * speed;
+                  dy = Math.sin(angle) * speed;
+                  moving = true;
+                  // If we're about to reach the pin, check if we should stop
+                  if (dist < speed) {
+                    // Snap to pin and stop
+                    this.chimp.x = targetX;
+                    this.chimp.y = targetY;
+                    dx = 0;
+                    dy = 0;
+                    moving = false;
+                    this._stoppedAtPin = true;
+                    this._lastPinPos = { x: targetX, y: targetY };
+                  }
+                } else {
+                  dx = 0;
+                  dy = 0;
+                  moving = false;
+                  // Optionally snap chimp to pointer if within threshold
+                  this.chimp.x = targetX;
+                  this.chimp.y = targetY;
+                  this._stoppedAtPin = true;
+                  this._lastPinPos = { x: targetX, y: targetY };
+                }
               }
             } else {
               // Touch released
               this.touchReached = false;
               this.lastTouchMove = null;
+              this._stoppedAtPin = false;
+              this._lastPinPos = null;
             }
             // Joystick-based movement removed (debug only)
           } else {
