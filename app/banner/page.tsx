@@ -116,35 +116,76 @@ export default function BannerPage() {
           </select>
         </div>
       </div>
+      <a
+        href={bannerPath}
+        download={currentBanner}
+        className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-lg shadow inline-block text-center"
+      >
+        Download
+      </a>
       <div className="flex flex-col items-center w-full max-w-2xl">
-        <div className="relative flex items-center justify-center w-full h-64 md:h-96 bg-white rounded-lg shadow mb-4">
+        <div className="relative w-full aspect-[2/1] bg-white rounded-lg shadow mb-2 overflow-hidden">
+          <Image
+            src={bannerPath}
+            alt={currentBanner}
+            fill
+            className="object-contain rounded select-none"
+            priority
+            sizes="(max-width: 800px) 100vw, 800px"
+          />
           <button
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 rounded-full p-2 text-2xl"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 rounded-full p-2 text-2xl z-20"
             onClick={handlePrev}
             aria-label="Previous banner"
+            style={{ pointerEvents: "auto" }}
           >
             &#8592;
           </button>
-          <div className="flex-1 flex items-center justify-center h-full">
-            <Image
-              src={bannerPath}
-              alt={currentBanner}
-              width={800}
-              height={400}
-              className="object-contain max-h-full max-w-full rounded"
-              priority
-            />
-          </div>
           <button
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 rounded-full p-2 text-2xl"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-200 hover:bg-gray-300 rounded-full p-2 text-2xl z-20"
             onClick={handleNext}
             aria-label="Next banner"
+            style={{ pointerEvents: "auto" }}
           >
             &#8594;
           </button>
         </div>
+        {/* Row of previews under the main banner */}
+        <div className="flex flex-row items-center justify-center gap-2 mb-4 w-full overflow-x-auto">
+          {Array.from({ length: 7 }).map((_, i) => {
+            const offset = i - 3;
+            const idx =
+              (currentIndex + offset + banners.length) % banners.length;
+            const isSelected = offset === 0;
+            return (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`border-2 rounded transition-all duration-200 focus:outline-none ${
+                  isSelected
+                    ? "border-yellow-500 scale-110 shadow-lg"
+                    : "border-transparent opacity-80 hover:opacity-100"
+                } bg-white`}
+                style={{ minWidth: 64 }}
+                aria-label={
+                  isSelected ? "Current banner" : `Banner preview ${idx + 1}`
+                }
+              >
+                <Image
+                  src={`/chimpers-x-banners/${bannerType === "official" ? "officials" : "community"}/${banners[idx]}`}
+                  alt={
+                    isSelected ? "Current banner" : `Banner preview ${idx + 1}`
+                  }
+                  width={120}
+                  height={60}
+                  className="object-contain rounded"
+                />
+              </button>
+            );
+          })}
+        </div>
         <button
-          className="mb-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 rounded font-bold text-lg shadow"
+          className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-lg shadow"
           onClick={handleRandom}
         >
           <span role="img" aria-label="cube" className="mr-2">
