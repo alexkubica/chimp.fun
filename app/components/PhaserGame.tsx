@@ -331,6 +331,8 @@ function ChimpHudControls({
   setShowFps,
   showJoystick,
   setShowJoystick,
+  showDestinationPin,
+  setShowDestinationPin,
   isMobile,
 }: {
   chimpId: string;
@@ -346,6 +348,8 @@ function ChimpHudControls({
   setShowFps: (v: boolean) => void;
   showJoystick: boolean;
   setShowJoystick: (v: boolean) => void;
+  showDestinationPin: boolean;
+  setShowDestinationPin: (v: boolean) => void;
   isMobile: boolean;
 }) {
   return (
@@ -440,6 +444,16 @@ function ChimpHudControls({
             }}
           />
           Show Joystick
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={showDestinationPin}
+            onChange={function (e) {
+              setShowDestinationPin(e.target.checked);
+            }}
+          />
+          Show destination pin
         </label>
       </div>
     </div>
@@ -557,7 +571,8 @@ export default function PhaserGame({
   const joystickDir = useRef({ dx: 0, dy: 0 });
   // In PhaserGame component state
   const [showFps, setShowFps] = useState(true);
-  const [showJoystick, setShowJoystick] = useState(false);
+  const [showJoystick, setShowJoystick] = useState(true);
+  const [showDestinationPin, setShowDestinationPin] = useState(true);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1362,30 +1377,21 @@ export default function PhaserGame({
                 this.touchPointer.x,
                 this.touchPointer.y,
               );
-              // If not reached, move toward finger
-              if (dist > 8) {
+              const TOUCH_THRESHOLD = 8;
+              if (dist > TOUCH_THRESHOLD) {
                 dx = Math.cos(angle) * speed;
                 dy = Math.sin(angle) * speed;
-                this.lastTouchMove = {
-                  dx: Math.cos(angle),
-                  dy: Math.sin(angle),
-                  speed,
-                };
-                this.touchReached = false;
                 moving = true;
-              } else if (this.lastTouchMove && !this.touchReached) {
-                // Just reached, keep moving in last direction
-                this.touchReached = true;
-                dx = this.lastTouchMove.dx * speed;
-                dy = this.lastTouchMove.dy * speed;
-                moving = true;
-              } else if (this.touchReached && this.lastTouchMove) {
-                // Continue moving in last direction
-                dx = this.lastTouchMove.dx * speed;
-                dy = this.lastTouchMove.dy * speed;
-                moving = true;
+              } else {
+                dx = 0;
+                dy = 0;
+                moving = false;
+                // Optionally snap chimp to pointer if within threshold
+                this.chimp.x = this.touchPointer.x;
+                this.chimp.y = this.touchPointer.y;
               }
             } else {
+              // Touch released
               this.touchReached = false;
               this.lastTouchMove = null;
             }
@@ -1571,7 +1577,12 @@ export default function PhaserGame({
           }
 
           // Update direction based on movement
-          if ((window as any).__GAME_STATUS__ !== "countdown" && dx !== 0) {
+          // Only update direction if position actually changed (not clamped)
+          if (
+            (window as any).__GAME_STATUS__ !== "countdown" &&
+            dx !== 0 &&
+            posChanged
+          ) {
             this.lastDirection = dx > 0 ? 1 : -1;
             this.chimp.setFlipX(this.lastDirection === -1);
           }
@@ -2032,6 +2043,8 @@ export default function PhaserGame({
                   setShowFps={setShowFps}
                   showJoystick={showJoystick}
                   setShowJoystick={setShowJoystick}
+                  showDestinationPin={showDestinationPin}
+                  setShowDestinationPin={setShowDestinationPin}
                   isMobile={isMobile}
                 />
               </SettingsContainer>
@@ -2072,6 +2085,24 @@ export default function PhaserGame({
         id="phaser-container"
         className="fixed inset-0 w-full h-full pointer-events-auto"
       />
+      {/* Destination Pin */}
+      {showDestinationPin &&
+        sceneRef.current &&
+        (sceneRef.current as any).touchPointer?.isDown && (
+          <div
+            style={{
+              position: "fixed",
+              left: (sceneRef.current as any).touchPointer.x - 18,
+              top: (sceneRef.current as any).touchPointer.y - 36,
+              zIndex: 30,
+              fontSize: 36,
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+          >
+            📍
+          </div>
+        )}
       {/* FPS Counter */}
       {showFps && (
         <div className="fixed bottom-2 left-2 z-50 text-white font-mono bg-black/60 px-2 py-1 rounded">
