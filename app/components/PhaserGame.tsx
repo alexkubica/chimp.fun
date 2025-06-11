@@ -438,7 +438,6 @@ function ChimpHudControls({
             onChange={function (e) {
               setShowJoystick(e.target.checked);
             }}
-            disabled={!isMobile}
           />
           Show Joystick
         </label>
@@ -1861,7 +1860,7 @@ export default function PhaserGame({
 
   // Joystick visualization: update based on chimp's movement direction
   useEffect(() => {
-    if (!showJoystick || !isMobile) return;
+    if (!showJoystick) return;
     const update = () => {
       const chimpDir = (window as any).__CHIMP_DIR__;
       if (chimpDir && (chimpDir.dx !== 0 || chimpDir.dy !== 0)) {
@@ -1883,7 +1882,7 @@ export default function PhaserGame({
     };
     update();
     return () => {};
-  }, [showJoystick, isMobile]);
+  }, [showJoystick]);
 
   if (!mounted) return null;
 
@@ -2079,8 +2078,8 @@ export default function PhaserGame({
           FPS: {fps}
         </div>
       )}
-      {/* Joystick UI only if enabled and mobile */}
-      {showJoystick && isMobile && (
+      {/* Joystick UI only if enabled */}
+      {showJoystick && (
         <Joystick
           dragging={false}
           pos={joystickPos}
