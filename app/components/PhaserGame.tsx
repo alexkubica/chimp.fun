@@ -117,7 +117,7 @@ function ChimpScoreShare({
         </button>
         <button
           onClick={() => {
-            const tweetText = `I !CHIMPED ${points} points within 30 seconds in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
+            const tweetText = `I !CHIMPED ${points} points in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
             const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
             window.open(tweetUrl, "_blank", "noopener,noreferrer");
           }}
@@ -1365,19 +1365,44 @@ export default function PhaserGame({
             }
             // Always allow touchPointer movement on mobile
             if (this.touchPointer?.isDown) {
+              // Convert pointer position to world coordinates
+              const camera = this.cameras.main;
+              const worldPoint = camera.getWorldPoint(
+                this.touchPointer.x,
+                this.touchPointer.y,
+              );
+
+              // Get chimp's scaled dimensions
+              const chimpWidth = this.chimp.width * this.chimp.scaleX;
+              const chimpHeight = this.chimp.height * this.chimp.scaleY;
+              const width = MainScene.MIN_BOUNDARY_WIDTH;
+              const height = MainScene.MIN_BOUNDARY_HEIGHT;
+              const x = (this.scale.width - width) / 2;
+              const y = (this.scale.height - height) / 2;
+              const minX = x + chimpWidth / 2 + MainScene.BOUNDARY_PADDING_X;
+              const maxX =
+                x + width - chimpWidth / 2 - MainScene.BOUNDARY_PADDING_X;
+              const minY = y + chimpHeight / 2 + MainScene.BOUNDARY_PADDING_Y;
+              const maxY =
+                y + height - chimpHeight / 2 - MainScene.BOUNDARY_PADDING_Y;
+
+              // Clamp the target position to the allowed area
+              const targetX = Phaser.Math.Clamp(worldPoint.x, minX, maxX);
+              const targetY = Phaser.Math.Clamp(worldPoint.y, minY, maxY);
+
               const dist = Phaser.Math.Distance.Between(
                 this.chimp.x,
                 this.chimp.y,
-                this.touchPointer.x,
-                this.touchPointer.y,
+                targetX,
+                targetY,
               );
               const angle = Phaser.Math.Angle.Between(
                 this.chimp.x,
                 this.chimp.y,
-                this.touchPointer.x,
-                this.touchPointer.y,
+                targetX,
+                targetY,
               );
-              const TOUCH_THRESHOLD = 8;
+              const TOUCH_THRESHOLD = 0;
               if (dist > TOUCH_THRESHOLD) {
                 dx = Math.cos(angle) * speed;
                 dy = Math.sin(angle) * speed;
@@ -1387,8 +1412,8 @@ export default function PhaserGame({
                 dy = 0;
                 moving = false;
                 // Optionally snap chimp to pointer if within threshold
-                this.chimp.x = this.touchPointer.x;
-                this.chimp.y = this.touchPointer.y;
+                this.chimp.x = targetX;
+                this.chimp.y = targetY;
               }
             } else {
               // Touch released
