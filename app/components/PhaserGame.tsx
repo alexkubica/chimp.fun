@@ -290,6 +290,11 @@ function ChimpHudControls({
   handleRandomBg,
   isDesktop,
   gameStatus,
+  showFps,
+  setShowFps,
+  showJoystick,
+  setShowJoystick,
+  isMobile,
 }: {
   chimpId: string;
   setChimpId: (id: string) => void;
@@ -300,6 +305,11 @@ function ChimpHudControls({
   handleRandomBg: () => void;
   isDesktop: boolean;
   gameStatus: string;
+  showFps: boolean;
+  setShowFps: (v: boolean) => void;
+  showJoystick: boolean;
+  setShowJoystick: (v: boolean) => void;
+  isMobile: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2 w-full items-center">
@@ -368,6 +378,29 @@ function ChimpHudControls({
           🎲 BG
         </button>
       </div>
+      <div className="flex flex-col gap-2 w-full mt-2">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={showFps}
+            onChange={function (e) {
+              setShowFps(e.target.checked);
+            }}
+          />
+          Show FPS
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={showJoystick}
+            onChange={function (e) {
+              setShowJoystick(e.target.checked);
+            }}
+            disabled={!isMobile}
+          />
+          Show Joystick
+        </label>
+      </div>
     </div>
   );
 }
@@ -404,85 +437,17 @@ function getRandomCollectiblePosition({
 
 // Joystick component for mobile controls
 function Joystick({
-  onMove,
-  onEnd,
+  dragging,
+  pos,
+  basePos,
+  radius = 48,
 }: {
-  onMove: (dx: number, dy: number) => void;
-  onEnd: () => void;
+  dragging: boolean;
+  pos: { x: number; y: number };
+  basePos: { x: number; y: number } | null;
+  radius?: number;
 }) {
-  const [dragging, setDragging] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [basePos, setBasePos] = useState<{ x: number; y: number } | null>(null); // null = default bottom right
-  const baseRef = useRef<HTMLDivElement>(null);
-  const stickRef = useRef<HTMLDivElement>(null);
-  const radius = 48;
-
-  // Helper to get relative coords for a given base position
-  function getRelativeCoordsFromBase(
-    touch: Touch,
-    base: { x: number; y: number },
-  ) {
-    const x = touch.clientX - base.x;
-    const y = touch.clientY - base.y;
-    return { x, y };
-  }
-
-  useEffect(() => {
-    function handleTouchStartDoc(e: TouchEvent) {
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        setBasePos({ x: touch.clientX, y: touch.clientY });
-        setDragging(true);
-        setPos({ x: 0, y: 0 });
-      }
-    }
-    function handleTouchMoveDoc(e: TouchEvent) {
-      if (!dragging || !basePos) return;
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        const { x, y } = getRelativeCoordsFromBase(touch, {
-          x: basePos.x,
-          y: basePos.y,
-        });
-        // Clamp to radius
-        const dist = Math.sqrt(x * x + y * y);
-        let nx = x,
-          ny = y;
-        if (dist > radius) {
-          nx = (x / dist) * radius;
-          ny = (y / dist) * radius;
-        }
-        setPos({ x: nx, y: ny });
-        handleMove(nx, ny);
-      }
-    }
-    function handleTouchEndDoc() {
-      setDragging(false);
-      setBasePos(null); // Reset to default
-      setPos({ x: 0, y: 0 });
-      onEnd();
-    }
-    document.addEventListener("touchstart", handleTouchStartDoc);
-    document.addEventListener("touchmove", handleTouchMoveDoc);
-    document.addEventListener("touchend", handleTouchEndDoc);
-    document.addEventListener("touchcancel", handleTouchEndDoc);
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStartDoc);
-      document.removeEventListener("touchmove", handleTouchMoveDoc);
-      document.removeEventListener("touchend", handleTouchEndDoc);
-      document.removeEventListener("touchcancel", handleTouchEndDoc);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dragging, basePos]);
-
-  function handleMove(x: number, y: number) {
-    // Normalize to [-1, 1]
-    const dx = x / radius;
-    const dy = y / radius;
-    onMove(dx, dy);
-  }
-
-  // Joystick base position: default bottom right, or at touch position
+  // Joystick base position: default bottom right, or at center
   let containerStyle: React.CSSProperties;
   if (basePos) {
     containerStyle = {
@@ -509,7 +474,7 @@ function Joystick({
   }
 
   return (
-    <div ref={baseRef} className="z-50 select-none" style={containerStyle}>
+    <div className="z-50 select-none" style={containerStyle}>
       <div
         className="absolute left-1/2 top-1/2 bg-gray-700/70 rounded-full"
         style={{
@@ -519,7 +484,6 @@ function Joystick({
         }}
       />
       <div
-        ref={stickRef}
         className="absolute left-1/2 top-1/2 bg-blue-400/90 rounded-full shadow-lg"
         style={{
           width: 48,
@@ -564,6 +528,17 @@ export default function PhaserGame({
   const [isMobile, setIsMobile] = useState(false);
   // Joystick state for mobile
   const joystickDir = useRef({ dx: 0, dy: 0 });
+  // In PhaserGame component state
+  const [showFps, setShowFps] = useState(false);
+  const [showJoystick, setShowJoystick] = useState(false);
+  // Joystick UI state
+  const [joystickDragging, setJoystickDragging] = useState(false);
+  const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
+  const [joystickBasePos, setJoystickBasePos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const joystickRadius = 48;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -725,6 +700,8 @@ export default function PhaserGame({
         private _cameraFollowState: WeakMap<any, boolean> = new WeakMap();
         private _hasCenteredChimpInitially: boolean = false;
         _hasSpawnedFirstCollectible: boolean = false;
+        lastTouchMove: { dx: number; dy: number; speed: number } | null = null;
+        touchReached: boolean = false;
 
         constructor() {
           super({ key: "MainScene" });
@@ -836,9 +813,13 @@ export default function PhaserGame({
 
           this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
             this.touchPointer = pointer;
+            this.touchReached = false;
+            this.lastTouchMove = null;
           });
           this.input.on("pointerup", () => {
             this.touchPointer = null;
+            this.touchReached = false;
+            this.lastTouchMove = null;
           });
 
           // Add debounced resize handler
@@ -1382,16 +1363,46 @@ export default function PhaserGame({
               dy += speed;
               moving = true;
             }
+            // Always allow touchPointer movement on mobile, regardless of joystick state
             if (this.touchPointer?.isDown) {
+              const dist = Phaser.Math.Distance.Between(
+                this.chimp.x,
+                this.chimp.y,
+                this.touchPointer.x,
+                this.touchPointer.y,
+              );
               const angle = Phaser.Math.Angle.Between(
                 this.chimp.x,
                 this.chimp.y,
                 this.touchPointer.x,
                 this.touchPointer.y,
               );
-              dx = Math.cos(angle) * speed;
-              dy = Math.sin(angle) * speed;
-              moving = true;
+              // If not reached, move toward finger
+              if (dist > 8) {
+                dx = Math.cos(angle) * speed;
+                dy = Math.sin(angle) * speed;
+                this.lastTouchMove = {
+                  dx: Math.cos(angle),
+                  dy: Math.sin(angle),
+                  speed,
+                };
+                this.touchReached = false;
+                moving = true;
+              } else if (this.lastTouchMove && !this.touchReached) {
+                // Just reached, keep moving in last direction
+                this.touchReached = true;
+                dx = this.lastTouchMove.dx * speed;
+                dy = this.lastTouchMove.dy * speed;
+                moving = true;
+              } else if (this.touchReached && this.lastTouchMove) {
+                // Continue moving in last direction
+                dx = this.lastTouchMove.dx * speed;
+                dy = this.lastTouchMove.dy * speed;
+                moving = true;
+              }
+            } else {
+              this.touchReached = false;
+              this.lastTouchMove = null;
             }
             // Joystick movement for mobile
             if (
@@ -1875,6 +1886,58 @@ export default function PhaserGame({
     }
   };
 
+  // Joystick touch logic (always active, must be before any return)
+  useEffect(() => {
+    function handleTouchStartDoc(e: TouchEvent) {
+      if (e.touches.length > 0) {
+        // Always center joystick at screen center
+        const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        setJoystickBasePos(center);
+        setJoystickDragging(true);
+        setJoystickPos({ x: 0, y: 0 });
+      }
+    }
+    function handleTouchMoveDoc(e: TouchEvent) {
+      if (!joystickDragging || !joystickBasePos) return;
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const x = touch.clientX - joystickBasePos.x;
+        const y = touch.clientY - joystickBasePos.y;
+        // Clamp to radius
+        const dist = Math.sqrt(x * x + y * y);
+        let nx = x,
+          ny = y;
+        if (dist > joystickRadius) {
+          nx = (x / dist) * joystickRadius;
+          ny = (y / dist) * joystickRadius;
+        }
+        setJoystickPos({ x: nx, y: ny });
+        // Normalize to [-1, 1]
+        const dx = nx / joystickRadius;
+        const dy = ny / joystickRadius;
+        joystickDir.current = { dx, dy };
+        (window as any).__JOYSTICK_DIR__ = { dx, dy };
+      }
+    }
+    function handleTouchEndDoc() {
+      setJoystickDragging(false);
+      setJoystickBasePos(null);
+      setJoystickPos({ x: 0, y: 0 });
+      joystickDir.current = { dx: 0, dy: 0 };
+      (window as any).__JOYSTICK_DIR__ = { dx: 0, dy: 0 };
+    }
+    document.addEventListener("touchstart", handleTouchStartDoc);
+    document.addEventListener("touchmove", handleTouchMoveDoc);
+    document.addEventListener("touchend", handleTouchEndDoc);
+    document.addEventListener("touchcancel", handleTouchEndDoc);
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStartDoc);
+      document.removeEventListener("touchmove", handleTouchMoveDoc);
+      document.removeEventListener("touchend", handleTouchEndDoc);
+      document.removeEventListener("touchcancel", handleTouchEndDoc);
+    };
+  }, [joystickDragging, joystickBasePos]);
+
   if (!mounted) return null;
 
   const handleChimpChange = () => {
@@ -1904,16 +1967,6 @@ export default function PhaserGame({
     }
     onRandomBg?.();
   };
-
-  // Joystick handlers
-  function handleJoystickMove(dx: number, dy: number) {
-    joystickDir.current = { dx, dy };
-    (window as any).__JOYSTICK_DIR__ = { dx, dy };
-  }
-  function handleJoystickEnd() {
-    joystickDir.current = { dx: 0, dy: 0 };
-    (window as any).__JOYSTICK_DIR__ = { dx: 0, dy: 0 };
-  }
 
   return (
     <>
@@ -1972,6 +2025,11 @@ export default function PhaserGame({
                 handleRandomBg={handleRandomBg}
                 isDesktop={isDesktop}
                 gameStatus={gameStatus}
+                showFps={showFps}
+                setShowFps={setShowFps}
+                showJoystick={showJoystick}
+                setShowJoystick={setShowJoystick}
+                isMobile={isMobile}
               />
             </SettingsContainer>
           )}
@@ -2006,15 +2064,25 @@ export default function PhaserGame({
         )}
       </div>
       {/* Game container */}
-      <div id="phaser-container" className="fixed inset-0 w-full h-full" />
+      <div
+        id="phaser-container"
+        className="fixed inset-0 w-full h-full pointer-events-auto"
+      />
 
       {/* FPS Counter */}
-      <div className="fixed bottom-2 left-2 z-50 text-white font-mono bg-black/60 px-2 py-1 rounded">
-        FPS: {fps}
-      </div>
-      {/* Mobile Joystick */}
-      {isMobile && (
-        <Joystick onMove={handleJoystickMove} onEnd={handleJoystickEnd} />
+      {showFps && (
+        <div className="fixed bottom-2 left-2 z-50 text-white font-mono bg-black/60 px-2 py-1 rounded">
+          FPS: {fps}
+        </div>
+      )}
+      {/* Joystick UI only if enabled and mobile */}
+      {showJoystick && isMobile && (
+        <Joystick
+          dragging={joystickDragging}
+          pos={joystickPos}
+          basePos={joystickBasePos}
+          radius={joystickRadius}
+        />
       )}
     </>
   );
