@@ -9,6 +9,7 @@ import type { MutableRefObject, Dispatch, SetStateAction } from "react";
 declare global {
   interface Window {
     __JOYSTICK_DIR__?: { dx: number; dy: number };
+    __CHIMP_DIR__?: { dx: number; dy: number };
   }
 }
 
@@ -488,31 +489,17 @@ function Joystick({
   basePos: { x: number; y: number } | null;
   radius?: number;
 }) {
-  // Joystick base position: default bottom right, or at center
-  let containerStyle: React.CSSProperties;
-  if (basePos) {
-    containerStyle = {
-      touchAction: "none",
-      width: 120,
-      height: 120,
-      position: "fixed",
-      left: basePos.x - 60,
-      top: basePos.y - 60,
-      zIndex: 100,
-      pointerEvents: "auto",
-    };
-  } else {
-    containerStyle = {
-      touchAction: "none",
-      width: 120,
-      height: 120,
-      position: "fixed",
-      right: 24,
-      bottom: 24,
-      zIndex: 100,
-      pointerEvents: "auto",
-    };
-  }
+  // Joystick base position: always bottom right
+  const containerStyle: React.CSSProperties = {
+    touchAction: "none",
+    width: 120,
+    height: 120,
+    position: "fixed",
+    right: 24,
+    bottom: 24,
+    zIndex: 100,
+    pointerEvents: "auto",
+  };
 
   return (
     <div className="z-50 select-none" style={containerStyle}>
@@ -572,14 +559,6 @@ export default function PhaserGame({
   // In PhaserGame component state
   const [showFps, setShowFps] = useState(true);
   const [showJoystick, setShowJoystick] = useState(false);
-  // Joystick UI state
-  const [joystickDragging, setJoystickDragging] = useState(false);
-  const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
-  const [joystickBasePos, setJoystickBasePos] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const joystickRadius = 48;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -633,54 +612,19 @@ export default function PhaserGame({
     // Set initial game status
     (window as any).__GAME_STATUS__ = gameStatus;
 
-    // Add keyboard event listener for zoom
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && (e.key === "+" || e.key === "-")) {
-        e.preventDefault();
-        if (sceneRef.current && sceneRef.current.cameras.main) {
-          const camera = sceneRef.current.cameras.main;
-          const currentZoom = camera.zoom;
-          const newZoom =
-            e.key === "+"
-              ? Math.min(currentZoom * 1.2, 2)
-              : Math.max(currentZoom / 1.2, 0.5);
-
-          // Calculate boundary dimensions
-          const width = 2000; // MIN_BOUNDARY_WIDTH
-          const height = 1500; // MIN_BOUNDARY_HEIGHT
-          const x = (sceneRef.current.scale.width - width) / 2;
-          const y = (sceneRef.current.scale.height - height) / 2;
-
-          // Calculate camera dimensions at new zoom
-          const cameraWidth = camera.width / newZoom;
-          const cameraHeight = camera.height / newZoom;
-
-          // Calculate target position to center on player if possible
-          let targetX = x + width / 2;
-          let targetY = y + height / 2;
-
-          const scene = sceneRef.current as MainScene;
-          if (scene.chimp) {
-            // Try to center on player
-            targetX = scene.chimp.x - cameraWidth / 2;
-            targetY = scene.chimp.y - cameraHeight / 2;
-
-            // Clamp to boundaries
-            targetX = Phaser.Math.Clamp(targetX, x, x + width - cameraWidth);
-            targetY = Phaser.Math.Clamp(targetY, y, y + height - cameraHeight);
-          }
-
-          // Apply zoom and position
-          camera.zoomTo(newZoom, 200, Phaser.Math.Easing.Quadratic.InOut);
-          camera.setScroll(targetX, targetY);
-        }
-      }
-    };
-
+    // Remove the inner handleKeyDown definition here
     window.addEventListener("keydown", handleKeyDown);
 
     // Avoid duplicate game init on hot reload
+    const containers = document.querySelectorAll("#phaser-container");
+    console.log("ALL phaser-containers:", containers);
+    if (containers.length > 1) {
+      containers.forEach((el, idx) => {
+        if (idx < containers.length - 1) el.remove();
+      });
+    }
     const container = document.getElementById("phaser-container");
+    console.log("phaser container", container);
     if (!container || gameRef.current) return;
 
     // Dynamically import Phaser
@@ -853,6 +797,7 @@ export default function PhaserGame({
           }
 
           this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+            console.log("pointerdown", pointer);
             this.touchPointer = pointer;
             this.touchReached = false;
             this.lastTouchMove = null;
@@ -1404,7 +1349,7 @@ export default function PhaserGame({
               dy += speed;
               moving = true;
             }
-            // Always allow touchPointer movement on mobile, regardless of joystick state
+            // Always allow touchPointer movement on mobile
             if (this.touchPointer?.isDown) {
               const dist = Phaser.Math.Distance.Between(
                 this.chimp.x,
@@ -1445,26 +1390,9 @@ export default function PhaserGame({
               this.touchReached = false;
               this.lastTouchMove = null;
             }
-            // Joystick movement for mobile
-            if (
-              window.__JOYSTICK_DIR__ &&
-              (window.__JOYSTICK_DIR__.dx !== 0 ||
-                window.__JOYSTICK_DIR__.dy !== 0)
-            ) {
-              dx = window.__JOYSTICK_DIR__.dx * speed;
-              dy = window.__JOYSTICK_DIR__.dy * speed;
-              moving = true;
-            }
+            // Joystick-based movement removed (debug only)
           } else {
-            // During countdown, check for any movement key or joystick to animate running
-            let joystickActive =
-              window.__JOYSTICK_DIR__ &&
-              (window.__JOYSTICK_DIR__.dx !== 0 ||
-                window.__JOYSTICK_DIR__.dy !== 0);
-            const joystickDx =
-              joystickActive && window.__JOYSTICK_DIR__
-                ? window.__JOYSTICK_DIR__.dx
-                : 0;
+            // During countdown, check for any movement key to animate running
             if (
               this.cursors?.left.isDown ||
               this.wasd?.left.isDown ||
@@ -1473,27 +1401,26 @@ export default function PhaserGame({
               this.cursors?.up.isDown ||
               this.wasd?.up.isDown ||
               this.cursors?.down.isDown ||
-              this.wasd?.down.isDown ||
-              joystickActive
+              this.wasd?.down.isDown
             ) {
               moving = true;
-              // Only update direction for left/right or joystick X
-              if (
-                this.cursors?.left.isDown ||
-                this.wasd?.left.isDown ||
-                (joystickActive && joystickDx < 0)
-              ) {
+              // Only update direction for left/right
+              if (this.cursors?.left.isDown || this.wasd?.left.isDown) {
                 this.lastDirection = -1;
                 this.chimp?.setFlipX(true);
               } else if (
                 this.cursors?.right.isDown ||
-                this.wasd?.right.isDown ||
-                (joystickActive && joystickDx > 0)
+                this.wasd?.right.isDown
               ) {
                 this.lastDirection = 1;
                 this.chimp?.setFlipX(false);
               }
             }
+          }
+
+          // Expose chimp's movement direction for debugging/visualization
+          if (typeof window !== "undefined") {
+            (window as any).__CHIMP_DIR__ = { dx, dy };
           }
 
           // Get chimp's scaled dimensions
@@ -1512,12 +1439,12 @@ export default function PhaserGame({
           const y = (this.scale.height - height) / 2;
 
           // Calculate new position with padding
-          let newX = this.chimp.x + dx;
-          let newY = this.chimp.y + dy;
+          let intendedX = this.chimp.x + dx;
+          let intendedY = this.chimp.y + dy;
 
           // Clamp position to boundaries with padding and overflow
-          newX = Phaser.Math.Clamp(
-            newX,
+          let newX = Phaser.Math.Clamp(
+            intendedX,
             x +
               chimpWidth / 2 +
               MainScene.BOUNDARY_PADDING_X -
@@ -1528,8 +1455,8 @@ export default function PhaserGame({
               MainScene.BOUNDARY_PADDING_X +
               boundaryOverflowX,
           );
-          newY = Phaser.Math.Clamp(
-            newY,
+          let newY = Phaser.Math.Clamp(
+            intendedY,
             y +
               chimpHeight / 2 +
               MainScene.BOUNDARY_PADDING_Y -
@@ -1736,6 +1663,7 @@ export default function PhaserGame({
       // Store a reference to the scene instance
       game.events.on("ready", () => {
         const scene = game.scene.getScene("MainScene") as MainScene;
+        console.log("phaser input enabled", scene.input && scene.input.enabled);
         if (scene) {
           sceneRef.current = scene;
           // Force initial boundary update
@@ -1927,57 +1855,35 @@ export default function PhaserGame({
     }
   };
 
-  // Joystick touch logic (always active, must be before any return)
+  // Joystick UI state
+  const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
+  const joystickRadius = 48;
+
+  // Joystick visualization: update based on chimp's movement direction
   useEffect(() => {
-    function handleTouchStartDoc(e: TouchEvent) {
-      if (e.touches.length > 0) {
-        // Always center joystick at screen center
-        const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-        setJoystickBasePos(center);
-        setJoystickDragging(true);
-        setJoystickPos({ x: 0, y: 0 });
-      }
-    }
-    function handleTouchMoveDoc(e: TouchEvent) {
-      if (!joystickDragging || !joystickBasePos) return;
-      if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        const x = touch.clientX - joystickBasePos.x;
-        const y = touch.clientY - joystickBasePos.y;
-        // Clamp to radius
-        const dist = Math.sqrt(x * x + y * y);
-        let nx = x,
-          ny = y;
-        if (dist > joystickRadius) {
-          nx = (x / dist) * joystickRadius;
-          ny = (y / dist) * joystickRadius;
+    if (!showJoystick || !isMobile) return;
+    const update = () => {
+      const chimpDir = (window as any).__CHIMP_DIR__;
+      if (chimpDir && (chimpDir.dx !== 0 || chimpDir.dy !== 0)) {
+        // Normalize and scale to joystick radius
+        const dist = Math.sqrt(
+          chimpDir.dx * chimpDir.dx + chimpDir.dy * chimpDir.dy,
+        );
+        let nx = 0,
+          ny = 0;
+        if (dist > 0) {
+          nx = (chimpDir.dx / dist) * joystickRadius;
+          ny = (chimpDir.dy / dist) * joystickRadius;
         }
         setJoystickPos({ x: nx, y: ny });
-        // Normalize to [-1, 1]
-        const dx = nx / joystickRadius;
-        const dy = ny / joystickRadius;
-        joystickDir.current = { dx, dy };
-        (window as any).__JOYSTICK_DIR__ = { dx, dy };
+      } else {
+        setJoystickPos({ x: 0, y: 0 });
       }
-    }
-    function handleTouchEndDoc() {
-      setJoystickDragging(false);
-      setJoystickBasePos(null);
-      setJoystickPos({ x: 0, y: 0 });
-      joystickDir.current = { dx: 0, dy: 0 };
-      (window as any).__JOYSTICK_DIR__ = { dx: 0, dy: 0 };
-    }
-    document.addEventListener("touchstart", handleTouchStartDoc);
-    document.addEventListener("touchmove", handleTouchMoveDoc);
-    document.addEventListener("touchend", handleTouchEndDoc);
-    document.addEventListener("touchcancel", handleTouchEndDoc);
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStartDoc);
-      document.removeEventListener("touchmove", handleTouchMoveDoc);
-      document.removeEventListener("touchend", handleTouchEndDoc);
-      document.removeEventListener("touchcancel", handleTouchEndDoc);
+      requestAnimationFrame(update);
     };
-  }, [joystickDragging, joystickBasePos]);
+    update();
+    return () => {};
+  }, [showJoystick, isMobile]);
 
   if (!mounted) return null;
 
@@ -2009,6 +1915,62 @@ export default function PhaserGame({
     onRandomBg?.();
   };
 
+  // handleKeyDown must be inside the component to access sceneRef
+  function handleKeyDown(e: KeyboardEvent) {
+    if ((e.metaKey || e.ctrlKey) && (e.key === "+" || e.key === "-")) {
+      e.preventDefault();
+      if (sceneRef.current && (sceneRef.current as any).cameras.main) {
+        const camera = (sceneRef.current as any).cameras.main;
+        const currentZoom = camera.zoom;
+        const newZoom =
+          e.key === "+"
+            ? Math.min(currentZoom * 1.2, 2)
+            : Math.max(currentZoom / 1.2, 0.5);
+
+        // Calculate boundary dimensions
+        const width = 2000; // MIN_BOUNDARY_WIDTH
+        const height = 1500; // MIN_BOUNDARY_HEIGHT
+        const x = (sceneRef.current as any).scale.width - width / 2;
+        const y = (sceneRef.current as any).scale.height - height / 2;
+
+        // Calculate camera dimensions at new zoom
+        const cameraWidth = camera.width / newZoom;
+        const cameraHeight = camera.height / newZoom;
+
+        // Calculate target position to center on player if possible
+        let targetX = x + width / 2;
+        let targetY = y + height / 2;
+
+        const scene = sceneRef.current as any;
+        if (scene.chimp) {
+          // Try to center on player
+          targetX = scene.chimp.x - cameraWidth / 2;
+          targetY = scene.chimp.y - cameraHeight / 2;
+
+          // Clamp to boundaries
+          targetX = (window as any).Phaser.Math.Clamp(
+            targetX,
+            x,
+            x + width - cameraWidth,
+          );
+          targetY = (window as any).Phaser.Math.Clamp(
+            targetY,
+            y,
+            y + height - cameraHeight,
+          );
+        }
+
+        // Apply zoom and position
+        camera.zoomTo(
+          newZoom,
+          200,
+          (window as any).Phaser.Math.Easing.Quadratic.InOut,
+        );
+        camera.setScroll(targetX, targetY);
+      }
+    }
+  }
+
   return (
     <>
       {/* Title and HUD: always top center, stacked on desktop */}
@@ -2023,57 +1985,59 @@ export default function PhaserGame({
           CHIMP.FUN
         </div>
         {/* Always show START/timer HUD centered under title */}
-        <div className="mt-4 flex flex-col items-center gap-2 pointer-events-auto">
-          <ChimpHUD
-            gameStatus={gameStatus}
-            timer={timer}
-            countdownText={countdownText}
-            pointsRef={pointsRef}
-            setGameStatus={setGameStatus}
-            setChimpPoints={setChimpPoints}
-            setCountdownText={setCountdownText}
-            setTimer={setTimer}
-            countdownIntervalRef={countdownIntervalRef}
-            sceneRef={sceneRef}
-            confetti={confetti}
-          />
-          {/* Show countdown if in countdown state */}
-          {gameStatus === "countdown" && (
-            <ChimpCountdown countdownText={countdownText} />
-          )}
-          {/* Show score and share when finished */}
-          {gameStatus === "finished" && (
-            <ChimpScoreShare
-              points={chimpPoints}
+        <div className="mt-4 flex flex-col items-center gap-2 pointer-events-none">
+          <div className="pointer-events-auto">
+            <ChimpHUD
+              gameStatus={gameStatus}
+              timer={timer}
+              countdownText={countdownText}
+              pointsRef={pointsRef}
               setGameStatus={setGameStatus}
               setChimpPoints={setChimpPoints}
               setCountdownText={setCountdownText}
               setTimer={setTimer}
               countdownIntervalRef={countdownIntervalRef}
               sceneRef={sceneRef}
+              confetti={confetti}
             />
-          )}
-          {/* Show SettingsContainer under START/timer HUD when toggled */}
-          {showHud && (
-            <SettingsContainer onClose={() => setShowHud(false)}>
-              <ChimpHudControls
-                chimpId={chimpId}
-                setChimpId={setChimpId}
-                handleChimpChange={handleChimpChange}
-                isZoomedOut={isZoomedOut}
-                toggleZoom={toggleZoom}
-                handleRandomChimp={handleRandomChimp}
-                handleRandomBg={handleRandomBg}
-                isDesktop={isDesktop}
-                gameStatus={gameStatus}
-                showFps={showFps}
-                setShowFps={setShowFps}
-                showJoystick={showJoystick}
-                setShowJoystick={setShowJoystick}
-                isMobile={isMobile}
+            {/* Show countdown if in countdown state */}
+            {gameStatus === "countdown" && (
+              <ChimpCountdown countdownText={countdownText} />
+            )}
+            {/* Show score and share when finished */}
+            {gameStatus === "finished" && (
+              <ChimpScoreShare
+                points={chimpPoints}
+                setGameStatus={setGameStatus}
+                setChimpPoints={setChimpPoints}
+                setCountdownText={setCountdownText}
+                setTimer={setTimer}
+                countdownIntervalRef={countdownIntervalRef}
+                sceneRef={sceneRef}
               />
-            </SettingsContainer>
-          )}
+            )}
+            {/* Show SettingsContainer under START/timer HUD when toggled */}
+            {showHud && (
+              <SettingsContainer onClose={() => setShowHud(false)}>
+                <ChimpHudControls
+                  chimpId={chimpId}
+                  setChimpId={setChimpId}
+                  handleChimpChange={handleChimpChange}
+                  isZoomedOut={isZoomedOut}
+                  toggleZoom={toggleZoom}
+                  handleRandomChimp={handleRandomChimp}
+                  handleRandomBg={handleRandomBg}
+                  isDesktop={isDesktop}
+                  gameStatus={gameStatus}
+                  showFps={showFps}
+                  setShowFps={setShowFps}
+                  showJoystick={showJoystick}
+                  setShowJoystick={setShowJoystick}
+                  isMobile={isMobile}
+                />
+              </SettingsContainer>
+            )}
+          </div>
         </div>
         {/* Desktop cog button: top right, only on desktop */}
         <div className="hidden sm:block fixed top-2 right-2 z-50 pointer-events-auto">
@@ -2109,7 +2073,6 @@ export default function PhaserGame({
         id="phaser-container"
         className="fixed inset-0 w-full h-full pointer-events-auto"
       />
-
       {/* FPS Counter */}
       {showFps && (
         <div className="fixed bottom-2 left-2 z-50 text-white font-mono bg-black/60 px-2 py-1 rounded">
@@ -2119,9 +2082,9 @@ export default function PhaserGame({
       {/* Joystick UI only if enabled and mobile */}
       {showJoystick && isMobile && (
         <Joystick
-          dragging={joystickDragging}
+          dragging={false}
           pos={joystickPos}
-          basePos={joystickBasePos}
+          basePos={null}
           radius={joystickRadius}
         />
       )}
