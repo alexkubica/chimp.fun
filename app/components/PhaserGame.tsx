@@ -567,8 +567,7 @@ export default function PhaserGame({
   const animationFrameRef = useRef<number>();
   const [showHud, setShowHud] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  // Joystick state for mobile
-  const joystickDir = useRef({ dx: 0, dy: 0 });
+
   // In PhaserGame component state
   const [showFps, setShowFps] = useState(false);
   const [showJoystick, setShowJoystick] = useState(false);
@@ -629,6 +628,7 @@ export default function PhaserGame({
     // Remove the inner handleKeyDown definition here
     window.addEventListener("keydown", handleKeyDown);
 
+    // kubica why do we have duplicate phaser containers?
     // Avoid duplicate game init on hot reload
     const containers = document.querySelectorAll("#phaser-container");
     console.log("ALL phaser-containers:", containers);
@@ -638,7 +638,7 @@ export default function PhaserGame({
       });
     }
     const container = document.getElementById("phaser-container");
-    console.log("phaser container", container);
+
     if (!container || gameRef.current) return;
 
     // Dynamically import Phaser
@@ -1783,7 +1783,7 @@ export default function PhaserGame({
         resizeObserver.disconnect();
       };
     });
-  }, [mounted]);
+  }, [gameStatus, mounted]);
 
   // Cleanup intervals on unmount
   useEffect(() => {
