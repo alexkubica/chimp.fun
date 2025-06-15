@@ -6,11 +6,8 @@ export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center bg-[#f8fbff] px-2 py-4">
       <div className="flex flex-col items-center gap-3 w-full max-w-md">
-        <div
-          className="bg-[#8DC7FF] rounded-2xl shadow-lg flex items-center justify-center"
-          style={{ width: 112, height: 112 }}
-        >
-          <Avatar className="w-28 h-28 rounded-xl">
+        <div className="bg-[#8DC7FF] rounded-2xl shadow-lg flex items-center justify-center">
+          <Avatar className="w-64 h-64 rounded-xl">
             <AvatarImage
               src="/Chimpers-2956-!CHIMP.gif"
               alt="Chimpers PFP"
