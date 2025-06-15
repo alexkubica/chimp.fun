@@ -27,9 +27,10 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { AiOutlineLoading3Quarters, AiOutlineCopy } from "react-icons/ai";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { shortenAddress } from "@/utils";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -466,7 +467,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1 flex flex-col gap-2">
-              <Label htmlFor="file">Or upload your image</Label>
+              <Label htmlFor="file">Or upload your own image</Label>
               <Input id="file" type="file" onChange={handleFileChange} />
               <Button
                 variant="outline"
@@ -517,7 +518,28 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
+              <Label>Select a reaction</Label>
+              <Select
+                value={overlayNumber.toString()}
+                onValueChange={function handleReaction(val) {
+                  setLoading(true);
+                  setOverlayNumber(Number(val));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select reaction" />
+                </SelectTrigger>
+                <SelectContent>
+                  {reactionsMap.map((value, index) => (
+                    <SelectItem key={index + 1} value={(index + 1).toString()}>
+                      {value.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
               <Label htmlFor="overlayEnabled">Show credit overlay</Label>
               <Switch
                 id="overlayEnabled"
@@ -611,27 +633,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <Label>Select a reaction</Label>
-            <Select
-              value={overlayNumber.toString()}
-              onValueChange={function handleReaction(val) {
-                setLoading(true);
-                setOverlayNumber(Number(val));
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select reaction" />
-              </SelectTrigger>
-              <SelectContent>
-                {reactionsMap.map((value, index) => (
-                  <SelectItem key={index + 1} value={(index + 1).toString()}>
-                    {value.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardContent>
         <CardFooter className="flex flex-col md:flex-row gap-2 justify-center items-center">
           <Button onClick={downloadOutput} className="w-full md:w-auto">
@@ -650,10 +651,63 @@ export default function Home() {
           </Button>
         </CardFooter>
         <div className="px-6 pb-4 pt-2 text-xs text-muted-foreground text-center">
-          <div className="mb-2">For donations:</div>
-          <div>ETH: 0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417</div>
-          <div>SOL: DMjh4rUhozxjXjVTRQhSBv8AzicPyQrGCD8UZZLXkEAe</div>
-          <div>BTC: bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk</div>
+          <div className="mb-2">Buy me a coffee ☕️</div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 justify-center">
+              <span>ETH:</span>
+              <code className="text-xs bg-muted px-2 py-1 rounded flex-1 text-center max-w-full overflow-x-auto whitespace-nowrap">
+                0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417
+              </code>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="Copy ETH address"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    "0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417",
+                  )
+                }
+              >
+                <AiOutlineCopy className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <span>SOL:</span>
+              <code className="text-xs bg-muted px-2 py-1 rounded flex-1 text-center max-w-full overflow-x-auto whitespace-nowrap">
+                DMjh4rUhozxjXjVTRQhSBv8AzicPyQrGCD8UZZLXkEAe
+              </code>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="Copy SOL address"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    "DMjh4rUhozxjXjVTRQhSBv8AzicPyQrGCD8UZZLXkEAe",
+                  )
+                }
+              >
+                <AiOutlineCopy className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <span>BTC:</span>
+              <code className="text-xs bg-muted px-2 py-1 rounded flex-1 text-center max-w-full overflow-x-auto whitespace-nowrap">
+                bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk
+              </code>
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="Copy BTC address"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    "bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk",
+                  )
+                }
+              >
+                <AiOutlineCopy className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
         <div className="px-6 pb-6 text-xs text-muted-foreground text-center">
           Made with ❤️ by{" "}
