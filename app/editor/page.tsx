@@ -415,8 +415,22 @@ export default function Home() {
                       setUploadedImageUri(null);
                     }}
                   >
-                    <SelectTrigger id="collection">
-                      <SelectValue placeholder="Select collection" />
+                    <SelectTrigger
+                      id="collection"
+                      className="flex-1 min-w-0 w-full overflow-hidden"
+                      style={{ overflow: "hidden" }}
+                    >
+                      <SelectValue
+                        placeholder="Select collection"
+                        className="truncate"
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          display: "block",
+                          width: "100%",
+                        }}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {collectionsMetadata.map((collection, index) => (
@@ -437,13 +451,15 @@ export default function Home() {
                       );
                       setCollectionIndex(randomIndex);
                       setLoading(true);
-                      collectionMetadata = collectionsMetadata[randomIndex];
-                      minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
-                      maxTokenID =
-                        collectionMetadata.total +
-                        (collectionMetadata.tokenIdOffset ?? 0);
-                      setTokenID(minTokenID);
-                      setTempTokenID(minTokenID);
+                      const randomCollection = collectionsMetadata[randomIndex];
+                      const min = 1 + (randomCollection.tokenIdOffset ?? 0);
+                      const max =
+                        randomCollection.total +
+                        (randomCollection.tokenIdOffset ?? 0);
+                      const randomTokenId =
+                        Math.floor(Math.random() * (max - min + 1)) + min;
+                      setTokenID(randomTokenId);
+                      setTempTokenID(randomTokenId);
                       setFile(null);
                       setUploadedImageUri(null);
                     }}
