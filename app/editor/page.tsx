@@ -19,7 +19,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AiOutlineCopy } from "react-icons/ai";
+import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 
 const fileToDataUri = (file: File) =>
@@ -391,42 +391,66 @@ export default function Home() {
               {/* Upload controls */}
               <div className="flex flex-col gap-2">
                 <Label htmlFor="collection">Collection</Label>
-                <Select
-                  value={collectionIndex.toString()}
-                  onValueChange={(val) => {
-                    const newCollectionIndex = Number(val);
-                    setLoading(true);
-                    setCollectionIndex(newCollectionIndex);
-                    collectionMetadata =
-                      collectionsMetadata[newCollectionIndex];
-                    minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
-                    maxTokenID =
-                      collectionMetadata.total +
-                      (collectionMetadata.tokenIdOffset ?? 0);
-                    if (
-                      Number(tokenID) < minTokenID ||
-                      Number(tokenID) > maxTokenID
-                    ) {
+                <div className="flex gap-2">
+                  <Select
+                    value={collectionIndex.toString()}
+                    onValueChange={function handleCollectionChange(val) {
+                      const newCollectionIndex = Number(val);
+                      setLoading(true);
+                      setCollectionIndex(newCollectionIndex);
+                      collectionMetadata =
+                        collectionsMetadata[newCollectionIndex];
+                      minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
+                      maxTokenID =
+                        collectionMetadata.total +
+                        (collectionMetadata.tokenIdOffset ?? 0);
+                      if (
+                        Number(tokenID) < minTokenID ||
+                        Number(tokenID) > maxTokenID
+                      ) {
+                        setTokenID(minTokenID);
+                        setTempTokenID(minTokenID);
+                      }
+                      setFile(null);
+                      setUploadedImageUri(null);
+                    }}
+                  >
+                    <SelectTrigger id="collection">
+                      <SelectValue placeholder="Select collection" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {collectionsMetadata.map((collection, index) => (
+                        <SelectItem
+                          key={collection.name}
+                          value={index.toString()}
+                        >
+                          {collection.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="secondary"
+                    onClick={function handleRandomCollection() {
+                      const randomIndex = Math.floor(
+                        Math.random() * collectionsMetadata.length,
+                      );
+                      setCollectionIndex(randomIndex);
+                      setLoading(true);
+                      collectionMetadata = collectionsMetadata[randomIndex];
+                      minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
+                      maxTokenID =
+                        collectionMetadata.total +
+                        (collectionMetadata.tokenIdOffset ?? 0);
                       setTokenID(minTokenID);
-                    }
-                    setFile(null);
-                    setUploadedImageUri(null);
-                  }}
-                >
-                  <SelectTrigger id="collection">
-                    <SelectValue placeholder="Select collection" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {collectionsMetadata.map((collection, index) => (
-                      <SelectItem
-                        key={collection.name}
-                        value={index.toString()}
-                      >
-                        {collection.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      setTempTokenID(minTokenID);
+                      setFile(null);
+                      setUploadedImageUri(null);
+                    }}
+                  >
+                    🎲
+                  </Button>
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="gifNumber">
@@ -438,7 +462,10 @@ export default function Home() {
                     min={minTokenID}
                     max={maxTokenID}
                     value={tempTokenID}
-                    onChange={handleTokenIdChange}
+                    onChange={function handleTokenIdInput(e) {
+                      setTempTokenID(e.target.value);
+                      setLoading(true);
+                    }}
                     type="number"
                     className="flex-1 min-w-0"
                     style={{ minWidth: 0 }}
@@ -491,27 +518,40 @@ export default function Home() {
                 {/* Reaction and overlay moved here */}
                 <div className="flex flex-col gap-2 mt-2">
                   <Label>Select a reaction</Label>
-                  <Select
-                    value={overlayNumber.toString()}
-                    onValueChange={function handleReaction(val) {
-                      setLoading(true);
-                      setOverlayNumber(Number(val));
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select reaction" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {reactionsMap.map((value, index) => (
-                        <SelectItem
-                          key={index + 1}
-                          value={(index + 1).toString()}
-                        >
-                          {value.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2 items-center">
+                    <Select
+                      value={overlayNumber.toString()}
+                      onValueChange={function handleReaction(val) {
+                        setLoading(true);
+                        setOverlayNumber(Number(val));
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select reaction" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {reactionsMap.map((value, index) => (
+                          <SelectItem
+                            key={index + 1}
+                            value={(index + 1).toString()}
+                          >
+                            {value.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="secondary"
+                      onClick={function handleRandomReaction() {
+                        const randomReaction =
+                          Math.floor(Math.random() * reactionsMap.length) + 1;
+                        setOverlayNumber(randomReaction);
+                        setLoading(true);
+                      }}
+                    >
+                      🎲
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-2 mt-2">
                   <Label htmlFor="overlayEnabled">Show credit overlay</Label>
@@ -545,8 +585,12 @@ export default function Home() {
                   )}
                 </div>
                 <div className="flex flex-col md:flex-row gap-2 w-full mt-2">
-                  <Button onClick={downloadOutput} className="w-full md:w-auto">
-                    Download
+                  <Button
+                    onClick={downloadOutput}
+                    className="w-full md:w-auto"
+                    aria-label="Download"
+                  >
+                    <AiOutlineDownload />
                   </Button>
                   <Button
                     variant="secondary"
