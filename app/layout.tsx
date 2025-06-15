@@ -1,29 +1,15 @@
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import RootLayout from "./components/RootLayout";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "chimp.fun",
-  icons: {
-    icon: [{ url: "/icon.gif", type: "image/gif" }],
-    apple: [{ url: "/icon.gif", type: "image/gif" }],
-  },
 };
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <Analytics />
-      <SpeedInsights />
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
+  console.log("layout!");
+  return <RootLayout>{children}</RootLayout>;
 }
