@@ -1,13 +1,35 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { collectionsMetadata, reactionsMap } from "@/consts";
+import { ReactionMetadata } from "@/types";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ReactionMetadata } from "@/types";
-import { collectionsMetadata, reactionsMap } from "@/consts";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -363,258 +385,300 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-center justify-center flex-col gap-2 p-0">
-      <h1>CHIMP.FUN</h1>
-      <h2>NFT Editor</h2>
-      <select
-        onChange={(e) => {
-          const newCollectionIndex = e.target.value as unknown as number;
-          setLoading(true);
-          setCollectionIndex(newCollectionIndex);
-          collectionMetadata = collectionsMetadata[newCollectionIndex];
-          minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
-          maxTokenID =
-            collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
-          if (Number(tokenID) < minTokenID || Number(tokenID) > maxTokenID) {
-            setTokenID(minTokenID);
-          }
-          setFile(null);
-          setUploadedImageUri(null);
-        }}
-      >
-        {collectionsMetadata.map((_, index) => {
-          const collection = collectionsMetadata[index];
-
-          return (
-            <option key={collection.name} value={index}>
-              {collection.name}
-            </option>
-          );
-        })}
-      </select>
-      <div className="flex flex-col sm:flex-row gap-1">
-        <label>
-          Token ID #({minTokenID}-{maxTokenID}):{" "}
-        </label>
-        <input
-          id="gifNumber"
-          min={minTokenID}
-          max={maxTokenID}
-          value={tempTokenID}
-          onChange={handleTokenIdChange}
-        />
-        <button
-          className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          onClick={handleTokenIdSubmit}
-        >
-          OK
-        </button>
-      </div>
-      {errorMessage && (
-        <div className="text-red-500 text-sm">{errorMessage}</div>
-      )}
-      <button
-        className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-        onClick={handleRandomClick}
-      >
-        RANDOM 🎲
-      </button>
-      <label>Or upload your image: </label>
-      <div className="flex gap-1 justify-center align-center">
-        <input
-          className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-          id="file"
-          type="file"
-          onChange={handleFileChange}
-        />
-      </div>
-      <small>
-        For best results use a 1080x1080 image, you can use{" "}
-        <a href="https://www.iloveimg.com/resize-image">this tool</a>.
-      </small>
-      <div id="gifContainer">
-        <div className="flex justify-center mb-2">
-          <button
-            className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-            onClick={async () => {
-              try {
-                const clipboardItems = await navigator.clipboard.read();
-                for (const clipboardItem of clipboardItems) {
-                  for (const type of clipboardItem.types) {
-                    if (type.startsWith("image/")) {
-                      const blob = await clipboardItem.getType(type);
-                      const file = new File([blob], "pasted-image", { type });
-                      setFile(file);
-                      return;
-                    }
+    <main className="min-h-screen flex items-center justify-center bg-background px-2 py-4">
+      <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-extrabold tracking-tight mb-1">
+            CHIMP.FUN
+          </CardTitle>
+          <CardDescription className="text-lg font-medium mb-2">
+            NFT Editor
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 flex flex-col gap-2">
+              <Label htmlFor="collection">Collection</Label>
+              <Select
+                value={collectionIndex.toString()}
+                onValueChange={(val) => {
+                  const newCollectionIndex = Number(val);
+                  setLoading(true);
+                  setCollectionIndex(newCollectionIndex);
+                  collectionMetadata = collectionsMetadata[newCollectionIndex];
+                  minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
+                  maxTokenID =
+                    collectionMetadata.total +
+                    (collectionMetadata.tokenIdOffset ?? 0);
+                  if (
+                    Number(tokenID) < minTokenID ||
+                    Number(tokenID) > maxTokenID
+                  ) {
+                    setTokenID(minTokenID);
                   }
-                }
-                alert("No image found in clipboard");
-              } catch (err) {
-                console.error("Failed to read clipboard:", err);
-                alert("Failed to read clipboard");
-              }
-            }}
-          >
-            Paste Image From Clipboard
-          </button>
-        </div>
-        <div className="relative max-w-[300px] max-h-[300px] w-full h-auto">
-          {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 rounded-lg">
-              <AiOutlineLoading3Quarters className="animate-spin text-white text-8xl" />
+                  setFile(null);
+                  setUploadedImageUri(null);
+                }}
+              >
+                <SelectTrigger id="collection">
+                  <SelectValue placeholder="Select collection" />
+                </SelectTrigger>
+                <SelectContent>
+                  {collectionsMetadata.map((collection, index) => (
+                    <SelectItem key={collection.name} value={index.toString()}>
+                      {collection.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
-          <Image
-            id="gif"
-            src={finalResult ?? "placeholder.png"}
-            alt=""
-            unoptimized
-            height={300}
-            width={300}
-          />
-        </div>
-      </div>
-      <div>
-        <div className="flex gap-2 justify-center">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={downloadOutput}
-          >
+            <div className="flex-1 flex flex-col gap-2">
+              <Label htmlFor="gifNumber">
+                Token ID ({minTokenID}-{maxTokenID})
+              </Label>
+              <Input
+                id="gifNumber"
+                min={minTokenID}
+                max={maxTokenID}
+                value={tempTokenID}
+                onChange={handleTokenIdChange}
+                type="number"
+                className="w-full"
+              />
+              <div className="flex gap-2">
+                <Button onClick={handleTokenIdSubmit} className="w-full">
+                  OK
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleRandomClick}
+                  className="w-full"
+                >
+                  RANDOM 🎲
+                </Button>
+              </div>
+              {errorMessage && (
+                <div className="text-destructive text-sm mt-1">
+                  {errorMessage}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="flex-1 flex flex-col gap-2">
+              <Label htmlFor="file">Or upload your image</Label>
+              <Input id="file" type="file" onChange={handleFileChange} />
+              <Button
+                variant="outline"
+                onClick={async function handlePasteImage() {
+                  try {
+                    const clipboardItems = await navigator.clipboard.read();
+                    for (const clipboardItem of clipboardItems) {
+                      for (const type of clipboardItem.types) {
+                        if (type.startsWith("image/")) {
+                          const blob = await clipboardItem.getType(type);
+                          const file = new File([blob], "pasted-image", {
+                            type,
+                          });
+                          setFile(file);
+                          return;
+                        }
+                      }
+                    }
+                    alert("No image found in clipboard");
+                  } catch (err) {
+                    console.error("Failed to read clipboard:", err);
+                    alert("Failed to read clipboard");
+                  }
+                }}
+              >
+                Paste Image From Clipboard
+              </Button>
+              <small className="text-muted-foreground">
+                For best results use a 1080x1080 image, you can use{" "}
+                <a
+                  href="https://www.iloveimg.com/resize-image"
+                  className="underline text-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  this tool
+                </a>
+                .
+              </small>
+            </div>
+            <div className="flex-1 flex flex-col items-center gap-2">
+              <Label>Preview</Label>
+              <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
+                <Avatar className="w-full h-full rounded-lg">
+                  {loading ? (
+                    <Skeleton className="w-full h-full rounded-lg" />
+                  ) : (
+                    finalResult && (
+                      <AvatarImage
+                        src={finalResult}
+                        alt="Preview"
+                        className="object-contain w-full h-full rounded-lg"
+                        style={{ background: "transparent" }}
+                      />
+                    )
+                  )}
+                </Avatar>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 flex flex-col gap-2">
+              <Label htmlFor="overlayEnabled">Show credit overlay</Label>
+              <Switch
+                id="overlayEnabled"
+                checked={overlayEnabled}
+                onCheckedChange={setOverlayEnabled}
+              />
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <Label>X</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  id="x"
+                  value={x}
+                  min={-1000}
+                  max={1000}
+                  onChange={function handleX(e) {
+                    setLoading(true);
+                    setX(Number(e.target.value));
+                  }}
+                  className="w-24"
+                />
+                <Slider
+                  min={-1000}
+                  max={1000}
+                  step={1}
+                  value={[x]}
+                  onValueChange={function handleSliderX(val) {
+                    setLoading(true);
+                    setX(val[0]);
+                  }}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <Label>Y</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  id="y"
+                  value={y}
+                  min={-1000}
+                  max={1000}
+                  onChange={function handleY(e) {
+                    setLoading(true);
+                    setY(Number(e.target.value));
+                  }}
+                  className="w-24"
+                />
+                <Slider
+                  min={-1000}
+                  max={1000}
+                  step={1}
+                  value={[y]}
+                  onValueChange={function handleSliderY(val) {
+                    setLoading(true);
+                    setY(val[0]);
+                  }}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <Label>Scale</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  id="scale"
+                  value={scale}
+                  min={-2}
+                  max={5}
+                  step={0.01}
+                  onChange={function handleScale(e) {
+                    setLoading(true);
+                    setScale(Number(e.target.value));
+                  }}
+                  className="w-24"
+                />
+                <Slider
+                  min={-2}
+                  max={5}
+                  step={0.01}
+                  value={[scale]}
+                  onValueChange={function handleSliderScale(val) {
+                    setLoading(true);
+                    setScale(val[0]);
+                  }}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Select a reaction</Label>
+            <Select
+              value={overlayNumber.toString()}
+              onValueChange={function handleReaction(val) {
+                setLoading(true);
+                setOverlayNumber(Number(val));
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select reaction" />
+              </SelectTrigger>
+              <SelectContent>
+                {reactionsMap.map((value, index) => (
+                  <SelectItem key={index + 1} value={(index + 1).toString()}>
+                    {value.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+        <CardFooter className="flex flex-col md:flex-row gap-2 justify-center items-center">
+          <Button onClick={downloadOutput} className="w-full md:w-auto">
             Download
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => {
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={function handleCopy() {
               if (finalResult) {
                 copyBlobToClipboard(finalResult);
               }
             }}
+            className="w-full md:w-auto"
           >
             Copy Result To Clipboard
-          </button>
+          </Button>
+        </CardFooter>
+        <div className="px-6 pb-4 pt-2 text-xs text-muted-foreground text-center">
+          <div className="mb-2">For donations:</div>
+          <div>ETH: 0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417</div>
+          <div>SOL: DMjh4rUhozxjXjVTRQhSBv8AzicPyQrGCD8UZZLXkEAe</div>
+          <div>BTC: bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk</div>
         </div>
-      </div>
-      <div>
-        <h2>Settings:</h2>
-      </div>
-      <div className="flex items-center gap-2 mb-2">
-        <input
-          type="checkbox"
-          id="overlayEnabled"
-          checked={overlayEnabled}
-          onChange={(e) => setOverlayEnabled(e.target.checked)}
-        />
-        <label htmlFor="overlayEnabled">Show credit overlay</label>
-      </div>
-      <div className="flex gap-1 flex-col sm:flex-row ">
-        <div className="flex flex-col gap-1">
-          <label>X: </label>
-          <input
-            type="number"
-            id="x"
-            value={x}
-            onChange={(e) => {
-              setLoading(true);
-              const normalized = Number(e.target.value);
-              setX(normalized);
-            }}
-          />
-          <input
-            type="range"
-            value={x}
-            min="-1000"
-            max="1000"
-            onChange={(e) => {
-              setLoading(true);
-              const normalized = Number(e.target.value);
-              setX(normalized);
-            }}
-          />
+        <div className="px-6 pb-6 text-xs text-muted-foreground text-center">
+          Made with ❤️ by{" "}
+          <a
+            href="https://linktr.ee/mrcryptoalex"
+            className="underline text-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Alex
+          </a>{" "}
+          !CHIMP 🙉
         </div>
-
-        <div className="flex flex-col gap-1">
-          <label>Y: </label>
-          <input
-            type="number"
-            id="y"
-            value={y}
-            onChange={(e) => {
-              setLoading(true);
-              const normalized = Number(e.target.value);
-              setY(normalized);
-            }}
-          />
-          <input
-            type="range"
-            value={y}
-            min="-1000"
-            max="1000"
-            onChange={(e) => {
-              setLoading(true);
-              const normalized = Number(e.target.value);
-              setY(normalized);
-            }}
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label>Scale: </label>
-          <input
-            type="number"
-            id="scale"
-            value={scale}
-            min="-2"
-            max="5"
-            onChange={(e) => {
-              setLoading(true);
-              const normalized = Number(e.target.value);
-              setScale(normalized);
-            }}
-          />
-          <input
-            type="range"
-            value={scale}
-            min="-2"
-            max="5"
-            onChange={(e) => {
-              setLoading(true);
-              const normalized = Number(e.target.value);
-              setScale(normalized);
-            }}
-          />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1">
-        <label>Select a reaction: </label>
-
-        <div className="flex flex-wrap justify-center items-center gap-1 max-w-md">
-          {reactionsMap.map((value, index) => {
-            return (
-              <button
-                key={index + 1}
-                className="bg-blue-300 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
-                onClick={() => {
-                  setLoading(true);
-                  setOverlayNumber(Number(index + 1));
-                }}
-              >
-                {value.title}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-      <div className="m-4 flex flex-col gap-1">
-        <div>For donations:</div>
-        <div>ETH: 0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417</div>
-        <div>SOL: DMjh4rUhozxjXjVTRQhSBv8AzicPyQrGCD8UZZLXkEAe</div>
-        <div>BTC: bc1qygspwlmyy77eds53mszhlr77nr2vm9pl6k0rrk</div>
-      </div>
-      <div className="m-4">
-        Made with ❤️ by <a href="https://linktr.ee/mrcryptoalex">Alex</a>
-        !CHIMP 🙉
-      </div>
-    </div>
+      </Card>
+    </main>
   );
 }

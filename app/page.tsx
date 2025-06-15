@@ -36,19 +36,19 @@ export default function Home() {
         <div className="flex flex-col gap-4 w-full mt-4 mx-auto">
           <Button
             asChild
-            className="w-full max-w-full text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md"
+            className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
           >
             <Link href="/editor">NFT Editor</Link>
           </Button>
           <Button
             asChild
-            className="w-full max-w-full text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md"
+            className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
           >
             <Link href="/banner">Banner Maker</Link>
           </Button>
           <Button
             asChild
-            className="w-full max-w-full text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md"
+            className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
           >
             <Link href="/game">Game</Link>
           </Button>

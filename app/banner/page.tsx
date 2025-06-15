@@ -83,9 +83,8 @@ export default function BannerPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-start p-4 bg-gray-50">
-      <h1 className="text-3xl md:text-5xl font-bold mb-4 mt-6 text-center">
-        CHIMP.FUN Banner Maker
-      </h1>
+      <h1>CHIMP.FUN</h1>
+      <h2>Banner Maker</h2>
       <div className="flex flex-col md:flex-row gap-4 mb-6 w-full max-w-xl justify-center items-center">
         <div>
           <label className="block text-sm font-medium mb-1">Collection</label>
