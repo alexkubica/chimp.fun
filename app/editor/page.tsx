@@ -495,35 +495,24 @@ export default function Home() {
                 Paste Image From Clipboard
               </Button>
               <small className="text-muted-foreground">
-                For best results use a 1080x1080 image, you can use{" "}
-                <a
-                  href="https://www.iloveimg.com/resize-image"
-                  className="underline text-primary"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  this tool
-                </a>
-                .
+                Tip: Use 1:1 aspect ratio for best results.
               </small>
             </div>
             <div className="flex-1 flex flex-col items-center gap-2">
               <Label>Preview</Label>
               <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
-                <Avatar className="w-full h-full rounded-lg">
-                  {loading ? (
-                    <Skeleton className="w-full h-full rounded-lg" />
-                  ) : (
-                    finalResult && (
-                      <AvatarImage
-                        src={finalResult}
-                        alt="Preview"
-                        className="object-contain w-full h-full rounded-lg"
-                        style={{ background: "transparent" }}
-                      />
-                    )
-                  )}
-                </Avatar>
+                {loading ? (
+                  <Skeleton className="w-full h-full rounded-lg" />
+                ) : (
+                  finalResult && (
+                    <img
+                      src={finalResult}
+                      alt="Preview"
+                      className="object-contain w-full h-full rounded-lg"
+                      style={{ background: "transparent" }}
+                    />
+                  )
+                )}
               </div>
             </div>
           </div>
