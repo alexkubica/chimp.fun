@@ -31,6 +31,13 @@ body {
   box-sizing: border-box;
 }
 
+button,
+input,
+select,
+textarea {
+  font-family: "Press Start 2P", monospace;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

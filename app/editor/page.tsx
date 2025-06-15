@@ -19,6 +19,8 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AiOutlineCopy } from "react-icons/ai";
+import { ImagePicker } from "@/components/ui/ImagePicker";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -430,26 +432,19 @@ export default function Home() {
                 <Label htmlFor="gifNumber">
                   Token ID ({minTokenID}-{maxTokenID})
                 </Label>
-                <Input
-                  id="gifNumber"
-                  min={minTokenID}
-                  max={maxTokenID}
-                  value={tempTokenID}
-                  onChange={handleTokenIdChange}
-                  type="number"
-                  className="w-full"
-                  style={{ minWidth: 0 }}
-                />
                 <div className="flex gap-2">
-                  <Button onClick={handleTokenIdSubmit} className="w-full">
-                    OK
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleRandomClick}
-                    className="w-full"
-                  >
-                    RANDOM 🎲
+                  <Input
+                    id="gifNumber"
+                    min={minTokenID}
+                    max={maxTokenID}
+                    value={tempTokenID}
+                    onChange={handleTokenIdChange}
+                    type="number"
+                    className="flex-1 min-w-0"
+                    style={{ minWidth: 0 }}
+                  />
+                  <Button variant="secondary" onClick={handleRandomClick}>
+                    🎲
                   </Button>
                 </div>
                 {errorMessage && (
@@ -459,8 +454,11 @@ export default function Home() {
                 )}
               </div>
               <div className="flex flex-col gap-2">
-                <Label htmlFor="file">Or upload your own image</Label>
-                <Input id="file" type="file" onChange={handleFileChange} />
+                <ImagePicker
+                  id="file"
+                  onFileChange={setFile}
+                  accept="image/*"
+                />
                 <Button
                   variant="outline"
                   onClick={async function handlePasteImage() {
@@ -485,48 +483,51 @@ export default function Home() {
                     }
                   }}
                 >
-                  Paste Image From Clipboard
+                  Paste From Clipboard
                 </Button>
                 <small className="text-muted-foreground">
                   Tip: Use 1:1 aspect ratio for best results.
                 </small>
+                {/* Reaction and overlay moved here */}
+                <div className="flex flex-col gap-2 mt-2">
+                  <Label>Select a reaction</Label>
+                  <Select
+                    value={overlayNumber.toString()}
+                    onValueChange={function handleReaction(val) {
+                      setLoading(true);
+                      setOverlayNumber(Number(val));
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select reaction" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {reactionsMap.map((value, index) => (
+                        <SelectItem
+                          key={index + 1}
+                          value={(index + 1).toString()}
+                        >
+                          {value.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center space-x-2 mt-2">
+                  <Label htmlFor="overlayEnabled">Show credit overlay</Label>
+                  <Switch
+                    id="overlayEnabled"
+                    checked={overlayEnabled}
+                    onCheckedChange={setOverlayEnabled}
+                  />
+                </div>
+                <Button className="mt-4" onClick={handleTokenIdSubmit}>
+                  GENERATE
+                </Button>
               </div>
             </div>
-            {/* Second column: select a reaction, show credit overlay */}
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label>Select a reaction</Label>
-                <Select
-                  value={overlayNumber.toString()}
-                  onValueChange={function handleReaction(val) {
-                    setLoading(true);
-                    setOverlayNumber(Number(val));
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select reaction" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {reactionsMap.map((value, index) => (
-                      <SelectItem
-                        key={index + 1}
-                        value={(index + 1).toString()}
-                      >
-                        {value.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="overlayEnabled">Show credit overlay</Label>
-                <Switch
-                  id="overlayEnabled"
-                  checked={overlayEnabled}
-                  onCheckedChange={setOverlayEnabled}
-                />
-              </div>
-              {/* Preview block moved here, under show credit overlay */}
+            {/* Second column: preview, download, copy only */}
+            <div className="flex flex-col gap-4 justify-center h-full">
               <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2">
                 <Label>Preview</Label>
                 <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
@@ -555,8 +556,9 @@ export default function Home() {
                       }
                     }}
                     className="w-full md:w-auto"
+                    aria-label="Copy"
                   >
-                    Copy Result To Clipboard
+                    <AiOutlineCopy />
                   </Button>
                 </div>
               </div>
