@@ -17,7 +17,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <Analytics />
       <SpeedInsights />
-      <body>
+      <body className="bg-[#f8fbff]">
         {children}
         <Footer />
       </body>

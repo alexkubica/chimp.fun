@@ -1,14 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { collectionsMetadata, reactionsMap } from "@/consts";
@@ -25,12 +18,7 @@ import { ReactionMetadata } from "@/types";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AiOutlineLoading3Quarters, AiOutlineCopy } from "react-icons/ai";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { shortenAddress } from "@/utils";
 
 const fileToDataUri = (file: File) =>
   new Promise((resolve, reject) => {
@@ -386,168 +374,197 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background px-2 py-4">
-      <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-extrabold tracking-tight mb-1">
+    <main className="min-h-screen flex items-center justify-center px-2 py-4">
+      <div className="w-full max-w-2xl mx-auto">
+        <header className="text-center mb-6">
+          <h1 className="text-3xl font-extrabold tracking-tight mb-1">
             CHIMP.FUN
-          </CardTitle>
-          <CardDescription className="text-lg font-medium mb-2">
-            NFT Editor
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 flex flex-col gap-2">
-              <Label htmlFor="collection">Collection</Label>
-              <Select
-                value={collectionIndex.toString()}
-                onValueChange={(val) => {
-                  const newCollectionIndex = Number(val);
-                  setLoading(true);
-                  setCollectionIndex(newCollectionIndex);
-                  collectionMetadata = collectionsMetadata[newCollectionIndex];
-                  minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
-                  maxTokenID =
-                    collectionMetadata.total +
-                    (collectionMetadata.tokenIdOffset ?? 0);
-                  if (
-                    Number(tokenID) < minTokenID ||
-                    Number(tokenID) > maxTokenID
-                  ) {
-                    setTokenID(minTokenID);
-                  }
-                  setFile(null);
-                  setUploadedImageUri(null);
-                }}
-              >
-                <SelectTrigger id="collection">
-                  <SelectValue placeholder="Select collection" />
-                </SelectTrigger>
-                <SelectContent>
-                  {collectionsMetadata.map((collection, index) => (
-                    <SelectItem key={collection.name} value={index.toString()}>
-                      {collection.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex-1 flex flex-col gap-2">
-              <Label htmlFor="gifNumber">
-                Token ID ({minTokenID}-{maxTokenID})
-              </Label>
-              <Input
-                id="gifNumber"
-                min={minTokenID}
-                max={maxTokenID}
-                value={tempTokenID}
-                onChange={handleTokenIdChange}
-                type="number"
-                className="w-full"
-              />
-              <div className="flex gap-2">
-                <Button onClick={handleTokenIdSubmit} className="w-full">
-                  OK
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleRandomClick}
-                  className="w-full"
-                >
-                  RANDOM 🎲
-                </Button>
-              </div>
-              {errorMessage && (
-                <div className="text-destructive text-sm mt-1">
-                  {errorMessage}
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="flex-1 flex flex-col gap-2">
-              <Label htmlFor="file">Or upload your own image</Label>
-              <Input id="file" type="file" onChange={handleFileChange} />
-              <Button
-                variant="outline"
-                onClick={async function handlePasteImage() {
-                  try {
-                    const clipboardItems = await navigator.clipboard.read();
-                    for (const clipboardItem of clipboardItems) {
-                      for (const type of clipboardItem.types) {
-                        if (type.startsWith("image/")) {
-                          const blob = await clipboardItem.getType(type);
-                          const file = new File([blob], "pasted-image", {
-                            type,
-                          });
-                          setFile(file);
-                          return;
-                        }
-                      }
+          </h1>
+          <p className="text-lg font-medium mb-2">NFT Editor</p>
+        </header>
+        <section className="flex flex-col gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* First column: collection, token id, image, tip */}
+            <div className="flex flex-col gap-8">
+              {/* Upload controls */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="collection">Collection</Label>
+                <Select
+                  value={collectionIndex.toString()}
+                  onValueChange={(val) => {
+                    const newCollectionIndex = Number(val);
+                    setLoading(true);
+                    setCollectionIndex(newCollectionIndex);
+                    collectionMetadata =
+                      collectionsMetadata[newCollectionIndex];
+                    minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
+                    maxTokenID =
+                      collectionMetadata.total +
+                      (collectionMetadata.tokenIdOffset ?? 0);
+                    if (
+                      Number(tokenID) < minTokenID ||
+                      Number(tokenID) > maxTokenID
+                    ) {
+                      setTokenID(minTokenID);
                     }
-                    alert("No image found in clipboard");
-                  } catch (err) {
-                    console.error("Failed to read clipboard:", err);
-                    alert("Failed to read clipboard");
-                  }
-                }}
-              >
-                Paste Image From Clipboard
-              </Button>
-              <small className="text-muted-foreground">
-                Tip: Use 1:1 aspect ratio for best results.
-              </small>
-            </div>
-            <div className="flex-1 flex flex-col items-center gap-2">
-              <Label>Preview</Label>
-              <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
-                {loading ? (
-                  <Skeleton className="w-full h-full rounded-lg" />
-                ) : (
-                  finalResult && (
-                    <img
-                      src={finalResult}
-                      alt="Preview"
-                      className="object-contain w-full h-full rounded-lg"
-                      style={{ background: "transparent" }}
-                    />
-                  )
+                    setFile(null);
+                    setUploadedImageUri(null);
+                  }}
+                >
+                  <SelectTrigger id="collection">
+                    <SelectValue placeholder="Select collection" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {collectionsMetadata.map((collection, index) => (
+                      <SelectItem
+                        key={collection.name}
+                        value={index.toString()}
+                      >
+                        {collection.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="gifNumber">
+                  Token ID ({minTokenID}-{maxTokenID})
+                </Label>
+                <Input
+                  id="gifNumber"
+                  min={minTokenID}
+                  max={maxTokenID}
+                  value={tempTokenID}
+                  onChange={handleTokenIdChange}
+                  type="number"
+                  className="w-full"
+                  style={{ minWidth: 0 }}
+                />
+                <div className="flex gap-2">
+                  <Button onClick={handleTokenIdSubmit} className="w-full">
+                    OK
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleRandomClick}
+                    className="w-full"
+                  >
+                    RANDOM 🎲
+                  </Button>
+                </div>
+                {errorMessage && (
+                  <div className="text-destructive text-sm mt-1">
+                    {errorMessage}
+                  </div>
                 )}
               </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="file">Or upload your own image</Label>
+                <Input id="file" type="file" onChange={handleFileChange} />
+                <Button
+                  variant="outline"
+                  onClick={async function handlePasteImage() {
+                    try {
+                      const clipboardItems = await navigator.clipboard.read();
+                      for (const clipboardItem of clipboardItems) {
+                        for (const type of clipboardItem.types) {
+                          if (type.startsWith("image/")) {
+                            const blob = await clipboardItem.getType(type);
+                            const file = new File([blob], "pasted-image", {
+                              type,
+                            });
+                            setFile(file);
+                            return;
+                          }
+                        }
+                      }
+                      alert("No image found in clipboard");
+                    } catch (err) {
+                      console.error("Failed to read clipboard:", err);
+                      alert("Failed to read clipboard");
+                    }
+                  }}
+                >
+                  Paste Image From Clipboard
+                </Button>
+                <small className="text-muted-foreground">
+                  Tip: Use 1:1 aspect ratio for best results.
+                </small>
+              </div>
+            </div>
+            {/* Second column: select a reaction, show credit overlay */}
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label>Select a reaction</Label>
+                <Select
+                  value={overlayNumber.toString()}
+                  onValueChange={function handleReaction(val) {
+                    setLoading(true);
+                    setOverlayNumber(Number(val));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select reaction" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {reactionsMap.map((value, index) => (
+                      <SelectItem
+                        key={index + 1}
+                        value={(index + 1).toString()}
+                      >
+                        {value.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="overlayEnabled">Show credit overlay</Label>
+                <Switch
+                  id="overlayEnabled"
+                  checked={overlayEnabled}
+                  onCheckedChange={setOverlayEnabled}
+                />
+              </div>
+              {/* Preview block moved here, under show credit overlay */}
+              <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2">
+                <Label>Preview</Label>
+                <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
+                  {loading ? (
+                    <Skeleton className="w-full h-full rounded-lg" />
+                  ) : (
+                    finalResult && (
+                      <img
+                        src={finalResult}
+                        alt="Preview"
+                        className="object-contain w-full h-full rounded-lg"
+                        style={{ background: "transparent" }}
+                      />
+                    )
+                  )}
+                </div>
+                <div className="flex flex-col md:flex-row gap-2 w-full mt-2">
+                  <Button onClick={downloadOutput} className="w-full md:w-auto">
+                    Download
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={function handleCopy() {
+                      if (finalResult) {
+                        copyBlobToClipboard(finalResult);
+                      }
+                    }}
+                    className="w-full md:w-auto"
+                  >
+                    Copy Result To Clipboard
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex flex-col gap-2">
-              <Label>Select a reaction</Label>
-              <Select
-                value={overlayNumber.toString()}
-                onValueChange={function handleReaction(val) {
-                  setLoading(true);
-                  setOverlayNumber(Number(val));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select reaction" />
-                </SelectTrigger>
-                <SelectContent>
-                  {reactionsMap.map((value, index) => (
-                    <SelectItem key={index + 1} value={(index + 1).toString()}>
-                      {value.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="overlayEnabled">Show credit overlay</Label>
-              <Switch
-                id="overlayEnabled"
-                checked={overlayEnabled}
-                onCheckedChange={setOverlayEnabled}
-              />
-            </div>
-            <div className="flex-1 flex flex-col gap-2">
+          {/* X, Y, Scale controls under both columns */}
+          <div className="flex flex-col md:flex-row gap-4 w-full">
+            <div className="flex flex-col gap-2 flex-1">
               <Label>X</Label>
               <div className="flex items-center gap-2">
                 <Input
@@ -575,7 +592,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <Label>Y</Label>
               <div className="flex items-center gap-2">
                 <Input
@@ -603,7 +620,7 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="flex-1 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <Label>Scale</Label>
               <div className="flex items-center gap-2">
                 <Input
@@ -633,24 +650,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </CardContent>
-        <CardFooter className="flex flex-col md:flex-row gap-2 justify-center items-center">
-          <Button onClick={downloadOutput} className="w-full md:w-auto">
-            Download
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={function handleCopy() {
-              if (finalResult) {
-                copyBlobToClipboard(finalResult);
-              }
-            }}
-            className="w-full md:w-auto"
-          >
-            Copy Result To Clipboard
-          </Button>
-        </CardFooter>
-      </Card>
+        </section>
+      </div>
     </main>
   );
 }
