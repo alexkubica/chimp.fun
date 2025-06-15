@@ -1,4 +1,3 @@
-import RootLayout from "../components/RootLayout";
 import "../globals.css";
 
 export const metadata = {
@@ -10,5 +9,5 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <RootLayout>{children}</RootLayout>;
+  return children;
 }
