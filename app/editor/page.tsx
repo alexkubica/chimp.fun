@@ -463,8 +463,24 @@ export default function Home() {
                     max={maxTokenID}
                     value={tempTokenID}
                     onChange={function handleTokenIdInput(e) {
-                      setTempTokenID(e.target.value);
-                      setLoading(true);
+                      const value = e.target.value;
+                      setTempTokenID(value);
+                      const tokenIdNum = Number(value);
+                      if (
+                        !isNaN(tokenIdNum) &&
+                        tokenIdNum >= minTokenID &&
+                        tokenIdNum <= maxTokenID
+                      ) {
+                        setErrorMessage(null);
+                        setTokenID(tokenIdNum);
+                        setLoading(true);
+                        setFile(null);
+                        setUploadedImageUri(null);
+                      } else {
+                        setErrorMessage(
+                          `Invalid Token ID, please choose between ${minTokenID} and ${maxTokenID}`,
+                        );
+                      }
                     }}
                     type="number"
                     className="flex-1 min-w-0"
