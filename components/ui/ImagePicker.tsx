@@ -8,6 +8,7 @@ interface ImagePickerProps {
   label?: string;
   onFileChange: (file: File | null) => void;
   className?: string;
+  accept?: string;
 }
 
 export function ImagePicker({
@@ -15,6 +16,7 @@ export function ImagePicker({
   label,
   onFileChange,
   className = "",
+  accept = "image/*",
 }: ImagePickerProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -87,7 +89,7 @@ export function ImagePicker({
           id={id}
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept={accept}
           className="hidden"
           onChange={handleInputChange}
         />
