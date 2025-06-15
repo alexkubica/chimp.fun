@@ -1,8 +1,8 @@
-import RootLayout from "./components/RootLayout";
-import "./globals.css";
+import RootLayout from "../components/RootLayout";
+import "../globals.css";
 
 export const metadata = {
-  title: "chimp.fun",
+  title: "chimp.fun - NFT Editor",
 };
 
 export default function Layout({
