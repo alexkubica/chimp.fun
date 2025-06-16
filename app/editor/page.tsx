@@ -183,10 +183,34 @@ function ReactionOverlayDraggable({
     }
     if (resizing && naturalSize) {
       const deltaPx = e.clientX - start.mouseX;
-      let newOverlayWidth = Math.max(20, start.overlayWidth + deltaPx);
+      let newOverlayWidth = start.overlayWidth + deltaPx;
+      let newOverlayHeight =
+        (start.naturalHeight / start.naturalWidth) * newOverlayWidth;
+      // Enforce minimum 50px for the smaller dimension
+      const minSize = 50;
+      if (newOverlayWidth < minSize || newOverlayHeight < minSize) {
+        if (newOverlayWidth < newOverlayHeight) {
+          newOverlayWidth = minSize;
+          newOverlayHeight =
+            (start.naturalHeight / start.naturalWidth) * minSize;
+        } else {
+          newOverlayHeight = minSize;
+          newOverlayWidth =
+            (start.naturalWidth / start.naturalHeight) * minSize;
+        }
+      }
+      newOverlayWidth = Math.max(newOverlayWidth, minSize);
+      newOverlayHeight = Math.max(newOverlayHeight, minSize);
       const pxTo1080 = 1080 / containerSize;
-      const newScale = start.naturalWidth / (newOverlayWidth * pxTo1080);
-      onChange({ x, y, scale: Math.max(0.1, newScale) });
+      // Clamp overlay so it doesn't go out of bounds
+      const maxWidth1080 = 1080 - x;
+      const maxHeight1080 = 1080 - y;
+      const minScaleWidth = start.naturalWidth / maxWidth1080;
+      const minScaleHeight = start.naturalHeight / maxHeight1080;
+      const minScale = Math.max(minScaleWidth, minScaleHeight, 0.1);
+      let newScale = start.naturalWidth / (newOverlayWidth * pxTo1080);
+      newScale = Math.max(newScale, minScale);
+      onChange({ x, y, scale: newScale });
       if (e.preventDefault) e.preventDefault();
     }
   }
@@ -208,10 +232,34 @@ function ReactionOverlayDraggable({
     if (resizing && naturalSize && e.touches.length > 0) {
       const touch = e.touches[0];
       const deltaPx = touch.clientX - start.mouseX;
-      let newOverlayWidth = Math.max(20, start.overlayWidth + deltaPx);
+      let newOverlayWidth = start.overlayWidth + deltaPx;
+      let newOverlayHeight =
+        (start.naturalHeight / start.naturalWidth) * newOverlayWidth;
+      // Enforce minimum 50px for the smaller dimension
+      const minSize = 50;
+      if (newOverlayWidth < minSize || newOverlayHeight < minSize) {
+        if (newOverlayWidth < newOverlayHeight) {
+          newOverlayWidth = minSize;
+          newOverlayHeight =
+            (start.naturalHeight / start.naturalWidth) * minSize;
+        } else {
+          newOverlayHeight = minSize;
+          newOverlayWidth =
+            (start.naturalWidth / start.naturalHeight) * minSize;
+        }
+      }
+      newOverlayWidth = Math.max(newOverlayWidth, minSize);
+      newOverlayHeight = Math.max(newOverlayHeight, minSize);
       const pxTo1080 = 1080 / containerSize;
-      const newScale = start.naturalWidth / (newOverlayWidth * pxTo1080);
-      onChange({ x, y, scale: Math.max(0.1, newScale) });
+      // Clamp overlay so it doesn't go out of bounds
+      const maxWidth1080 = 1080 - x;
+      const maxHeight1080 = 1080 - y;
+      const minScaleWidth = start.naturalWidth / maxWidth1080;
+      const minScaleHeight = start.naturalHeight / maxHeight1080;
+      const minScale = Math.max(minScaleWidth, minScaleHeight, 0.1);
+      let newScale = start.naturalWidth / (newOverlayWidth * pxTo1080);
+      newScale = Math.max(newScale, minScale);
+      onChange({ x, y, scale: newScale });
       if (e.preventDefault) e.preventDefault();
     }
   }

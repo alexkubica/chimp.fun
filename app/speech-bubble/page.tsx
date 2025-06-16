@@ -74,7 +74,7 @@ export default function SpeechBubblePage() {
   }, [text]);
 
   return (
-    <main className="flex min-h-screen items-center bg-[#f8fbff] px-2 py-4 flex-col">
+    <main className="flex items-center bg-[#f8fbff] px-2 py-4 flex-col">
       <h1 className="text-4xl font-extrabold mb-2 text-center">CHIMP.FUN</h1>
       <h2 className="text-2xl font-bold text-center mb-6">
         Speech Bubble Generator
