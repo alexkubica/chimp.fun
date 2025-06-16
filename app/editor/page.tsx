@@ -414,6 +414,56 @@ function ReactionOverlayDraggable({
   );
 }
 
+// --- Reaction Settings Persistence Helpers ---
+function getReactionSettingsKey(
+  collectionIndex: number,
+  tokenID: string | number,
+) {
+  return `reactionSettings-${collectionIndex}-${tokenID}`;
+}
+
+function saveReactionSettings(
+  collectionIndex: number,
+  tokenID: string | number,
+  settings: {
+    x: number;
+    y: number;
+    scale: number;
+    overlayNumber: number;
+    overlayEnabled: boolean;
+  },
+) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(
+      getReactionSettingsKey(collectionIndex, tokenID),
+      JSON.stringify(settings),
+    );
+  } catch {}
+}
+
+function loadReactionSettings(
+  collectionIndex: number,
+  tokenID: string | number,
+): {
+  x: number;
+  y: number;
+  scale: number;
+  overlayNumber: number;
+  overlayEnabled: boolean;
+} | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(
+      getReactionSettingsKey(collectionIndex, tokenID),
+    );
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
@@ -667,13 +717,13 @@ export default function Home() {
     };
   }, [debouncedRenderImageUrl]);
 
+  // Only keep the effect that resets x, y, scale on overlayNumber change
   useEffect(() => {
     let overlaySettings = reactionsMap[overlayNumber - 1];
-
     setX(overlaySettings.x);
     setY(overlaySettings.y);
     setScale(overlaySettings.scale);
-  }, [tokenID, overlayNumber]);
+  }, [overlayNumber]);
 
   async function downloadOutput() {
     if (!finalResult) {
