@@ -487,6 +487,9 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const [resizing, setResizing] = useState(false);
+  const [showGifCopyModal, setShowGifCopyModal] = useState(false);
+  const [gifBlobToCopy, setGifBlobToCopy] = useState<Blob | null>(null);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -785,24 +788,70 @@ export default function Home() {
     setUploadedImageUri(null);
   }, [maxTokenID]);
 
+  // Helper: Copy first frame of GIF as PNG to clipboard
+  async function copyGifFirstFrameAsPng(blob: Blob) {
+    return new Promise<void>((resolve, reject) => {
+      const url = URL.createObjectURL(blob);
+      const img = new window.Image();
+      img.onload = async function () {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            alert("Failed to get canvas context for PNG copy.");
+            reject(new Error("Failed to get canvas context."));
+            URL.revokeObjectURL(url);
+            return;
+          }
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob(async (pngBlob) => {
+            if (!pngBlob) {
+              alert("Failed to convert GIF to PNG.");
+              reject(new Error("Failed to convert GIF to PNG."));
+              return;
+            }
+            try {
+              await navigator.clipboard.write([
+                new ClipboardItem({ "image/png": pngBlob }),
+              ]);
+              alert("Static PNG (first frame) copied to clipboard!");
+              resolve();
+            } catch (err) {
+              alert("Failed to copy PNG to clipboard.");
+              reject(err);
+            }
+            URL.revokeObjectURL(url);
+          }, "image/png");
+        } catch (err) {
+          alert("Failed to process GIF for PNG copy.");
+          reject(err);
+        }
+      };
+      img.onerror = (err) => {
+        alert("Failed to load GIF for PNG copy.");
+        reject(err);
+      };
+      img.src = url;
+    });
+  }
+
   const copyBlobToClipboard = async (blobUrl: string) => {
     try {
       const response = await fetch(blobUrl);
       const blob = await response.blob();
 
       if (blob.type === "image/gif") {
-        if (
-          confirm(
-            "Copying GIFs isn't supported by current browser. Would you like to download instead?",
-          )
-        ) {
-          downloadOutput();
-        }
+        setGifBlobToCopy(blob);
+        setShowGifCopyModal(true);
         return;
       }
 
       if (!navigator.clipboard.write) {
-        alert("Your browser does not support copying images to clipboard");
+        setCopyStatus(
+          "Your browser does not support copying images to clipboard",
+        );
         return;
       }
 
@@ -811,15 +860,35 @@ export default function Home() {
           [blob.type]: blob,
         }),
       ]);
-      alert("Image copied to clipboard successfully!");
+      setCopyStatus("Image copied to clipboard successfully!");
     } catch (err) {
       console.error("Failed to copy image:", err);
-      if (
-        confirm("Failed to copy image. Would you like to download it instead?")
-      ) {
-        downloadOutput();
-      }
+      setCopyStatus(
+        "Failed to copy image. Please try again or download instead.",
+      );
     }
+  };
+
+  // Handler for modal confirm
+  const handleGifCopyModalConfirm = async () => {
+    if (!gifBlobToCopy) return;
+    setShowGifCopyModal(false);
+    try {
+      await copyGifFirstFrameAsPng(gifBlobToCopy);
+      setCopyStatus("Static PNG (first frame) copied to clipboard!");
+    } catch (err) {
+      setCopyStatus(
+        "Failed to copy PNG to clipboard. Please try again or download instead.",
+      );
+    } finally {
+      setGifBlobToCopy(null);
+    }
+  };
+
+  // Handler for modal cancel
+  const handleGifCopyModalCancel = () => {
+    setShowGifCopyModal(false);
+    setGifBlobToCopy(null);
   };
 
   useEffect(() => {
@@ -1182,6 +1251,7 @@ export default function Home() {
                     variant="secondary"
                     onClick={function handleCopy() {
                       if (finalResult) {
+                        setCopyStatus(null);
                         copyBlobToClipboard(finalResult);
                       }
                     }}
@@ -1191,6 +1261,43 @@ export default function Home() {
                     <AiOutlineCopy />
                   </Button>
                 </div>
+                {copyStatus && (
+                  <div className="text-sm mt-1 text-center text-muted-foreground">
+                    {copyStatus}
+                  </div>
+                )}
+                {/* GIF Copy Modal */}
+                {showGifCopyModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
+                      <div className="mb-4 text-center">
+                        <div className="font-semibold mb-2">
+                          Copy GIF as static PNG?
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Copying GIFs isn&apos;t supported by your browser.
+                          Would you like to copy a static PNG (first frame)
+                          instead?
+                        </div>
+                      </div>
+                      <div className="flex gap-2 w-full justify-center">
+                        <Button
+                          onClick={handleGifCopyModalConfirm}
+                          className="flex-1"
+                        >
+                          Copy PNG
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={handleGifCopyModalCancel}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
