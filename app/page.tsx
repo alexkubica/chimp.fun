@@ -7,7 +7,9 @@ export default function Home() {
     <main className="flex flex-col items-center justify-center bg-[#f8fbff] px-2 py-4">
       <div className="flex flex-col items-center gap-3 w-full max-w-md">
         <h1 className="text-4xl font-extrabold tracking-tight text-[#222] mt-2 text-center drop-shadow-sm">
-          CHIMP.FUN
+          <a href="/" className="text-inherit no-underline">
+            CHIMP.FUN
+          </a>
         </h1>
         <div className="bg-[#8DC7FF] rounded-2xl shadow-lg flex items-center justify-center">
           <Avatar className="w-64 h-64 rounded-xl">

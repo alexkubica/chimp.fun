@@ -1,7 +1,12 @@
 import "../globals.css";
 
 export const metadata = {
-  title: "chimp.fun - NFT Editor",
+  title: "NFT Editor | CHIMP.FUN",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function Layout({

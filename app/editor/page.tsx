@@ -1020,7 +1020,9 @@ export default function Home() {
       <div className="w-full max-w-2xl mx-auto">
         <header className="text-center mb-6">
           <h1 className="text-3xl font-extrabold tracking-tight mb-1">
-            CHIMP.FUN
+            <a href="/" className="text-inherit no-underline">
+              CHIMP.FUN
+            </a>
           </h1>
           <p className="text-lg font-medium mb-2">NFT Editor</p>
           <div className="flex justify-center mt-2">

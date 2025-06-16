@@ -2063,13 +2063,15 @@ export default function PhaserGame({
       {/* Title and HUD: always top center, stacked on desktop */}
       <div className="fixed top-0 left-0 w-full z-50 flex flex-col items-center pointer-events-none">
         <div
-          className="mt-4 text-3xl sm:text-5xl font-extrabold text-white drop-shadow-lg select-none pointer-events-none tracking-widest px-2 text-center w-[98vw] max-w-full"
+          className="mt-4 text-3xl sm:text-5xl font-extrabold text-white drop-shadow-lg select-none tracking-widest px-2 text-center w-[98vw] max-w-full pointer-events-auto"
           style={{
             fontFamily:
               '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
           }}
         >
-          CHIMP.FUN
+          <a href="/" className="text-inherit no-underline">
+            CHIMP.FUN
+          </a>
         </div>
         {/* Always show START/timer HUD centered under title */}
         <div className="mt-4 flex flex-col items-center gap-2 pointer-events-none">
