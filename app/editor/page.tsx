@@ -1109,6 +1109,39 @@ export default function Home() {
                     {errorMessage}
                   </div>
                 )}
+                {/* OpenSea link below Token ID input */}
+                {(() => {
+                  const contract = collectionMetadata.contract;
+                  const chain = collectionMetadata.chain;
+                  const tokenIdNum = Number(tempTokenID);
+                  const validTokenId =
+                    !isNaN(tokenIdNum) &&
+                    tokenIdNum >= minTokenID &&
+                    tokenIdNum <= maxTokenID;
+                  let openseaChainSegment = "";
+                  if (chain === "ape") {
+                    openseaChainSegment = "ape_chain";
+                  } else if (chain === "polygon") {
+                    openseaChainSegment = "polygon";
+                  } else {
+                    openseaChainSegment = "ethereum";
+                  }
+                  if (validTokenId && contract && openseaChainSegment) {
+                    const url = `https://opensea.io/assets/${openseaChainSegment}/${contract}/${tokenIdNum}`;
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-sm mt-1"
+                        style={{ wordBreak: "break-all" }}
+                      >
+                        View on OpenSea
+                      </a>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <div className="flex flex-col gap-2">
                 <ImagePicker
