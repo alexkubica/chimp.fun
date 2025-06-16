@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton, Spinner } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { collectionsMetadata, reactionsMap } from "@/consts";
@@ -52,6 +52,7 @@ type ReactionOverlayDraggableProps = {
   setResizing: (resizing: boolean) => void;
   resizing: boolean;
   onResizeEnd?: () => void;
+  disabled?: boolean;
 };
 
 function ReactionOverlayDraggable({
@@ -67,6 +68,7 @@ function ReactionOverlayDraggable({
   setResizing,
   resizing,
   onResizeEnd,
+  disabled = false,
 }: ReactionOverlayDraggableProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [start, setStart] = useState({
@@ -364,38 +366,50 @@ function ReactionOverlayDraggable({
   return (
     <div
       ref={overlayRef}
-      style={overlayStyle}
-      onMouseDown={onMouseDown}
-      onTouchStart={onTouchStart}
+      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 10 }}
     >
-      {imageUrl && (
+      <div
+        className="absolute"
+        style={{
+          left: `${(x / 1080) * containerSize}px`,
+          top: `${(y / 1080) * containerSize}px`,
+          width: naturalSize
+            ? `${(naturalSize.width / scale) * (containerSize / 1080)}px`
+            : 100,
+          height: naturalSize
+            ? `${(naturalSize.height / scale) * (containerSize / 1080)}px`
+            : 100,
+          pointerEvents: disabled ? "none" : "auto",
+          filter: disabled
+            ? "brightness(0.7) grayscale(0.3) opacity(0.8)"
+            : undefined,
+          transition: "filter 0.2s",
+          border: "2px dotted #888",
+          borderRadius: "0.5rem",
+          boxSizing: "border-box",
+        }}
+        onMouseDown={disabled ? undefined : onMouseDown}
+        onTouchStart={disabled ? undefined : onTouchStart}
+      >
         <img
           src={imageUrl}
           alt="Reaction overlay"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            pointerEvents: "none",
-          }}
+          className="w-full h-full object-contain select-none"
+          draggable={false}
+          style={{ pointerEvents: "none" }}
         />
-      )}
-      {/* Resize handle */}
-      <div
-        style={{
-          position: "absolute" as const,
-          right: 0,
-          bottom: 0,
-          width: 16,
-          height: 16,
-          background: "#fff",
-          border: "2px solid #888",
-          cursor: "nwse-resize",
-          zIndex: 11,
-        }}
-        onMouseDown={onResizeMouseDown}
-        onTouchStart={onResizeTouchStart}
-      />
+        {/* No dark overlay when disabled */}
+        {/* Resize handle, only if not disabled */}
+        {!disabled && (
+          <div
+            className="absolute bottom-0 right-0 w-4 h-4 bg-white border border-gray-400 rounded-full cursor-nwse-resize z-20"
+            onMouseDown={onResizeMouseDown}
+            onTouchStart={onResizeTouchStart}
+            style={{ touchAction: "none" }}
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -1021,7 +1035,52 @@ export default function Home() {
               <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
                 <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
                   {loading ? (
-                    <Skeleton className="w-full h-full rounded-lg" />
+                    isFirstRender ? (
+                      <Skeleton className="w-full h-full rounded-lg" />
+                    ) : finalResult ? (
+                      <div className="relative w-full h-full">
+                        <img
+                          src={finalResult}
+                          alt="Preview"
+                          className="object-contain w-full h-full rounded-lg opacity-80"
+                          style={{
+                            background: "transparent",
+                            filter: "brightness(0.7) grayscale(0.3)",
+                          }}
+                        />
+                        {/* Draggable overlay for reaction, always shown if finalResult */}
+                        <ReactionOverlayDraggable
+                          x={x}
+                          y={y}
+                          scale={scale}
+                          imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                          onChange={({ x: newX, y: newY, scale: newScale }) => {
+                            setX(newX);
+                            setY(newY);
+                            setScale(newScale);
+                          }}
+                          containerSize={320}
+                          setDragging={setDragging}
+                          dragging={dragging}
+                          setResizing={setResizing}
+                          resizing={resizing}
+                          onDragEnd={() => {
+                            setDragging(false);
+                            debouncedRenderImageUrl();
+                          }}
+                          onResizeEnd={() => {
+                            setResizing(false);
+                            debouncedRenderImageUrl();
+                          }}
+                          disabled={loading}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Spinner />
+                        </div>
+                      </div>
+                    ) : (
+                      <Skeleton className="w-full h-full rounded-lg" />
+                    )
                   ) : (
                     finalResult && (
                       <>
@@ -1055,6 +1114,7 @@ export default function Home() {
                             setResizing(false);
                             debouncedRenderImageUrl();
                           }}
+                          disabled={loading}
                         />
                       </>
                     )
