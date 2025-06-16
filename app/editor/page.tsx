@@ -29,6 +29,7 @@ import {
 } from "react";
 import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
+import path from "path";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -973,6 +974,47 @@ export default function Home() {
     }
   }, [isGIF, finalResult, playAnimation]);
 
+  const handleFeelingLucky = useCallback(() => {
+    // Randomize collection
+    const randomCollectionIndex = Math.floor(
+      Math.random() * collectionsMetadata.length,
+    );
+    const randomCollection = collectionsMetadata[randomCollectionIndex];
+    let randomTokenId: number | string;
+    // If collection has gifOverride, any ID in range is valid
+    if (randomCollection.gifOverride) {
+      const min = 1 + (randomCollection.tokenIdOffset ?? 0);
+      const max =
+        randomCollection.total + (randomCollection.tokenIdOffset ?? 0);
+      randomTokenId = Math.floor(Math.random() * (max - min + 1)) + min;
+    } else {
+      // Otherwise, pick a valid tokenId from metadata files if available
+      let validTokenIds: number[] = [];
+      try {
+        // Only works client-side if you expose the list, so fallback to range if not available
+        // For now, fallback to range
+        const min = 1 + (randomCollection.tokenIdOffset ?? 0);
+        const max =
+          randomCollection.total + (randomCollection.tokenIdOffset ?? 0);
+        randomTokenId = Math.floor(Math.random() * (max - min + 1)) + min;
+      } catch {
+        // fallback to range
+        const min = 1 + (randomCollection.tokenIdOffset ?? 0);
+        const max =
+          randomCollection.total + (randomCollection.tokenIdOffset ?? 0);
+        randomTokenId = Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+    }
+    const randomPreset = Math.floor(Math.random() * reactionsMap.length) + 1;
+    setCollectionIndex(randomCollectionIndex);
+    setTokenID(randomTokenId);
+    setTempTokenID(randomTokenId);
+    setOverlayNumber(randomPreset);
+    setLoading(true);
+    setFile(null);
+    setUploadedImageUri(null);
+  }, []);
+
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
       <div className="w-full max-w-2xl mx-auto">
@@ -981,6 +1023,11 @@ export default function Home() {
             CHIMP.FUN
           </h1>
           <p className="text-lg font-medium mb-2">NFT Editor</p>
+          <div className="flex justify-center mt-2">
+            <Button onClick={handleFeelingLucky} variant="secondary">
+              I&apos;m Feeling Lucky
+            </Button>
+          </div>
         </header>
         <section className="flex flex-col gap-4">
           <div className="grid md:grid-cols-2 gap-4">
@@ -1249,12 +1296,18 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="flex items-center space-x-2 w-full">
-                  <Switch
-                    id="playAnimation"
-                    checked={playAnimation}
-                    onCheckedChange={setPlayAnimation}
-                  />
-                  <Label htmlFor="playAnimation">Play animation</Label>
+                  {["Chimpers", "Chimpers Genesis"].includes(
+                    collectionMetadata.name,
+                  ) && (
+                    <>
+                      <Switch
+                        id="playAnimation"
+                        checked={playAnimation}
+                        onCheckedChange={setPlayAnimation}
+                      />
+                      <Label htmlFor="playAnimation">Play animation</Label>
+                    </>
+                  )}
                 </div>
                 <div className="flex items-center space-x-2 w-full">
                   <Switch
