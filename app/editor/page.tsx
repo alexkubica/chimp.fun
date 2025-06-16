@@ -30,14 +30,21 @@ import {
 import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 
-const fileToDataUri = (file: File) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      resolve(event?.target?.result);
-    };
-    reader.readAsDataURL(file);
-  });
+function dataURLtoBlob(dataurl: string) {
+  const arr = dataurl.split(",");
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  if (!mimeMatch) {
+    throw new Error("Invalid data URL");
+  }
+  const mime = mimeMatch[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
+}
 
 type ReactionOverlayDraggableProps = {
   x: number;
@@ -464,6 +471,15 @@ function loadReactionSettings(
   }
 }
 
+const fileToDataUri = (file: File) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      resolve(event?.target?.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
@@ -490,6 +506,10 @@ export default function Home() {
   const [showGifCopyModal, setShowGifCopyModal] = useState(false);
   const [gifBlobToCopy, setGifBlobToCopy] = useState<Blob | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [playAnimation, setPlayAnimation] = useState(true);
+  const [staticGifFrameUrl, setStaticGifFrameUrl] = useState<string | null>(
+    null,
+  );
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -733,8 +753,15 @@ export default function Home() {
       console.warn("can't download gif, no final result");
       return;
     }
-
-    // Create a download link and trigger the download
+    // If playAnimation is off and staticGifFrameUrl is available, download as PNG
+    if (isGIF && !playAnimation && staticGifFrameUrl) {
+      const a = document.createElement("a");
+      a.href = staticGifFrameUrl;
+      a.download = `${collectionMetadata.name}-${tokenID}-${reactionsMap[overlayNumber - 1].title}.png`;
+      a.click();
+      return;
+    }
+    // Otherwise, download the GIF or other image as before
     const a = document.createElement("a");
     a.href = finalResult;
     a.download = `${collectionMetadata.name}-${tokenID}-${reactionsMap[overlayNumber - 1].title}.${imageExtension}`;
@@ -816,21 +843,17 @@ export default function Home() {
               await navigator.clipboard.write([
                 new ClipboardItem({ "image/png": pngBlob }),
               ]);
-              alert("Static PNG (first frame) copied to clipboard!");
               resolve();
             } catch (err) {
-              alert("Failed to copy PNG to clipboard.");
               reject(err);
             }
             URL.revokeObjectURL(url);
           }, "image/png");
         } catch (err) {
-          alert("Failed to process GIF for PNG copy.");
           reject(err);
         }
       };
       img.onerror = (err) => {
-        alert("Failed to load GIF for PNG copy.");
         reject(err);
       };
       img.src = url;
@@ -875,10 +898,10 @@ export default function Home() {
     setShowGifCopyModal(false);
     try {
       await copyGifFirstFrameAsPng(gifBlobToCopy);
-      setCopyStatus("Static PNG (first frame) copied to clipboard!");
+      setCopyStatus("Image copied to clipboard!");
     } catch (err) {
       setCopyStatus(
-        "Failed to copy PNG to clipboard. Please try again or download instead.",
+        "Failed to copy image to clipboard. Please try again or download instead.",
       );
     } finally {
       setGifBlobToCopy(null);
@@ -901,6 +924,54 @@ export default function Home() {
       }
     };
   }, [debouncedRenderImageUrl]);
+
+  // Helper to determine if current image is a GIF
+  const isGIF = imageExtension === "gif";
+
+  // Extract first frame of GIF as PNG data URL for static preview
+  useEffect(() => {
+    async function extractFirstFrame(gifUrl: string) {
+      try {
+        const response = await fetch(gifUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        return await new Promise<string>((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = function () {
+            try {
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              if (!ctx) {
+                reject(new Error("Failed to get canvas context."));
+                URL.revokeObjectURL(url);
+                return;
+              }
+              ctx.drawImage(img, 0, 0);
+              resolve(canvas.toDataURL("image/png"));
+              URL.revokeObjectURL(url);
+            } catch (err) {
+              reject(err);
+              URL.revokeObjectURL(url);
+            }
+          };
+          img.onerror = (err) => {
+            reject(err);
+            URL.revokeObjectURL(url);
+          };
+          img.src = url;
+        });
+      } catch (err) {
+        return null;
+      }
+    }
+    if (isGIF && finalResult && !playAnimation) {
+      extractFirstFrame(finalResult).then(setStaticGifFrameUrl);
+    } else {
+      setStaticGifFrameUrl(null);
+    }
+  }, [isGIF, finalResult, playAnimation]);
 
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
@@ -1142,12 +1213,20 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="flex items-center space-x-2 w-full">
-                  <Label htmlFor="overlayEnabled">Show MADE WITH</Label>
+                  <Switch
+                    id="playAnimation"
+                    checked={playAnimation}
+                    onCheckedChange={setPlayAnimation}
+                  />
+                  <Label htmlFor="playAnimation">Play animation</Label>
+                </div>
+                <div className="flex items-center space-x-2 w-full">
                   <Switch
                     id="overlayEnabled"
                     checked={overlayEnabled}
                     onCheckedChange={setOverlayEnabled}
                   />
+                  <Label htmlFor="overlayEnabled">MADE WITH CHIMP.FUN</Label>
                 </div>
               </div>
               {/* Preview and controls below */}
@@ -1158,15 +1237,27 @@ export default function Home() {
                       <Skeleton className="w-full h-full rounded-lg" />
                     ) : finalResult ? (
                       <div className="relative w-full h-full">
-                        <img
-                          src={finalResult}
-                          alt="Preview"
-                          className="object-contain w-full h-full rounded-lg opacity-80"
-                          style={{
-                            background: "transparent",
-                            filter: "brightness(0.7) grayscale(0.3)",
-                          }}
-                        />
+                        {isGIF && !playAnimation && staticGifFrameUrl ? (
+                          <img
+                            src={staticGifFrameUrl}
+                            alt="Preview (static frame)"
+                            className="object-contain w-full h-full rounded-lg opacity-80"
+                            style={{
+                              background: "transparent",
+                              filter: "brightness(0.7) grayscale(0.3)",
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={finalResult}
+                            alt="Preview"
+                            className="object-contain w-full h-full rounded-lg opacity-80"
+                            style={{
+                              background: "transparent",
+                              filter: "brightness(0.7) grayscale(0.3)",
+                            }}
+                          />
+                        )}
                         {/* Draggable overlay for reaction, always shown if finalResult */}
                         <ReactionOverlayDraggable
                           x={x}
@@ -1203,12 +1294,21 @@ export default function Home() {
                   ) : (
                     finalResult && (
                       <>
-                        <img
-                          src={finalResult}
-                          alt="Preview"
-                          className="object-contain w-full h-full rounded-lg"
-                          style={{ background: "transparent" }}
-                        />
+                        {isGIF && !playAnimation && staticGifFrameUrl ? (
+                          <img
+                            src={staticGifFrameUrl}
+                            alt="Preview (static frame)"
+                            className="object-contain w-full h-full rounded-lg"
+                            style={{ background: "transparent" }}
+                          />
+                        ) : (
+                          <img
+                            src={finalResult}
+                            alt="Preview"
+                            className="object-contain w-full h-full rounded-lg"
+                            style={{ background: "transparent" }}
+                          />
+                        )}
                         {/* Draggable overlay for reaction */}
                         <ReactionOverlayDraggable
                           x={x}
@@ -1250,6 +1350,22 @@ export default function Home() {
                   <Button
                     variant="secondary"
                     onClick={function handleCopy() {
+                      if (isGIF && !playAnimation && staticGifFrameUrl) {
+                        setCopyStatus(null);
+                        // Copy PNG from staticGifFrameUrl
+                        const blob = dataURLtoBlob(staticGifFrameUrl);
+                        navigator.clipboard
+                          .write([new ClipboardItem({ "image/png": blob })])
+                          .then(() => {
+                            setCopyStatus("Image copied to clipboard!");
+                          })
+                          .catch((err) => {
+                            setCopyStatus(
+                              "Failed to copy image to clipboard. Please try again or download instead.",
+                            );
+                          });
+                        return;
+                      }
                       if (finalResult) {
                         setCopyStatus(null);
                         copyBlobToClipboard(finalResult);
@@ -1272,12 +1388,11 @@ export default function Home() {
                     <div className="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
                       <div className="mb-4 text-center">
                         <div className="font-semibold mb-2">
-                          Copy GIF as static PNG?
+                          Copy GIF as static image?
                         </div>
                         <div className="text-sm text-muted-foreground">
                           Copying GIFs isn&apos;t supported by your browser.
-                          Would you like to copy a static PNG (first frame)
-                          instead?
+                          Would you like to copy a static image instead?
                         </div>
                       </div>
                       <div className="flex gap-2 w-full justify-center">
