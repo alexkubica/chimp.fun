@@ -1,71 +1,63 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import opentype from "opentype.js";
+import { useRef, useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SpeechBubblePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [text, setText] = useState("!CHIMP");
-  const [font, setFont] = useState<opentype.Font | null>(null);
-
-  useEffect(() => {
-    opentype.load("/slkscr.ttf", (err, font) => {
-      if (err) console.error(err);
-      else setFont(font);
-    });
-  }, []);
 
   const drawSpeechBubble = () => {
-    if (!canvasRef.current || !font) return;
-
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const fontSize = 48;
+    const fontSize = 16;
     const padding = 20;
     const spikeHeight = 20;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Measure text width
-    const glyphs = font.stringToGlyphs(text);
-    const width = glyphs.reduce(
-      (w, g, i) => w + font.getAdvanceWidth(text[i], fontSize),
-      0,
-    );
+    ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+    // Support multi-line text
+    const lines = text.split("\n");
+    const textWidths = lines.map((line) => ctx.measureText(line).width);
+    const textWidth = Math.max(...textWidths);
+    const textHeight = fontSize * lines.length;
 
-    const textX = padding;
-    const textY = padding + fontSize;
+    const bubbleWidth = textWidth + padding * 2;
+    const bubbleHeight = textHeight + padding * 2 + spikeHeight;
 
-    const bubbleWidth = width + padding * 2;
-    const bubbleHeight = fontSize + padding * 2 + spikeHeight;
+    canvas.width = bubbleWidth;
+    canvas.height = bubbleHeight;
 
-    // Draw bubble
-    ctx.fillStyle = "#FFF";
-    ctx.strokeStyle = "#000";
+    // Reapply font after resizing canvas
+    ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+
+    // Draw speech bubble
+    ctx.fillStyle = "#FFFFFF";
+    ctx.strokeStyle = "#000000";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(10, 10);
-    ctx.lineTo(10, bubbleHeight - spikeHeight);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, bubbleHeight - spikeHeight);
     ctx.lineTo(bubbleWidth / 2 - 10, bubbleHeight - spikeHeight);
     ctx.lineTo(bubbleWidth / 2, bubbleHeight);
     ctx.lineTo(bubbleWidth / 2 + 10, bubbleHeight - spikeHeight);
-    ctx.lineTo(bubbleWidth - 10, bubbleHeight - spikeHeight);
-    ctx.lineTo(bubbleWidth - 10, 10);
+    ctx.lineTo(bubbleWidth, bubbleHeight - spikeHeight);
+    ctx.lineTo(bubbleWidth, 0);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Draw text
-    ctx.fillStyle = "#000";
-    glyphs.forEach((glyph, i) => {
-      glyph.draw(
-        ctx,
-        textX + i * font.getAdvanceWidth(text[i], fontSize),
-        textY,
-        fontSize,
-      );
+    // Draw text (multi-line)
+    ctx.fillStyle = "#000000";
+    ctx.textBaseline = "top";
+    lines.forEach((line, i) => {
+      ctx.fillText(line, padding, padding + i * fontSize);
     });
   };
 
@@ -79,30 +71,36 @@ export default function SpeechBubblePage() {
 
   useEffect(() => {
     drawSpeechBubble();
-  }, [text, font]);
+  }, [text]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Speech Bubble Generator</h1>
-      <input
-        type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        className="border p-2 mb-4 w-full max-w-md"
-        placeholder="Enter text..."
-      />
-      <canvas
-        ref={canvasRef}
-        width={600}
-        height={200}
-        className="border mb-4"
-      />
-      <button
-        onClick={handleDownload}
-        className="bg-black text-white px-4 py-2 rounded"
-      >
-        Download PNG
-      </button>
-    </div>
+    <main className="flex min-h-screen items-center bg-[#f8fbff] px-2 py-4 flex-col">
+      <h1 className="text-4xl font-extrabold mb-2 text-center">CHIMP.FUN</h1>
+      <h2 className="text-2xl font-bold text-center mb-6">
+        Speech Bubble Generator
+      </h2>
+      <div className="w-full max-w-md flex flex-col items-center gap-4">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="mb-2 w-full text-base p-2 rounded border resize-y min-h-[60px]"
+          placeholder="Enter text..."
+          rows={3}
+        />
+        <div className="w-full flex justify-center">
+          <canvas
+            ref={canvasRef}
+            className="border mb-2 max-w-full h-auto"
+            style={{ display: "block", maxWidth: "100%", height: "auto" }}
+          />
+        </div>
+        <Button
+          onClick={handleDownload}
+          className="w-full bg-black text-white px-4 py-2 rounded mt-2"
+        >
+          Download PNG
+        </Button>
+      </div>
+    </main>
   );
 }
