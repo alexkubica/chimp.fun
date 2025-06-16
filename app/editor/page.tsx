@@ -18,7 +18,15 @@ import { ReactionMetadata } from "@/types";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  MouseEvent,
+  TouchEvent,
+} from "react";
 import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 
@@ -30,6 +38,292 @@ const fileToDataUri = (file: File) =>
     };
     reader.readAsDataURL(file);
   });
+
+type ReactionOverlayDraggableProps = {
+  x: number;
+  y: number;
+  scale: number;
+  imageUrl: string;
+  containerSize?: number;
+  onChange: (vals: { x: number; y: number; scale: number }) => void;
+  setDragging: (dragging: boolean) => void;
+  dragging: boolean;
+  onDragEnd?: () => void;
+};
+
+function ReactionOverlayDraggable({
+  x,
+  y,
+  scale,
+  imageUrl,
+  containerSize = 320, // px, matches max-w-xs
+  onChange,
+  setDragging,
+  dragging,
+  onDragEnd,
+}: ReactionOverlayDraggableProps) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [resizing, setResizing] = useState(false);
+  const [start, setStart] = useState({
+    x: 0,
+    y: 0,
+    scale: 1,
+    mouseX: 0,
+    mouseY: 0,
+    offsetX: 0,
+    offsetY: 0,
+    overlayWidth: 100,
+    overlayHeight: 100,
+    naturalWidth: 100,
+    naturalHeight: 100,
+  });
+  const [naturalSize, setNaturalSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  // Load image and get natural size
+  useEffect(() => {
+    if (!imageUrl) {
+      setNaturalSize(null);
+      return;
+    }
+    const img = new window.Image();
+    img.onload = function () {
+      setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.src = imageUrl;
+  }, [imageUrl]);
+
+  // --- Mouse and Touch Event Helpers ---
+  function getClientXY(
+    e: MouseEvent | TouchEvent | globalThis.MouseEvent | globalThis.TouchEvent,
+  ) {
+    if ("touches" in e && e.touches.length > 0) {
+      return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+    } else if ("changedTouches" in e && e.changedTouches.length > 0) {
+      return {
+        clientX: e.changedTouches[0].clientX,
+        clientY: e.changedTouches[0].clientY,
+      };
+    } else if ("clientX" in e && "clientY" in e) {
+      return { clientX: e.clientX, clientY: e.clientY };
+    }
+    return { clientX: 0, clientY: 0 };
+  }
+
+  // Drag handlers
+  function onMouseDown(e: MouseEvent<HTMLDivElement>) {
+    setDragging(true);
+    const overlayLeftPx = (x / 1080) * containerSize;
+    const overlayTopPx = (y / 1080) * containerSize;
+    setStart({
+      x,
+      y,
+      scale,
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      offsetX: e.clientX - overlayLeftPx,
+      offsetY: e.clientY - overlayTopPx,
+      overlayWidth: naturalSize
+        ? (naturalSize.width / scale) * (containerSize / 1080)
+        : 100,
+      overlayHeight: naturalSize
+        ? (naturalSize.height / scale) * (containerSize / 1080)
+        : 100,
+      naturalWidth: naturalSize ? naturalSize.width : 100,
+      naturalHeight: naturalSize ? naturalSize.height : 100,
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    setDragging(true);
+    const touch = e.touches[0];
+    const overlayLeftPx = (x / 1080) * containerSize;
+    const overlayTopPx = (y / 1080) * containerSize;
+    setStart({
+      x,
+      y,
+      scale,
+      mouseX: touch.clientX,
+      mouseY: touch.clientY,
+      offsetX: touch.clientX - overlayLeftPx,
+      offsetY: touch.clientY - overlayTopPx,
+      overlayWidth: naturalSize
+        ? (naturalSize.width / scale) * (containerSize / 1080)
+        : 100,
+      overlayHeight: naturalSize
+        ? (naturalSize.height / scale) * (containerSize / 1080)
+        : 100,
+      naturalWidth: naturalSize ? naturalSize.width : 100,
+      naturalHeight: naturalSize ? naturalSize.height : 100,
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  function onMouseMove(e: MouseEvent | globalThis.MouseEvent) {
+    if (dragging) {
+      const newLeftPx = e.clientX - start.offsetX;
+      const newTopPx = e.clientY - start.offsetY;
+      const newX = (newLeftPx / containerSize) * 1080;
+      const newY = (newTopPx / containerSize) * 1080;
+      onChange({ x: newX, y: newY, scale });
+      if (e.preventDefault) e.preventDefault();
+    }
+    if (resizing && naturalSize) {
+      const deltaPx = e.clientX - start.mouseX;
+      let newOverlayWidth = Math.max(20, start.overlayWidth + deltaPx);
+      const pxTo1080 = 1080 / containerSize;
+      const newScale = start.naturalWidth / (newOverlayWidth * pxTo1080);
+      onChange({ x, y, scale: Math.max(0.1, newScale) });
+      if (e.preventDefault) e.preventDefault();
+    }
+  }
+  function onTouchMove(e: TouchEvent | globalThis.TouchEvent) {
+    if (dragging && e.touches.length > 0) {
+      const touch = e.touches[0];
+      const newLeftPx = touch.clientX - start.offsetX;
+      const newTopPx = touch.clientY - start.offsetY;
+      const newX = (newLeftPx / containerSize) * 1080;
+      const newY = (newTopPx / containerSize) * 1080;
+      onChange({ x: newX, y: newY, scale });
+      if (e.preventDefault) e.preventDefault();
+    }
+    if (resizing && naturalSize && e.touches.length > 0) {
+      const touch = e.touches[0];
+      const deltaPx = touch.clientX - start.mouseX;
+      let newOverlayWidth = Math.max(20, start.overlayWidth + deltaPx);
+      const pxTo1080 = 1080 / containerSize;
+      const newScale = start.naturalWidth / (newOverlayWidth * pxTo1080);
+      onChange({ x, y, scale: Math.max(0.1, newScale) });
+      if (e.preventDefault) e.preventDefault();
+    }
+  }
+  function onMouseUp() {
+    setDragging(false);
+    setResizing(false);
+    if (onDragEnd) onDragEnd();
+  }
+  function onTouchEnd(e: TouchEvent | globalThis.TouchEvent) {
+    setDragging(false);
+    setResizing(false);
+    if (onDragEnd) onDragEnd();
+    if (e.preventDefault) e.preventDefault();
+  }
+  function onResizeMouseDown(e: MouseEvent<HTMLDivElement>) {
+    setResizing(true);
+    setStart((prev) => ({
+      ...prev,
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      overlayWidth: naturalSize
+        ? (naturalSize.width / scale) * (containerSize / 1080)
+        : 100,
+      overlayHeight: naturalSize
+        ? (naturalSize.height / scale) * (containerSize / 1080)
+        : 100,
+      naturalWidth: naturalSize ? naturalSize.width : 100,
+      naturalHeight: naturalSize ? naturalSize.height : 100,
+    }));
+    e.stopPropagation();
+  }
+  function onResizeTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    setResizing(true);
+    const touch = e.touches[0];
+    setStart((prev) => ({
+      ...prev,
+      mouseX: touch.clientX,
+      mouseY: touch.clientY,
+      overlayWidth: naturalSize
+        ? (naturalSize.width / scale) * (containerSize / 1080)
+        : 100,
+      overlayHeight: naturalSize
+        ? (naturalSize.height / scale) * (containerSize / 1080)
+        : 100,
+      naturalWidth: naturalSize ? naturalSize.width : 100,
+      naturalHeight: naturalSize ? naturalSize.height : 100,
+    }));
+    e.stopPropagation();
+  }
+  useEffect(() => {
+    if (dragging || resizing) {
+      window.addEventListener("mousemove", onMouseMove as any);
+      window.addEventListener("mouseup", onMouseUp);
+      window.addEventListener("touchmove", onTouchMove as any, {
+        passive: false,
+      });
+      window.addEventListener("touchend", onTouchEnd as any);
+      return () => {
+        window.removeEventListener("mousemove", onMouseMove as any);
+        window.removeEventListener("mouseup", onMouseUp);
+        window.removeEventListener("touchmove", onTouchMove as any);
+        window.removeEventListener("touchend", onTouchEnd as any);
+      };
+    }
+  });
+
+  // Calculate overlay style (relative to 1080x1080 canvas)
+  let overlayWidth = 100;
+  let overlayHeight = 100;
+  if (naturalSize) {
+    overlayWidth = (naturalSize.width / scale) * (containerSize / 1080);
+    overlayHeight = (naturalSize.height / scale) * (containerSize / 1080);
+  }
+  const overlayStyle: React.CSSProperties = {
+    position: "absolute",
+    left: (x / 1080) * containerSize,
+    top: (y / 1080) * containerSize,
+    width: overlayWidth,
+    height: overlayHeight,
+    border: "2px dashed #888",
+    cursor: dragging ? "grabbing" : "grab",
+    zIndex: 10,
+    background: "rgba(0,0,0,0.05)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    userSelect: dragging ? "none" : undefined,
+  };
+  return (
+    <div
+      ref={overlayRef}
+      style={overlayStyle}
+      onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
+    >
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="Reaction overlay"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            pointerEvents: "none",
+          }}
+        />
+      )}
+      {/* Resize handle */}
+      <div
+        style={{
+          position: "absolute" as const,
+          right: 0,
+          bottom: 0,
+          width: 16,
+          height: 16,
+          background: "#fff",
+          border: "2px solid #888",
+          cursor: "nwse-resize",
+          zIndex: 11,
+        }}
+        onMouseDown={onResizeMouseDown}
+        onTouchStart={onResizeTouchStart}
+      />
+    </div>
+  );
+}
 
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
@@ -52,6 +346,7 @@ export default function Home() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [overlayEnabled, setOverlayEnabled] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -375,6 +670,17 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).debouncedRenderImageUrl = debouncedRenderImageUrl;
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        (window as any).debouncedRenderImageUrl = undefined;
+      }
+    };
+  }, [debouncedRenderImageUrl]);
+
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
       <div className="w-full max-w-2xl mx-auto">
@@ -630,12 +936,32 @@ export default function Home() {
                     <Skeleton className="w-full h-full rounded-lg" />
                   ) : (
                     finalResult && (
-                      <img
-                        src={finalResult}
-                        alt="Preview"
-                        className="object-contain w-full h-full rounded-lg"
-                        style={{ background: "transparent" }}
-                      />
+                      <>
+                        <img
+                          src={finalResult}
+                          alt="Preview"
+                          className="object-contain w-full h-full rounded-lg"
+                          style={{ background: "transparent" }}
+                        />
+                        {/* Draggable overlay for reaction */}
+                        <ReactionOverlayDraggable
+                          x={x}
+                          y={y}
+                          scale={scale}
+                          imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                          onChange={({ x: newX, y: newY, scale: newScale }) => {
+                            setX(newX);
+                            setY(newY);
+                            setScale(newScale);
+                          }}
+                          containerSize={320}
+                          setDragging={setDragging}
+                          dragging={dragging}
+                          onDragEnd={() => {
+                            debouncedRenderImageUrl();
+                          }}
+                        />
+                      </>
                     )
                   )}
                 </div>
