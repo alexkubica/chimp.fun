@@ -6,6 +6,9 @@ export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center bg-[#f8fbff] px-2 py-4">
       <div className="flex flex-col items-center gap-3 w-full max-w-md">
+        <h1 className="text-4xl font-extrabold tracking-tight text-[#222] mt-2 text-center drop-shadow-sm">
+          CHIMP.FUN
+        </h1>
         <div className="bg-[#8DC7FF] rounded-2xl shadow-lg flex items-center justify-center">
           <Avatar className="w-64 h-64 rounded-xl">
             <AvatarImage
@@ -15,21 +18,6 @@ export default function Home() {
             />
           </Avatar>
         </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-[#222] mt-2 text-center drop-shadow-sm">
-          CHIMP.FUN
-        </h1>
-        <h2 className="text-lg text-[#444] font-medium text-center mb-2">
-          Brought you by{" "}
-          <Link
-            href="https://linktr.ee/mrcryptoalex"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#8DC7FF] underline font-semibold hover:text-[#5bb0f7]"
-          >
-            Alex
-          </Link>{" "}
-          !CHIMP 🙉
-        </h2>
         <div className="flex flex-col gap-4 w-full mt-4 mx-auto">
           <Button
             asChild

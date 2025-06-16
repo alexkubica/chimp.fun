@@ -78,7 +78,10 @@ export default function BannerPage() {
     setCurrentIndex((prev) => (prev + 1) % banners.length);
   }
   function handleRandom() {
-    setCurrentIndex(Math.floor(Math.random() * banners.length));
+    const types: ("official" | "community")[] = ["official", "community"];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+    setBannerType(randomType);
+    // setCurrentIndex will be handled by useEffect when bannerType changes
   }
 
   return (
@@ -115,13 +118,12 @@ export default function BannerPage() {
           </select>
         </div>
       </div>
-      <a
-        href={bannerPath}
-        download={currentBanner}
-        className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-lg shadow inline-block text-center"
+      <button
+        className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-lg shadow"
+        onClick={handleRandom}
       >
-        Download
-      </a>
+        🎲 Random
+      </button>
       <div className="flex flex-col items-center w-full max-w-2xl">
         <div className="relative w-full aspect-[2/1] bg-white rounded-lg shadow mb-2 overflow-hidden">
           <Image
@@ -183,15 +185,41 @@ export default function BannerPage() {
             );
           })}
         </div>
-        <button
-          className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-lg shadow"
-          onClick={handleRandom}
+        {/* Move credit and download here */}
+        <div className="mb-2 text-sm text-gray-600">
+          {bannerType === "official" ? (
+            <span>
+              Credit:{" "}
+              <a
+                href="https://chimpers.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-blue-700"
+              >
+                Chimpers
+              </a>
+            </span>
+          ) : (
+            <span>
+              Credit:{" "}
+              <a
+                href="https://x.com/rafalors"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-blue-700"
+              >
+                RafaSimon
+              </a>
+            </span>
+          )}
+        </div>
+        <a
+          href={bannerPath}
+          download={currentBanner}
+          className="mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-bold text-lg shadow inline-block text-center"
         >
-          <span role="img" aria-label="cube" className="mr-2">
-            🧊
-          </span>
-          Random
-        </button>
+          Download
+        </a>
       </div>
     </main>
   );
