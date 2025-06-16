@@ -49,6 +49,9 @@ type ReactionOverlayDraggableProps = {
   setDragging: (dragging: boolean) => void;
   dragging: boolean;
   onDragEnd?: () => void;
+  setResizing: (resizing: boolean) => void;
+  resizing: boolean;
+  onResizeEnd?: () => void;
 };
 
 function ReactionOverlayDraggable({
@@ -61,9 +64,11 @@ function ReactionOverlayDraggable({
   setDragging,
   dragging,
   onDragEnd,
+  setResizing,
+  resizing,
+  onResizeEnd,
 }: ReactionOverlayDraggableProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [resizing, setResizing] = useState(false);
   const [start, setStart] = useState({
     x: 0,
     y: 0,
@@ -166,8 +171,13 @@ function ReactionOverlayDraggable({
     if (dragging) {
       const newLeftPx = e.clientX - start.offsetX;
       const newTopPx = e.clientY - start.offsetY;
-      const newX = (newLeftPx / containerSize) * 1080;
-      const newY = (newTopPx / containerSize) * 1080;
+      let newX = (newLeftPx / containerSize) * 1080;
+      let newY = (newTopPx / containerSize) * 1080;
+      // Clamp logic
+      const overlayWidth1080 = (start.naturalWidth || 100) / start.scale;
+      const overlayHeight1080 = (start.naturalHeight || 100) / start.scale;
+      newX = Math.max(0, Math.min(newX, 1080 - overlayWidth1080));
+      newY = Math.max(0, Math.min(newY, 1080 - overlayHeight1080));
       onChange({ x: newX, y: newY, scale });
       if (e.preventDefault) e.preventDefault();
     }
@@ -185,8 +195,13 @@ function ReactionOverlayDraggable({
       const touch = e.touches[0];
       const newLeftPx = touch.clientX - start.offsetX;
       const newTopPx = touch.clientY - start.offsetY;
-      const newX = (newLeftPx / containerSize) * 1080;
-      const newY = (newTopPx / containerSize) * 1080;
+      let newX = (newLeftPx / containerSize) * 1080;
+      let newY = (newTopPx / containerSize) * 1080;
+      // Clamp logic
+      const overlayWidth1080 = (start.naturalWidth || 100) / start.scale;
+      const overlayHeight1080 = (start.naturalHeight || 100) / start.scale;
+      newX = Math.max(0, Math.min(newX, 1080 - overlayWidth1080));
+      newY = Math.max(0, Math.min(newY, 1080 - overlayHeight1080));
       onChange({ x: newX, y: newY, scale });
       if (e.preventDefault) e.preventDefault();
     }
@@ -204,11 +219,17 @@ function ReactionOverlayDraggable({
     setDragging(false);
     setResizing(false);
     if (onDragEnd) onDragEnd();
+    if (resizing && typeof onResizeEnd === "function") {
+      onResizeEnd();
+    }
   }
   function onTouchEnd(e: TouchEvent | globalThis.TouchEvent) {
     setDragging(false);
     setResizing(false);
     if (onDragEnd) onDragEnd();
+    if (resizing && typeof onResizeEnd === "function") {
+      onResizeEnd();
+    }
     if (e.preventDefault) e.preventDefault();
   }
   function onResizeMouseDown(e: MouseEvent<HTMLDivElement>) {
@@ -254,11 +275,17 @@ function ReactionOverlayDraggable({
         passive: false,
       });
       window.addEventListener("touchend", onTouchEnd as any);
+      if (resizing) {
+        document.body.style.userSelect = "none";
+      }
       return () => {
         window.removeEventListener("mousemove", onMouseMove as any);
         window.removeEventListener("mouseup", onMouseUp);
         window.removeEventListener("touchmove", onTouchMove as any);
         window.removeEventListener("touchend", onTouchEnd as any);
+        if (resizing) {
+          document.body.style.userSelect = "";
+        }
       };
     }
   });
@@ -347,6 +374,7 @@ export default function Home() {
   const [overlayEnabled, setOverlayEnabled] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [resizing, setResizing] = useState(false);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -554,10 +582,22 @@ export default function Home() {
   }, [file]);
 
   useEffect(() => {
-    if (ffmpegReady && (encodedImageUrl || uploadedImageUri)) {
+    if (
+      ffmpegReady &&
+      (encodedImageUrl || uploadedImageUri) &&
+      !dragging &&
+      !resizing
+    ) {
       debouncedRenderImageUrl();
     }
-  }, [ffmpegReady, uploadedImageUri, debouncedRenderImageUrl, encodedImageUrl]);
+  }, [
+    ffmpegReady,
+    uploadedImageUri,
+    debouncedRenderImageUrl,
+    encodedImageUrl,
+    dragging,
+    resizing,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -957,7 +997,14 @@ export default function Home() {
                           containerSize={320}
                           setDragging={setDragging}
                           dragging={dragging}
+                          setResizing={setResizing}
+                          resizing={resizing}
                           onDragEnd={() => {
+                            setDragging(false);
+                            debouncedRenderImageUrl();
+                          }}
+                          onResizeEnd={() => {
+                            setResizing(false);
                             debouncedRenderImageUrl();
                           }}
                         />
