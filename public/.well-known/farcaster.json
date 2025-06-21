@@ -1,0 +1,14 @@
+{
+  "frame": {
+    "version": "1",
+    "name": "CHIMP.FUN",
+    "iconUrl": "https://chimp.fun/icon.png",
+    "homeUrl": "https://chimp.fun/",
+    "imageUrl": "https://chimp.fun/opengraph-image",
+    "buttonTitle": "🚩 Start",
+    "splashImageUrl": "https://chimp.fun/Chimpers-2956-!CHIMP.gif",
+    "splashBackgroundColor": "#8DC7FF",
+    "requiredChains": ["eip155:8453"],
+    "requiredCapabilities": ["actions.signIn", "wallet.getEthereumProvider"]
+  }
+}
