@@ -1,10 +1,10 @@
 "use client";
+
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { AiOutlineCopy } from "react-icons/ai";
 import dynamic from "next/dynamic";
+import React from "react";
+import ClientSdkProvider from "./SdkProvider";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -18,7 +18,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <Analytics />
       <SpeedInsights />
       <body className="bg-[#f8fbff]">
-        {children}
+        <ClientSdkProvider>{children}</ClientSdkProvider>
         <Footer />
       </body>
     </html>
