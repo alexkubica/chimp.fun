@@ -12,6 +12,7 @@
     "cacheMetadata": "tsx scripts/cacheMetadata.ts"
   },
   "dependencies": {
+    "@farcaster/frame-sdk": "^0.0.64",
     "@ffmpeg/ffmpeg": "^0.12.6",
     "@ffmpeg/util": "^0.12.1",
     "@maticnetwork/maticjs": "^3.9.2",
