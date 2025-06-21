@@ -1,14 +1,18 @@
 {
   "frame": {
-    "version": "1",
     "name": "CHIMP.FUN",
+    "version": "1",
     "iconUrl": "https://chimp.fun/icon.png",
-    "homeUrl": "https://chimp.fun/",
-    "imageUrl": "https://chimp.fun/opengraph-image",
-    "buttonTitle": "🚩 Start",
+    "homeUrl": "https://chimp.fun",
     "splashImageUrl": "https://chimp.fun/Chimpers-2956-!CHIMP.gif",
     "splashBackgroundColor": "#8DC7FF",
-    "requiredChains": ["eip155:8453"],
-    "requiredCapabilities": ["actions.signIn", "wallet.getEthereumProvider"]
+    "subtitle": "!CHIMP tools",
+    "description": "NFT tools.",
+    "primaryCategory": "utility"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjE0ODc5LCJ0eXBlIjoiYXV0aCIsImtleSI6IjB4MEVhOWJDNzZhOWM5OUZEMjZlOGUyN2FDM0IwMEY0YzIyOGU1YjhlMSJ9",
+    "payload": "eyJkb21haW4iOiJjaGltcC5mdW4ifQ",
+    "signature": "ZQlt86yTHEzKMdwDIvslTxnfMTJXX3I7NC35JPrCJs8457Q202bnziwAIt3z/D9SlTzV+jNGVEhWhPfdpGp58Bs="
   }
 }
