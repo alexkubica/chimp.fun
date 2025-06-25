@@ -367,6 +367,20 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 70,
     filename: "handsome.png",
   },
+  {
+    title: "Happy Wisebeard Wednesday!",
+    scale: 0.9,
+    x: 600,
+    y: 20,
+    filename: "Happy Wisebeard Wednesday!.png",
+  },
+  {
+    title: "Happy WBW!",
+    scale: 0.7,
+    x: 550,
+    y: 60,
+    filename: "Happy WBW.png",
+  },
 ];
 
 export const tokenURIABI = [
