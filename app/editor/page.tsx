@@ -618,7 +618,7 @@ function UnifiedNFTGallery({
             )}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
-              <div className="text-[10px] text-white truncate font-medium">
+              <div className="text-xs md:text-sm text-white truncate font-medium">
                 {nft.name || `#${nft.identifier}`}
               </div>
             </div>
@@ -695,6 +695,9 @@ export default function Home() {
   const [provider, setProvider] = useState<string | null>(null);
   const [providerName, setProviderName] = useState<string | null>(null);
   const [isResolvingENS, setIsResolvingENS] = useState(false);
+  
+  // Tab state for switching between connected and inputted wallet
+  const [activeTab, setActiveTab] = useState<'connected' | 'input'>('connected');
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -759,10 +762,9 @@ export default function Home() {
         return;
       }
       resolvedAddress = resolved;
-    }
-
-    if (!isValidEthereumAddress(resolvedAddress)) {
-      setNftError("Please enter a valid Ethereum address or ENS name");
+    } else if (!isValidEthereumAddress(resolvedAddress)) {
+      // Show "Invalid wallet" error for invalid input
+      setNftError("Invalid wallet");
       return;
     }
 
@@ -809,13 +811,23 @@ export default function Home() {
     }
   }, [supportedCollections, resolveENS]);
 
-  // Load user's own NFTs when they sign in
+  // Load user's own NFTs when they sign in and switch to connected tab
   useEffect(() => {
-    if (isLoggedIn && primaryWallet?.address && !activeWallet) {
-      setWalletInput(""); // Clear input when loading user's wallet
-      fetchWalletNFTs(primaryWallet.address);
+    if (isLoggedIn && primaryWallet?.address) {
+      setActiveTab('connected'); // Switch to connected tab when logged in
+      if (!activeWallet || activeWallet !== primaryWallet.address) {
+        setWalletInput(""); // Clear input when loading user's wallet
+        fetchWalletNFTs(primaryWallet.address);
+      }
     }
-  }, [isLoggedIn, primaryWallet?.address, activeWallet, fetchWalletNFTs]);
+  }, [isLoggedIn, primaryWallet?.address, fetchWalletNFTs]);
+
+  // Switch tab logic
+  useEffect(() => {
+    if (!isLoggedIn && activeTab === 'connected') {
+      setActiveTab('input'); // Switch to input tab if not logged in
+    }
+  }, [isLoggedIn, activeTab]);
 
   // Unified NFT selection handler
   const handleNFTSelect = useCallback((contract: string, tokenId: string, imageUrl: string) => {
@@ -1425,170 +1437,236 @@ export default function Home() {
         <section className="flex flex-col gap-4">
           {/* NFT Gallery - Mobile: under title, Desktop: above collection selector */}
           <div className="md:hidden flex flex-col gap-4">
-            {/* Show unified gallery when user is logged in or external wallet is loaded */}
-            {(isLoggedIn && !activeWallet) && (
-              <div className="text-center text-muted-foreground p-4 border rounded-md">
-                Connect your wallet to see your NFTs, or enter a wallet address below
-              </div>
-            )}
-            
-            {/* Wallet Input - Mobile */}
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="walletInputMobile">Browse Wallet NFTs</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="walletInputMobile"
-                  placeholder="0x... or ENS name"
-                  value={walletInput}
-                  onChange={(e) => setWalletInput(e.target.value)}
-                  className="flex-1 min-w-0 font-mono text-sm"
-                  onKeyDown={handleWalletInputKeyDown}
-                />
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePasteFromClipboard}
-                  title="Paste from clipboard"
-                >
-                  📋
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={loadWallet}
-                  disabled={nftLoading || isResolvingENS || !walletInput.trim()}
-                >
-                  {nftLoading || isResolvingENS ? "..." : "Load"}
-                </Button>
-              </div>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <div>Enter any Ethereum wallet address or ENS name to browse their supported NFTs</div>
-                <div className="flex flex-wrap gap-1">
-                  <span>Quick try:</span>
-                  <button 
-                    type="button"
-                    onClick={() => setWalletInput("vitalik.eth")}
-                    className="text-blue-600 hover:underline"
-                  >
-                    vitalik.eth
-                  </button>
-                  <span>•</span>
-                  <button 
-                    type="button"
-                    onClick={() => setWalletInput("pranksy.eth")}
-                    className="text-blue-600 hover:underline"
-                  >
-                    pranksy.eth
-                  </button>
-                </div>
-              </div>
+            {/* Simple Tabs - Mobile */}
+            <div className="flex border-b">
+              <button
+                onClick={() => setActiveTab('connected')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'connected'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+                disabled={!isLoggedIn}
+              >
+                Your NFTs
+              </button>
+              <button
+                onClick={() => setActiveTab('input')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'input'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Browse Wallet
+              </button>
             </div>
 
-            {/* Unified NFT Gallery - Mobile */}
-            {(nfts.length > 0 || nftLoading || nftError) && (
-              <UnifiedNFTGallery
-                onSelectNFT={handleNFTSelect}
-                supportedCollections={supportedCollections}
-                nfts={nfts}
-                loading={nftLoading}
-                error={nftError}
-                hasMore={hasMore}
-                providerName={providerName}
-                onLoadMore={() => {
-                  if (nextCursor && !nftLoading) {
-                    fetchWalletNFTs(walletInput.trim(), nextCursor);
-                  }
-                }}
-                title={getGalleryInfo.title}
-                subtitle={getGalleryInfo.subtitle}
-                showLoadingState={true}
-              />
+            {/* Tab Content - Mobile */}
+            {activeTab === 'connected' ? (
+              isLoggedIn ? (
+                (nfts.length > 0 || nftLoading || nftError) && activeWallet === primaryWallet?.address ? (
+                  <UnifiedNFTGallery
+                    onSelectNFT={handleNFTSelect}
+                    supportedCollections={supportedCollections}
+                    nfts={nfts}
+                    loading={nftLoading}
+                    error={nftError}
+                    hasMore={hasMore}
+                    providerName={providerName}
+                    onLoadMore={() => {
+                      if (nextCursor && !nftLoading && primaryWallet?.address) {
+                        fetchWalletNFTs(primaryWallet.address, nextCursor);
+                      }
+                    }}
+                    title="Your NFTs"
+                    subtitle={nfts.length > 0 ? `${nfts.length} NFTs found in your connected wallet` : undefined}
+                    showLoadingState={true}
+                  />
+                ) : (
+                  <div className="text-center text-muted-foreground p-4 border rounded-md">
+                    Loading your NFTs...
+                  </div>
+                )
+              ) : (
+                <div className="text-center text-muted-foreground p-4 border rounded-md">
+                  Connect your wallet to see your NFTs
+                </div>
+              )
+            ) : (
+              <div className="flex flex-col gap-4">
+                {/* Wallet Input */}
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="walletInputMobile">Enter wallet address or ENS name</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="walletInputMobile"
+                      placeholder="0x... or vitalik.eth"
+                      value={walletInput}
+                      onChange={(e) => setWalletInput(e.target.value)}
+                      className="flex-1 min-w-0 font-mono text-sm"
+                      onKeyDown={handleWalletInputKeyDown}
+                    />
+                    <Button 
+                      variant="outline"
+                      size="icon"
+                      onClick={handlePasteFromClipboard}
+                      title="Paste from clipboard"
+                    >
+                      📋
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={loadWallet}
+                      disabled={nftLoading || isResolvingENS || !walletInput.trim()}
+                    >
+                      {nftLoading || isResolvingENS ? "..." : "Load"}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* External Wallet NFT Gallery */}
+                {activeWallet && activeWallet !== primaryWallet?.address && (nfts.length > 0 || nftLoading || nftError) && (
+                  <UnifiedNFTGallery
+                    onSelectNFT={handleNFTSelect}
+                    supportedCollections={supportedCollections}
+                    nfts={nfts}
+                    loading={nftLoading}
+                    error={nftError}
+                    hasMore={hasMore}
+                    providerName={providerName}
+                    onLoadMore={() => {
+                      if (nextCursor && !nftLoading) {
+                        fetchWalletNFTs(walletInput.trim(), nextCursor);
+                      }
+                    }}
+                    title={getGalleryInfo.title}
+                    subtitle={getGalleryInfo.subtitle}
+                    showLoadingState={true}
+                  />
+                )}
+              </div>
             )}
           </div>
           
           <div className="grid md:grid-cols-2 gap-4">
             {/* First column: collection, token id, image, tip */}
             <div className="flex flex-col gap-8">
-                           {/* Show hint when no wallet loaded - Desktop only */}
-             <div className="hidden md:block">
-               {(isLoggedIn && !activeWallet) && (
-                 <div className="text-center text-muted-foreground p-4 border rounded-md">
-                   Connect your wallet to see your NFTs, or enter a wallet address below
-                 </div>
-               )}
-             </div>
-
-             {/* Wallet Input - Browse any wallet's NFTs */}
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="walletInput">Browse Wallet NFTs</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="walletInput"
-                    placeholder="0x... or ENS name (vitalik.eth)"
-                    value={walletInput}
-                    onChange={(e) => setWalletInput(e.target.value)}
-                    className="flex-1 min-w-0 font-mono text-sm"
-                    onKeyDown={handleWalletInputKeyDown}
-                  />
-                  <Button 
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePasteFromClipboard}
-                    title="Paste from clipboard"
+              {/* Simple Tabs - Desktop */}
+              <div className="hidden md:block">
+                <div className="flex border-b">
+                  <button
+                    onClick={() => setActiveTab('connected')}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'connected'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                    disabled={!isLoggedIn}
                   >
-                    📋
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={loadWallet}
-                    disabled={nftLoading || isResolvingENS || !walletInput.trim()}
+                    Your NFTs
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('input')}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'input'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
                   >
-                    {nftLoading || isResolvingENS ? "Loading..." : "Load NFTs"}
-                  </Button>
+                    Browse Wallet
+                  </button>
                 </div>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <div>Enter any Ethereum wallet address or ENS name to browse their supported NFTs</div>
-                  <div className="flex flex-wrap gap-1">
-                    <span>Quick try:</span>
-                    <button 
-                      type="button"
-                      onClick={() => setWalletInput("vitalik.eth")}
-                      className="text-blue-600 hover:underline"
-                    >
-                      vitalik.eth
-                    </button>
-                    <span>•</span>
-                    <button 
-                      type="button"
-                      onClick={() => setWalletInput("pranksy.eth")}
-                      className="text-blue-600 hover:underline"
-                    >
-                      pranksy.eth
-                    </button>
-                  </div>
+
+                {/* Tab Content - Desktop */}
+                <div className="mt-4">
+                  {activeTab === 'connected' ? (
+                    isLoggedIn ? (
+                      (nfts.length > 0 || nftLoading || nftError) && activeWallet === primaryWallet?.address ? (
+                        <UnifiedNFTGallery
+                          onSelectNFT={handleNFTSelect}
+                          supportedCollections={supportedCollections}
+                          nfts={nfts}
+                          loading={nftLoading}
+                          error={nftError}
+                          hasMore={hasMore}
+                          providerName={providerName}
+                          onLoadMore={() => {
+                            if (nextCursor && !nftLoading && primaryWallet?.address) {
+                              fetchWalletNFTs(primaryWallet.address, nextCursor);
+                            }
+                          }}
+                                                   title="Your NFTs"
+                         subtitle={nfts.length > 0 ? `${nfts.length} NFTs found in your connected wallet` : undefined}
+                         showLoadingState={true}
+                        />
+                      ) : (
+                        <div className="text-center text-muted-foreground p-4 border rounded-md">
+                          Loading your NFTs...
+                        </div>
+                      )
+                    ) : (
+                      <div className="text-center text-muted-foreground p-4 border rounded-md">
+                        Connect your wallet to see your NFTs
+                      </div>
+                    )
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {/* Wallet Input */}
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="walletInput">Enter wallet address or ENS name</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="walletInput"
+                            placeholder="0x... or vitalik.eth"
+                            value={walletInput}
+                            onChange={(e) => setWalletInput(e.target.value)}
+                            className="flex-1 min-w-0 font-mono text-sm"
+                            onKeyDown={handleWalletInputKeyDown}
+                          />
+                          <Button 
+                            variant="outline"
+                            size="icon"
+                            onClick={handlePasteFromClipboard}
+                            title="Paste from clipboard"
+                          >
+                            📋
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            onClick={loadWallet}
+                            disabled={nftLoading || isResolvingENS || !walletInput.trim()}
+                          >
+                            {nftLoading || isResolvingENS ? "Loading..." : "Load NFTs"}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* External Wallet NFT Gallery */}
+                      {activeWallet && activeWallet !== primaryWallet?.address && (nfts.length > 0 || nftLoading || nftError) && (
+                        <UnifiedNFTGallery
+                          onSelectNFT={handleNFTSelect}
+                          supportedCollections={supportedCollections}
+                          nfts={nfts}
+                          loading={nftLoading}
+                          error={nftError}
+                          hasMore={hasMore}
+                          providerName={providerName}
+                          onLoadMore={() => {
+                            if (nextCursor && !nftLoading) {
+                              fetchWalletNFTs(walletInput.trim(), nextCursor);
+                            }
+                          }}
+                          title={getGalleryInfo.title}
+                          subtitle={getGalleryInfo.subtitle}
+                          showLoadingState={true}
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* External Wallet NFT Gallery */}
-              {(nfts.length > 0 || nftLoading || nftError) && (
-                <UnifiedNFTGallery
-                  onSelectNFT={handleNFTSelect}
-                  supportedCollections={supportedCollections}
-                  nfts={nfts}
-                  loading={nftLoading}
-                  error={nftError}
-                  hasMore={hasMore}
-                  providerName={providerName}
-                  onLoadMore={() => {
-                    if (nextCursor && !nftLoading) {
-                      fetchWalletNFTs(walletInput.trim(), nextCursor);
-                    }
-                  }}
-                  title={getGalleryInfo.title}
-                  subtitle={getGalleryInfo.subtitle}
-                  showLoadingState={true}
-                />
-              )}
               
               {/* Upload controls */}
               <div className="flex flex-col gap-2">
@@ -1779,7 +1857,7 @@ export default function Home() {
                     }
                   }}
                 >
-                  Paste From Clipboard
+                  📋 Paste From Clipboard
                 </Button>
                 <small className="text-muted-foreground">
                   Tip: Use 1:1 aspect ratio for best results.
