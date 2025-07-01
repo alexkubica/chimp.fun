@@ -685,6 +685,120 @@ function NFTGallery({
   );
 }
 
+// External Wallet NFT Gallery Component  
+function ExternalWalletGallery({
+  onSelectNFT,
+  supportedCollections,
+  nfts,
+  loading,
+  error,
+  hasMore,
+  providerName,
+  onLoadMore,
+}: {
+  onSelectNFT: (contract: string, tokenId: string, imageUrl: string) => void;
+  supportedCollections: Set<string>;
+  nfts: UserNFT[];
+  loading: boolean;
+  error: string | null;
+  hasMore: boolean;
+  providerName: string | null;
+  onLoadMore: () => void;
+}) {
+  if (loading && nfts.length === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>Wallet NFTs</Label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="w-full aspect-square rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>Wallet NFTs</Label>
+        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+          <div className="font-medium mb-1">Failed to load NFTs</div>
+          <div className="text-xs">{error}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (nfts.length === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>Wallet NFTs</Label>
+        <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md text-center">
+          <div>No supported NFTs found in this wallet</div>
+          {providerName && (
+            <div className="text-xs mt-1 opacity-75">
+              Using {providerName} API
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <Label>Wallet NFTs ({nfts.length} found)</Label>
+        {providerName && (
+          <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+            via {providerName}
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-64 overflow-y-auto border rounded-md p-2">
+        {nfts.map((nft) => (
+          <button
+            key={`${nft.contract}-${nft.identifier}`}
+            onClick={() => onSelectNFT(nft.contract, nft.identifier, nft.image_url || '')}
+            className="group relative aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50"
+          >
+            {nft.image_url ? (
+              <img
+                src={nft.image_url}
+                alt={nft.name || `NFT ${nft.identifier}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                No Image
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
+              <div className="text-[10px] text-white truncate font-medium">
+                {nft.name || `#${nft.identifier}`}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+      {hasMore && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onLoadMore}
+          disabled={loading}
+          className="w-full"
+        >
+          {loading ? "Loading..." : "Load More"}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
@@ -716,12 +830,28 @@ export default function Home() {
     null,
   );
 
+  // Dynamic SDK hooks for wallet context
+  const { primaryWallet } = useDynamicContext();
+  const isLoggedIn = useIsLoggedIn();
+
   // NFT Gallery state
   const [selectedFromWallet, setSelectedFromWallet] = useState<{
     contract: string;
     tokenId: string;
     imageUrl: string;
+    source?: 'your-wallet' | 'external-wallet';
+    walletAddress?: string;
   } | null>(null);
+
+  // External wallet browsing state
+  const [externalWallet, setExternalWallet] = useState<string>("");
+  const [externalNfts, setExternalNfts] = useState<UserNFT[]>([]);
+  const [externalLoading, setExternalLoading] = useState(false);
+  const [externalError, setExternalError] = useState<string | null>(null);
+  const [externalHasMore, setExternalHasMore] = useState(false);
+  const [externalNextCursor, setExternalNextCursor] = useState<string | null>(null);
+  const [externalProvider, setExternalProvider] = useState<string | null>(null);
+  const [externalProviderName, setExternalProviderName] = useState<string | null>(null);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -737,6 +867,78 @@ export default function Home() {
     );
   }, []);
 
+  // Helper function to validate Ethereum address
+  const isValidEthereumAddress = (address: string): boolean => {
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+  };
+
+  // Fetch NFTs from external wallet
+  const fetchExternalWalletNFTs = useCallback(async (wallet: string, cursor?: string) => {
+    if (!wallet || !isValidEthereumAddress(wallet)) {
+      setExternalError("Please enter a valid Ethereum address");
+      return;
+    }
+
+    setExternalLoading(true);
+    setExternalError(null);
+
+    try {
+      let url = `/fetchUserNFTs?wallet=${wallet}&limit=50`;
+      
+      if (cursor) {
+        url += `&next=${encodeURIComponent(cursor)}`;
+      }
+
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `Failed to fetch NFTs: ${response.status}`);
+      }
+
+      const data: NFTApiResponse = await response.json();
+      
+      // Filter NFTs to only show supported collections
+      const filteredNFTs = data.nfts.filter(nft => 
+        supportedCollections.has(nft.contract.toLowerCase())
+      );
+
+      if (cursor) {
+        setExternalNfts(prev => [...prev, ...filteredNFTs]);
+      } else {
+        setExternalNfts(filteredNFTs);
+      }
+      
+      setExternalNextCursor(data.next || null);
+      setExternalHasMore(!!data.next);
+      setExternalProvider(data.provider || null);
+      setExternalProviderName(data.providerName || null);
+    } catch (err) {
+      console.error("Error fetching external wallet NFTs:", err);
+      setExternalError(err instanceof Error ? err.message : "Failed to fetch NFTs");
+    } finally {
+      setExternalLoading(false);
+    }
+  }, [supportedCollections]);
+
+  // Handle external wallet NFT selection
+  const handleExternalNFTSelect = useCallback((contract: string, tokenId: string, imageUrl: string) => {
+    // Find the collection index for this contract
+    const collectionIdx = collectionsMetadata.findIndex(
+      c => c.contract?.toLowerCase() === contract.toLowerCase()
+    );
+    
+    if (collectionIdx >= 0) {
+      setLoading(true);
+      setCollectionIndex(collectionIdx);
+      setTokenID(tokenId);
+      setTempTokenID(tokenId);
+      setFile(null);
+      setUploadedImageUri(null);
+      setSelectedFromWallet({ contract, tokenId, imageUrl, source: 'external-wallet', walletAddress: externalWallet });
+    }
+  }, [externalWallet]);
+
   // Handle NFT selection from wallet
   const handleNFTSelect = useCallback((contract: string, tokenId: string, imageUrl: string) => {
     // Find the collection index for this contract
@@ -751,9 +953,15 @@ export default function Home() {
       setTempTokenID(tokenId);
       setFile(null);
       setUploadedImageUri(null);
-      setSelectedFromWallet({ contract, tokenId, imageUrl });
+      setSelectedFromWallet({ 
+        contract, 
+        tokenId, 
+        imageUrl, 
+        source: 'your-wallet', 
+        walletAddress: primaryWallet?.address || ''
+      });
     }
-  }, []);
+  }, [primaryWallet?.address]);
 
   useEffect(() => {
     if (isFirstRender) {
@@ -1254,7 +1462,19 @@ export default function Home() {
     setFile(null);
     setUploadedImageUri(null);
     setSelectedFromWallet(null); // Clear wallet selection when feeling lucky
+    // Clear external wallet browsing state
+    setExternalWallet("");
+    setExternalNfts([]);
+    setExternalError(null);
   }, []);
+
+  // Handle Enter key for wallet input
+  const handleWalletInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && externalWallet.trim() && !externalLoading) {
+      setExternalNfts([]); // Clear previous results
+      fetchExternalWalletNFTs(externalWallet.trim());
+    }
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
@@ -1274,11 +1494,78 @@ export default function Home() {
         </header>
         <section className="flex flex-col gap-4">
           {/* NFT Gallery - Mobile: under title, Desktop: above collection selector */}
-          <div className="md:hidden">
+          <div className="md:hidden flex flex-col gap-4">
             <NFTGallery
               onSelectNFT={handleNFTSelect}
               supportedCollections={supportedCollections}
             />
+            
+            {/* Wallet Input - Mobile */}
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="walletInputMobile">Browse Wallet NFTs</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="walletInputMobile"
+                  placeholder="0x... wallet address"
+                  value={externalWallet}
+                  onChange={(e) => setExternalWallet(e.target.value)}
+                  className="flex-1 min-w-0 font-mono text-sm"
+                  onKeyDown={handleWalletInputKeyDown}
+                />
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (externalWallet.trim()) {
+                      setExternalNfts([]); // Clear previous results
+                      fetchExternalWalletNFTs(externalWallet.trim());
+                    }
+                  }}
+                  disabled={externalLoading || !externalWallet.trim()}
+                >
+                  {externalLoading ? "Loading..." : "Load"}
+                </Button>
+              </div>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <div>Enter any Ethereum wallet address to browse their supported NFTs</div>
+                <div className="flex flex-wrap gap-1">
+                  <span>Quick try:</span>
+                  <button 
+                    type="button"
+                    onClick={() => setExternalWallet("0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417")}
+                    className="text-blue-600 hover:underline"
+                  >
+                    vitalik.eth
+                  </button>
+                  <span>•</span>
+                  <button 
+                    type="button"
+                    onClick={() => setExternalWallet("0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984")}
+                    className="text-blue-600 hover:underline"
+                  >
+                    pranksy.eth
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* External Wallet NFT Gallery - Mobile */}
+            {(externalNfts.length > 0 || externalLoading || externalError) && (
+              <ExternalWalletGallery
+                onSelectNFT={handleExternalNFTSelect}
+                supportedCollections={supportedCollections}
+                nfts={externalNfts}
+                loading={externalLoading}
+                error={externalError}
+                hasMore={externalHasMore}
+                providerName={externalProviderName}
+                onLoadMore={() => {
+                  if (externalNextCursor && !externalLoading) {
+                    fetchExternalWalletNFTs(externalWallet.trim(), externalNextCursor);
+                  }
+                }}
+              />
+            )}
           </div>
           
           <div className="grid md:grid-cols-2 gap-4">
@@ -1291,6 +1578,72 @@ export default function Home() {
                   supportedCollections={supportedCollections}
                 />
               </div>
+
+              {/* Wallet Input - Browse any wallet's NFTs */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="walletInput">Browse Wallet NFTs</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="walletInput"
+                    placeholder="0x... wallet address"
+                    value={externalWallet}
+                    onChange={(e) => setExternalWallet(e.target.value)}
+                    className="flex-1 min-w-0 font-mono text-sm"
+                    onKeyDown={handleWalletInputKeyDown}
+                  />
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      if (externalWallet.trim()) {
+                        setExternalNfts([]); // Clear previous results
+                        fetchExternalWalletNFTs(externalWallet.trim());
+                      }
+                    }}
+                    disabled={externalLoading || !externalWallet.trim()}
+                  >
+                    {externalLoading ? "Loading..." : "Load NFTs"}
+                  </Button>
+                </div>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <div>Enter any Ethereum wallet address to browse their supported NFTs</div>
+                  <div className="flex flex-wrap gap-1">
+                    <span>Quick try:</span>
+                    <button 
+                      type="button"
+                      onClick={() => setExternalWallet("0xd81B7A2a1bBf3e1c713f2A5C886f88EE5f862417")}
+                      className="text-blue-600 hover:underline"
+                    >
+                      vitalik.eth
+                    </button>
+                    <span>•</span>
+                    <button 
+                      type="button"
+                      onClick={() => setExternalWallet("0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984")}
+                      className="text-blue-600 hover:underline"
+                    >
+                      pranksy.eth
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* External Wallet NFT Gallery */}
+              {(externalNfts.length > 0 || externalLoading || externalError) && (
+                <ExternalWalletGallery
+                  onSelectNFT={handleExternalNFTSelect}
+                  supportedCollections={supportedCollections}
+                  nfts={externalNfts}
+                  loading={externalLoading}
+                  error={externalError}
+                  hasMore={externalHasMore}
+                  providerName={externalProviderName}
+                  onLoadMore={() => {
+                    if (externalNextCursor && !externalLoading) {
+                      fetchExternalWalletNFTs(externalWallet.trim(), externalNextCursor);
+                    }
+                  }}
+                />
+              )}
               
               {/* Upload controls */}
               <div className="flex flex-col gap-2">
@@ -1359,7 +1712,14 @@ export default function Home() {
                 </div>
                 {selectedFromWallet && (
                   <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded border-l-2 border-blue-500">
-                    💳 Selected from your wallet
+                    {selectedFromWallet.source === 'your-wallet' ? (
+                      <span>💳 Selected from your wallet</span>
+                    ) : (
+                      <span>🔍 Selected from {selectedFromWallet.walletAddress ? 
+                        `${selectedFromWallet.walletAddress.slice(0, 6)}...${selectedFromWallet.walletAddress.slice(-4)}` : 
+                        'external wallet'
+                      }</span>
+                    )}
                   </div>
                 )}
               </div>
