@@ -72,6 +72,12 @@ export const collectionsMetadata: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
+    name: "Doodles",
+    total: 10000,
+    contract: "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+    chain: "ethereum",
+  },
+  {
     name: "DSNRS",
     total: 8888,
     contract: "0x896BE40d15d1dbFA4F4Ff25A110F3CE770e07897",
