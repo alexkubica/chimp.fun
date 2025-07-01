@@ -387,6 +387,13 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 60,
     filename: "Happy WBW.png",
   },
+  {
+    title: "$DOOD",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "$DOOD.png",
+  },
 ];
 
 export const tokenURIABI = [
