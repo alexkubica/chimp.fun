@@ -518,6 +518,7 @@ function UnifiedNFTGallery({
   hasMore,
   providerName,
   onLoadMore,
+  onLoadAll,
   title,
   subtitle,
   showLoadingState = true,
@@ -530,6 +531,7 @@ function UnifiedNFTGallery({
   hasMore: boolean;
   providerName: string | null;
   onLoadMore: () => void;
+  onLoadAll?: () => void;
   title: string;
   subtitle?: string;
   showLoadingState?: boolean;
@@ -626,15 +628,28 @@ function UnifiedNFTGallery({
         ))}
       </div>
       {hasMore && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onLoadMore}
-          disabled={loading}
-          className="w-full"
-        >
-          {loading ? "Loading..." : "Load More"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLoadMore}
+            disabled={loading}
+            className="flex-1"
+          >
+            {loading ? "Loading..." : "Load More"}
+          </Button>
+          {onLoadAll && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onLoadAll}
+              disabled={loading}
+              className="flex-1"
+            >
+              {loading ? "Loading..." : "Load All"}
+            </Button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -750,7 +765,93 @@ export default function Home() {
     }
   }, []);
 
-  // Unified function to fetch NFTs from any wallet
+  // Function to fetch ALL NFTs from user's connected wallet (auto-paginate)
+  const fetchAllUserNFTs = useCallback(async (walletAddress: string) => {
+    let resolvedAddress = walletAddress.trim();
+    
+    // Handle ENS resolution
+    if (looksLikeENS(resolvedAddress)) {
+      const resolved = await resolveENS(resolvedAddress);
+      if (!resolved) {
+        setNftError(`Could not resolve ENS name: ${resolvedAddress}`);
+        return;
+      }
+      resolvedAddress = resolved;
+    } else if (!isValidEthereumAddress(resolvedAddress)) {
+      setNftError("Invalid wallet");
+      return;
+    }
+
+    setNftLoading(true);
+    setNftError(null);
+    setNfts([]); // Clear previous results
+    setActiveWallet(resolvedAddress);
+
+    try {
+      let allNFTs: UserNFT[] = [];
+      let nextCursor: string | null = null;
+      let provider: string | null = null;
+      let providerName: string | null = null;
+      let pageCount = 0;
+
+      do {
+        pageCount++;
+        let url = `/fetchUserNFTs?wallet=${resolvedAddress}&limit=100`; // Increased limit for fewer requests
+        
+        if (nextCursor) {
+          url += `&next=${encodeURIComponent(nextCursor)}`;
+        }
+
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          throw new Error(errorData.error || `Failed to fetch NFTs: ${response.status}`);
+        }
+
+        const data: NFTApiResponse = await response.json();
+        
+        // Filter NFTs to only show supported collections
+        const filteredNFTs = data.nfts.filter(nft => 
+          supportedCollections.has(nft.contract.toLowerCase())
+        );
+
+        allNFTs = [...allNFTs, ...filteredNFTs];
+        nextCursor = data.next || null;
+        
+        // Store provider info from first response
+        if (pageCount === 1) {
+          provider = data.provider || null;
+          providerName = data.providerName || null;
+        }
+
+        // Update state with current progress
+        setNfts([...allNFTs]);
+        
+        // Add a small delay between requests to be nice to the API
+        if (nextCursor) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+      } while (nextCursor);
+
+      // Final state updates
+      setNextCursor(null);
+      setHasMore(false);
+      setProvider(provider);
+      setProviderName(providerName);
+      
+      console.log(`Fetched ${allNFTs.length} supported NFTs across ${pageCount} pages`);
+      
+    } catch (err) {
+      console.error("Error fetching all user NFTs:", err);
+      setNftError(err instanceof Error ? err.message : "Failed to fetch NFTs");
+    } finally {
+      setNftLoading(false);
+    }
+  }, [supportedCollections, resolveENS]);
+
+  // Function to fetch NFTs from external wallets (manual pagination)
   const fetchWalletNFTs = useCallback(async (walletAddress: string, cursor?: string) => {
     let resolvedAddress = walletAddress.trim();
     
@@ -817,10 +918,10 @@ export default function Home() {
       setActiveTab('connected'); // Switch to connected tab when logged in
       if (!activeWallet || activeWallet !== primaryWallet.address) {
         setWalletInput(""); // Clear input when loading user's wallet
-        fetchWalletNFTs(primaryWallet.address);
+        fetchAllUserNFTs(primaryWallet.address); // Fetch ALL user NFTs automatically
       }
     }
-  }, [isLoggedIn, primaryWallet?.address, fetchWalletNFTs]);
+  }, [isLoggedIn, primaryWallet?.address, fetchAllUserNFTs]);
 
   // Switch tab logic
   useEffect(() => {
@@ -879,6 +980,15 @@ export default function Home() {
     }
   }, [walletInput, fetchWalletNFTs]);
 
+  // Load all NFTs from external wallet
+  const loadAllFromExternalWallet = useCallback(() => {
+    if (walletInput.trim()) {
+      setNfts([]); // Clear previous results
+      setActiveWallet(null); // Reset active wallet
+      fetchAllUserNFTs(walletInput.trim());
+    }
+  }, [walletInput, fetchAllUserNFTs]);
+
   // Get current gallery display info
   const getGalleryInfo = useMemo(() => {
     if (!activeWallet) {
@@ -887,10 +997,22 @@ export default function Home() {
     
     const isYourWallet = activeWallet === primaryWallet?.address;
     if (isYourWallet) {
-      return { 
-        title: "Your NFTs", 
-        subtitle: `${nfts.length} NFTs found in your connected wallet` 
-      };
+      if (nftLoading && nfts.length === 0) {
+        return { 
+          title: "Your NFTs", 
+          subtitle: "Loading all your NFTs..." 
+        };
+      } else if (nftLoading && nfts.length > 0) {
+        return { 
+          title: "Your NFTs", 
+          subtitle: `Found ${nfts.length} NFTs so far, loading more...` 
+        };
+      } else {
+        return { 
+          title: "Your NFTs", 
+          subtitle: nfts.length > 0 ? `${nfts.length} NFTs found in your connected wallet` : "No supported NFTs found in your wallet"
+        };
+      }
     }
     
     // For external wallets, show shortened address or ENS if available
@@ -898,11 +1020,17 @@ export default function Home() {
       ? walletInput 
       : `${activeWallet.slice(0, 6)}...${activeWallet.slice(-4)}`;
     
+    const subtitle = nftLoading && nfts.length === 0 
+      ? "Loading NFTs..."
+      : hasMore 
+        ? `${nfts.length} NFTs found (more available)`
+        : `${nfts.length} NFTs found`;
+    
     return { 
       title: `${displayAddress}'s NFTs`, 
-      subtitle: `${nfts.length} NFTs found` 
+      subtitle 
     };
-  }, [activeWallet, primaryWallet?.address, nfts.length, walletInput]);
+  }, [activeWallet, primaryWallet?.address, nfts.length, walletInput, nftLoading, hasMore]);
 
   useEffect(() => {
     if (isFirstRender) {
@@ -1475,9 +1603,8 @@ export default function Home() {
                     hasMore={hasMore}
                     providerName={providerName}
                     onLoadMore={() => {
-                      if (nextCursor && !nftLoading && primaryWallet?.address) {
-                        fetchWalletNFTs(primaryWallet.address, nextCursor);
-                      }
+                      // For connected wallet, we auto-fetch all NFTs, so no manual loading needed
+                      // This shouldn't be called since hasMore is set to false for user wallet
                     }}
                     title="Your NFTs"
                     subtitle={nfts.length > 0 ? `${nfts.length} NFTs found in your connected wallet` : undefined}
@@ -1541,6 +1668,7 @@ export default function Home() {
                         fetchWalletNFTs(walletInput.trim(), nextCursor);
                       }
                     }}
+                    onLoadAll={loadAllFromExternalWallet}
                     title={getGalleryInfo.title}
                     subtitle={getGalleryInfo.subtitle}
                     showLoadingState={true}
@@ -1592,11 +1720,10 @@ export default function Home() {
                           error={nftError}
                           hasMore={hasMore}
                           providerName={providerName}
-                          onLoadMore={() => {
-                            if (nextCursor && !nftLoading && primaryWallet?.address) {
-                              fetchWalletNFTs(primaryWallet.address, nextCursor);
-                            }
-                          }}
+                                                     onLoadMore={() => {
+                             // For connected wallet, we auto-fetch all NFTs, so no manual loading needed
+                             // This shouldn't be called since hasMore is set to false for user wallet
+                           }}
                                                    title="Your NFTs"
                          subtitle={nfts.length > 0 ? `${nfts.length} NFTs found in your connected wallet` : undefined}
                          showLoadingState={true}
@@ -1658,6 +1785,7 @@ export default function Home() {
                               fetchWalletNFTs(walletInput.trim(), nextCursor);
                             }
                           }}
+                          onLoadAll={loadAllFromExternalWallet}
                           title={getGalleryInfo.title}
                           subtitle={getGalleryInfo.subtitle}
                           showLoadingState={true}
