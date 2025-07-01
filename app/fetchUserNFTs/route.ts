@@ -169,7 +169,7 @@ export async function GET(req: NextRequest) {
   const walletAddress = searchParams.get("wallet");
   const chain = searchParams.get("chain") || "ethereum";
   const limit = searchParams.get("limit") || "50";
-  const next = searchParams.get("next");
+  const next = searchParams.get("next") || undefined;
   const provider = searchParams.get("provider") || "auto"; // Allow manual provider selection
 
   if (!walletAddress) {
@@ -206,7 +206,7 @@ export async function GET(req: NextRequest) {
   }
 
   const providerConfig = NFT_PROVIDERS[selectedProvider as keyof typeof NFT_PROVIDERS];
-  const apiKey = providerConfig.envKey ? process.env[providerConfig.envKey] || undefined : undefined;
+  const apiKey: string | undefined = providerConfig.envKey ? process.env[providerConfig.envKey] : undefined;
 
   try {
     let data;
