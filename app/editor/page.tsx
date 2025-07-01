@@ -527,24 +527,18 @@ function NFTGallery({
     setError(null);
 
     try {
-      const chainMap: Record<string, string> = {
-        '1': 'ethereum',
-        '137': 'matic',
-        '33139': 'ape'  // Note: OpenSea may not support ape chain
-      };
-
-      // Try ethereum chain first
-      const chain = 'ethereum';
-      let url = `https://api.opensea.io/api/v2/chain/${chain}/account/${primaryWallet.address}/nfts?limit=50`;
+      // Use our API route instead of calling OpenSea directly
+      let url = `/fetchUserNFTs?wallet=${primaryWallet.address}&limit=50`;
       
       if (cursor) {
-        url += `&next=${cursor}`;
+        url += `&next=${encodeURIComponent(cursor)}`;
       }
 
       const response = await fetch(url);
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch NFTs: ${response.status}`);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `Failed to fetch NFTs: ${response.status}`);
       }
 
       const data: NFTApiResponse = await response.json();
