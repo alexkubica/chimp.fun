@@ -555,7 +555,7 @@ function UnifiedNFTGallery({
           <div className="font-medium mb-1">Failed to load NFTs</div>
           <div className="text-xs">{error}</div>
           <div className="text-xs mt-2 opacity-75">
-            Try ENS names like "vitalik.eth" or paste a wallet address
+            Try ENS names like &quot;vitalik.eth&quot; or paste a wallet address
           </div>
         </div>
       </div>
