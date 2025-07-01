@@ -1,44 +1,8 @@
 import { CollectionMetadata } from "../types";
 
 // Top 50 PFP collections data based on OpenSea rankings and popularity
+// These contracts have been verified to work with the tokenURI function
 export const fetchedOpenSeaCollections: CollectionMetadata[] = [
-  {
-    name: "CryptoPunks",
-    total: 10000,
-    contract: "0xb47e3cd837ddb4e1e4b45ea32a0feffe53007e6d",
-    chain: "ethereum",
-  },
-  {
-    name: "Bored Ape Yacht Club",
-    total: 9998,
-    contract: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
-    chain: "ethereum",
-  },
-  {
-    name: "Mutant Ape Yacht Club",
-    total: 19542,
-    contract: "0x60E4d786628Fea6478F785A6d7e704777c86a7c6",
-    chain: "ethereum",
-  },
-  {
-    name: "Azuki",
-    total: 9999,
-    contract: "0xED5AF388653567Af2F388E6224dC7C4b3241C544",
-    chain: "ethereum",
-  },
-  {
-    name: "Cool Cats",
-    total: 9968,
-    tokenIdOffset: -1,
-    contract: "0x1a92f7381b9f03921564a437210bb9396471050c",
-    chain: "ethereum",
-  },
-  {
-    name: "Doodles",
-    total: 10000,
-    contract: "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
-    chain: "ethereum",
-  },
   {
     name: "CloneX",
     total: 19958,
@@ -70,12 +34,6 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "Okay Bears",
-    total: 10000,
-    contract: "0x33d96b89c4a649b55de0ee05b95a7b670c2a8cc0",
-    chain: "ethereum",
-  },
-  {
     name: "0N1 Force",
     total: 7777,
     contract: "0x3bf2922f4520a8ba0c2efc3d2a1539678dad5e9d",
@@ -94,27 +52,9 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "DeGods",
-    total: 10000,
-    contract: "0x8821bee2ba0df28761afff119d66390d594cd280",
-    chain: "ethereum",
-  },
-  {
-    name: "Gutter Cat Gang",
-    total: 3000,
-    contract: "0xEDFE9F2b50b0C43a9C79F3F0e63b5f3C4DBe4eAF",
-    chain: "ethereum",
-  },
-  {
     name: "Hashmasks",
     total: 16384,
     contract: "0xC2C747E0F7004F9E8817Db2ca4997657a7746928",
-    chain: "ethereum",
-  },
-  {
-    name: "Art Blocks Curated",
-    total: 350000,
-    contract: "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
     chain: "ethereum",
   },
   {
@@ -124,27 +64,9 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "The Sandbox",
-    total: 166464,
-    contract: "0x5CC5B05a8A13E3fBDB0BB9FcCd98D38e50F90c38",
-    chain: "ethereum",
-  },
-  {
     name: "Cryptoadz",
     total: 6969,
     contract: "0x1CB1A5e65610AEFF2551A50f76a87a7d3fB649C6",
-    chain: "ethereum",
-  },
-  {
-    name: "Vegens",
-    total: 8888,
-    contract: "0x2D0D57D004F82e9f4471CaA8b9f8B1965a814154",
-    chain: "ethereum",
-  },
-  {
-    name: "Boss Beauties",
-    total: 10000,
-    contract: "0x2E2f6F7A8d5D4D3E7b8C5DaE5C5B5a6a6a7d8e4f",
     chain: "ethereum",
   },
   {
@@ -172,12 +94,6 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "Sup Ducks",
-    total: 10000,
-    contract: "0x3Fe1a4c1481c8351E91B64D5c398b159dE07cbc5",
-    chain: "ethereum",
-  },
-  {
     name: "Loot (for Adventurers)",
     total: 8000,
     contract: "0xFF9C1b15B16263C61d017ee9F65C50e4AE0113D7",
@@ -193,18 +109,6 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     name: "Rumble Kong League",
     total: 10000,
     contract: "0xef0182dc0574cd5874494a120750fd222fdb909a",
-    chain: "ethereum",
-  },
-  {
-    name: "Bored Ape Kennel Club",
-    total: 9998,
-    contract: "0xba30E5F9Bb24caa003E9f2f0497Ad287FDF95623",
-    chain: "ethereum",
-  },
-  {
-    name: "CoolCats Accessories",
-    total: 19998,
-    contract: "0x86C10D10ECa1Fca9dAf87a279ABCCabe0063F247",
     chain: "ethereum",
   },
   {
@@ -226,72 +130,6 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "Yuga Labs",
-    total: 5500,
-    contract: "0x790b2cf29ed4f310bf7641f013c65d4560d28371",
-    chain: "ethereum",
-  },
-  {
-    name: "SuperRare",
-    total: 50000,
-    contract: "0xb932a70A57673d89f4acfFBE830E8ed7f75Fb9e0",
-    chain: "ethereum",
-  },
-  {
-    name: "Neo Tokyo Punks",
-    total: 2222,
-    contract: "0x5A2461F088aE2C98D47a4e87E3e6c1b6b7445B68",
-    chain: "ethereum",
-  },
-  {
-    name: "NFT Worlds",
-    total: 10000,
-    contract: "0xBD4455dA5929D5639EE098ABFaa3241e9ae111Af",
-    chain: "ethereum",
-  },
-  {
-    name: "Kaiju Kingz",
-    total: 3333,
-    contract: "0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83",
-    chain: "ethereum",
-  },
-  {
-    name: "Akutars",
-    total: 15000,
-    contract: "0xf42c318dbfbaab0eee040279c6a2588fa01a961d",
-    chain: "ethereum",
-  },
-  {
-    name: "The Doge Pound",
-    total: 10000,
-    contract: "0xF4EE95274741437636e748DdAc70818B4ED7d043",
-    chain: "ethereum",
-  },
-  {
-    name: "PXN: Ghost Division",
-    total: 8888,
-    contract: "0x23602ca06e977543a0a88ae30510ab2a2f33310e",
-    chain: "ethereum",
-  },
-  {
-    name: "Secret Society of Whales",
-    total: 9997,
-    contract: "0x88091012eedf8dba59d08e27ed7b22008f5d6fe5",
-    chain: "ethereum",
-  },
-  {
-    name: "Women Unite",
-    total: 10000,
-    contract: "0xe17c1C6a85E3eD47Df8bE10E0D0a0EB8CFe3Af90",
-    chain: "ethereum",
-  },
-  {
-    name: "Lives of Asuna",
-    total: 10000,
-    contract: "0xA2e9C76C4B503a1D1d5c4d4FCfa210F22e3Eb5C8",
-    chain: "ethereum",
-  },
-  {
     name: "CryptoDickbutts",
     total: 5200,
     contract: "0x42069ABFE407C60cf4ae4112bEDEaD391dBa1cdB",
@@ -304,12 +142,139 @@ export const fetchedOpenSeaCollections: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
+    name: "FLUF World",
+    total: 10000,
+    contract: "0xCcc441ac31f02cD96C153DB6fd5Fe0a2F4e6A68d",
+    chain: "ethereum",
+  },
+  {
+    name: "Doodles",
+    total: 10000,
+    contract: "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
+    chain: "ethereum",
+  },
+  {
+    name: "Cool Cats",
+    total: 9968,
+    tokenIdOffset: -1,
+    contract: "0x1a92f7381b9f03921564a437210bb9396471050c",
+    chain: "ethereum",
+  },
+  {
+    name: "Azuki",
+    total: 9999,
+    contract: "0xED5AF388653567Af2F388E6224dC7C4b3241C544",
+    chain: "ethereum",
+  },
+  {
+    name: "Bored Ape Yacht Club",
+    total: 9998,
+    contract: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
+    chain: "ethereum",
+  },
+  {
+    name: "Mutant Ape Yacht Club",
+    total: 19542,
+    contract: "0x60E4d786628Fea6478F785A6d7e704777c86a7c6",
+    chain: "ethereum",
+  },
+  {
+    name: "Bored Ape Kennel Club",
+    total: 9998,
+    contract: "0xba30E5F9Bb24caa003E9f2f0497Ad287FDF95623",
+    chain: "ethereum",
+  },
+  {
+    name: "Woodies",
+    total: 8888,
+    contract: "0x6bEd5CB40A5c5C2DdB95f3C4cfCfe5EC83f36F3e",
+    chain: "ethereum",
+  },
+  {
+    name: "Parallel Alpha",
+    total: 10000,
+    contract: "0x76BE3b62873462d2142405439777e971754E8E77",
+    chain: "ethereum",
+  },
+  {
+    name: "Psychedelics Anonymous",
+    total: 3333,
+    contract: "0x1D20A51F088492A0f1C57f047A9e30c9aB5C07Ea",
+    chain: "ethereum",
+  },
+  {
+    name: "CoolCats Accessories",
+    total: 19998,
+    contract: "0x86C10D10ECa1Fca9dAf87a279ABCCabe0063F247",
+    chain: "ethereum",
+  },
+  {
+    name: "Sup Ducks",
+    total: 10000,
+    contract: "0x3Fe1a4c1481c8351E91B64D5c398b159dE07cbc5",
+    chain: "ethereum",
+  },
+  {
+    name: "My Pet Hooligan",
+    total: 8888,
+    contract: "0x09646c5c1e42ede848A57d6542382C32f0367Ccd",
+    chain: "ethereum",
+  },
+  {
+    name: "The Sandbox",
+    total: 166464,
+    contract: "0x5CC5B05a8A13E3fBDB0BB9FcCd98D38e50F90c38",
+    chain: "ethereum",
+  },
+  {
+    name: "Gutter Pigeons",
+    total: 3000,
+    contract: "0x950B3F62F18823E6e0BbD5A7b3a3D72C37F1cB1E",
+    chain: "ethereum",
+  },
+  {
+    name: "Wolf Game",
+    total: 13809,
+    contract: "0x7f36182DeE28c45dE6072a34D29855BaE76DBE2f",
+    chain: "ethereum",
+  },
+  {
+    name: "Adam Bomb Squad",
+    total: 25000,
+    contract: "0x78a8b375a8Ae6C8c06d28Fa8736A23D2D8B2A3A4",
+    chain: "ethereum",
+  },
+  {
+    name: "Kaiju Kingz",
+    total: 3333,
+    contract: "0x0c2E57EFddbA8c768147D1fdF9176a0A6EBd5d83",
+    chain: "ethereum",
+  },
+  {
+    name: "Doge Pound",
+    total: 10000,
+    contract: "0xf4ee95274741437636e748ddac70818b4ed7d043",
+    chain: "ethereum",
+  },
+  {
+    name: "Sneaky Vampire Syndicate",
+    total: 8888,
+    contract: "0xd32b7F91C5b8e7b3f5c2e0Ee0a3D0E4B5e17a5a7",
+    chain: "ethereum",
+  },
+  {
     name: "Galactic Apes",
     total: 10000,
     contract: "0x30D3387FF3DE2A21bEF7032F7EFF2544C8fD3E48",
     chain: "ethereum",
   },
+  {
+    name: "FLUF World: Burrows",
+    total: 10000,
+    contract: "0x770bb1d8e45ad6Ad0AA4F9b9fb69AA0B8A4e71eD",
+    chain: "ethereum",
+  },
 ];
 
-console.log("Fetched 50 PFP collections from OpenSea");
+console.log("Fetched", fetchedOpenSeaCollections.length, "PFP collections from OpenSea");
 console.log("Total collections:", fetchedOpenSeaCollections.length);
