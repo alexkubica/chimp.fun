@@ -206,20 +206,20 @@ export async function GET(req: NextRequest) {
   }
 
   const providerConfig = NFT_PROVIDERS[selectedProvider as keyof typeof NFT_PROVIDERS];
-  const apiKey = providerConfig.envKey ? process.env[providerConfig.envKey] : null;
+  const apiKey = providerConfig.envKey ? process.env[providerConfig.envKey] || undefined : undefined;
 
   try {
     let data;
     
     switch (selectedProvider) {
       case "alchemy":
-        data = await fetchFromAlchemy(walletAddress, chain, limit, next, apiKey || undefined);
+        data = await fetchFromAlchemy(walletAddress, chain, limit, next, apiKey);
         break;
       case "opensea":
-        data = await fetchFromOpenSea(walletAddress, chain, limit, next, apiKey || undefined);
+        data = await fetchFromOpenSea(walletAddress, chain, limit, next, apiKey);
         break;
       case "moralis":
-        data = await fetchFromMoralis(walletAddress, chain, limit, next, apiKey || undefined);
+        data = await fetchFromMoralis(walletAddress, chain, limit, next, apiKey);
         break;
       default:
         throw new Error(`Unsupported provider: ${selectedProvider}`);
