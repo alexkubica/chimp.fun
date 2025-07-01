@@ -502,6 +502,8 @@ interface UserNFT {
 interface NFTApiResponse {
   nfts: UserNFT[];
   next?: string;
+  provider?: string;
+  providerName?: string;
 }
 
 // NFT Gallery Component
@@ -519,6 +521,8 @@ function NFTGallery({
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [provider, setProvider] = useState<string | null>(null);
+  const [providerName, setProviderName] = useState<string | null>(null);
 
   const fetchUserNFTs = useCallback(async (cursor?: string) => {
     if (!primaryWallet?.address) return;
@@ -556,6 +560,8 @@ function NFTGallery({
       
       setNextCursor(data.next || null);
       setHasMore(!!data.next);
+      setProvider(data.provider || null);
+      setProviderName(data.providerName || null);
     } catch (err) {
       console.error("Error fetching NFTs:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch NFTs");
@@ -598,7 +604,13 @@ function NFTGallery({
       <div className="flex flex-col gap-2">
         <Label>Your NFTs</Label>
         <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
-          {error}
+          <div className="font-medium mb-1">Failed to load NFTs</div>
+          <div className="text-xs">{error}</div>
+          <div className="text-xs mt-2 opacity-75">
+            Need an API key? Try:
+            <br />• Alchemy (free tier): https://dashboard.alchemy.com
+            <br />• Moralis (free tier): https://admin.moralis.io
+          </div>
         </div>
       </div>
     );
@@ -609,7 +621,12 @@ function NFTGallery({
       <div className="flex flex-col gap-2">
         <Label>Your NFTs</Label>
         <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md text-center">
-          No supported NFTs found in your wallet
+          <div>No supported NFTs found in your wallet</div>
+          {providerName && (
+            <div className="text-xs mt-1 opacity-75">
+              Using {providerName} API
+            </div>
+          )}
         </div>
       </div>
     );
@@ -617,7 +634,14 @@ function NFTGallery({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Your NFTs ({nfts.length} found)</Label>
+      <div className="flex items-center justify-between">
+        <Label>Your NFTs ({nfts.length} found)</Label>
+        {providerName && (
+          <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+            via {providerName}
+          </div>
+        )}
+      </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-64 overflow-y-auto border rounded-md p-2">
         {nfts.map((nft) => (
           <button
