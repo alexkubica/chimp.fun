@@ -1,6 +1,8 @@
 import { CollectionMetadata, ReactionMetadata } from "@/types";
+import { fetchedOpenSeaCollections } from "../scripts/fetchOpenSeaCollections";
 
-export const collectionsMetadata: CollectionMetadata[] = [
+// Original collections (keeping existing ones for backward compatibility)
+const originalCollections: CollectionMetadata[] = [
   {
     name: "Chimpers",
     total: 5555,
@@ -16,47 +18,9 @@ export const collectionsMetadata: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "Secret Society of Whales",
-    total: 9997,
-    contract: "0x88091012eedf8dba59d08e27ed7b22008f5d6fe5",
-    chain: "ethereum",
-  },
-  // check why ipfs times out
-  //   {
-  //     name: "Pixel Chibis",
-  //     total: 9996,
-  //     contract: "0x8bd99726c3af7e30b35d1537cdcbbd9d6fb1c6a8",
-  //     chain: "polygon",
-  //   },
-  {
-    name: "Cool Cats",
-    total: 9968,
-    tokenIdOffset: -1,
-    contract: "0x1a92f7381b9f03921564a437210bb9396471050c",
-    chain: "ethereum",
-  },
-  {
-    name: "Bored Ape Yacht Club",
-    total: 9998,
-    contract: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D",
-    chain: "ethereum",
-  },
-  {
-    name: "Mutant Ape Yacht Club",
-    total: 19542,
-    contract: "0x60E4d786628Fea6478F785A6d7e704777c86a7c6",
-    chain: "ethereum",
-  },
-  {
     name: "Muskers",
     total: 2222,
     contract: "0xE6e6B146aDBEe274Fa1A011FE91f6F708f9cBBF8",
-    chain: "ethereum",
-  },
-  {
-    name: "Azuki",
-    total: 9999,
-    contract: "0xED5AF388653567Af2F388E6224dC7C4b3241C544",
     chain: "ethereum",
   },
   {
@@ -72,17 +36,34 @@ export const collectionsMetadata: CollectionMetadata[] = [
     chain: "ethereum",
   },
   {
-    name: "Doodles",
-    total: 10000,
-    contract: "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
-    chain: "ethereum",
-  },
-  {
     name: "DSNRS",
     total: 8888,
     contract: "0x896BE40d15d1dbFA4F4Ff25A110F3CE770e07897",
     chain: "ape",
   },
+  // check why ipfs times out
+  //   {
+  //     name: "Pixel Chibis",
+  //     total: 9996,
+  //     contract: "0x8bd99726c3af7e30b35d1537cdcbbd9d6fb1c6a8",
+  //     chain: "polygon",
+  //   },
+];
+
+// Filter out duplicates from fetched collections (by contract address or name)
+const existingContracts = new Set(originalCollections.map(c => c.contract?.toLowerCase()));
+const existingNames = new Set(originalCollections.map(c => c.name.toLowerCase()));
+
+const uniqueNewCollections = fetchedOpenSeaCollections.filter(collection => {
+  const contractExists = collection.contract && existingContracts.has(collection.contract.toLowerCase());
+  const nameExists = existingNames.has(collection.name.toLowerCase());
+  return !contractExists && !nameExists;
+});
+
+// Combine original collections with unique new ones
+export const collectionsMetadata: CollectionMetadata[] = [
+  ...originalCollections,
+  ...uniqueNewCollections
 ];
 
 export const reactionsMap: ReactionMetadata[] = [

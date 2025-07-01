@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -1039,7 +1040,8 @@ export default function Home() {
               <div className="flex flex-col gap-2">
                 <Label htmlFor="collection">Collection</Label>
                 <div className="flex gap-2">
-                  <Select
+                  <SearchableSelect
+                    items={collectionsMetadata}
                     value={collectionIndex.toString()}
                     onValueChange={function handleCollectionChange(val) {
                       const newCollectionIndex = Number(val);
@@ -1061,35 +1063,18 @@ export default function Home() {
                       setFile(null);
                       setUploadedImageUri(null);
                     }}
-                  >
-                    <SelectTrigger
-                      id="collection"
-                      className="flex-1 min-w-0 w-full overflow-hidden"
-                      style={{ overflow: "hidden" }}
-                    >
-                      <SelectValue
-                        placeholder="Select collection"
-                        className="truncate"
-                        style={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          display: "block",
-                          width: "100%",
-                        }}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collectionsMetadata.map((collection, index) => (
-                        <SelectItem
-                          key={collection.name}
-                          value={index.toString()}
-                        >
-                          {collection.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    getItemValue={(collection) => collectionsMetadata.indexOf(collection).toString()}
+                    getItemLabel={(collection) => collection.name}
+                    getItemKey={(collection) => collection.name}
+                    placeholder="Select collection"
+                    searchPlaceholder="Search collections... (e.g. 'doo' for Doodles)"
+                    className="flex-1 min-w-0 w-full"
+                    fuseOptions={{
+                      keys: ["name"],
+                      threshold: 0.3,
+                      includeScore: true,
+                    }}
+                  />
                   <Button
                     variant="secondary"
                     onClick={function handleRandomCollection() {
@@ -1239,51 +1224,25 @@ export default function Home() {
                 <Label>Preset</Label>
                 <div className="flex gap-2 items-center w-full">
                   <div className="flex-1 min-w-0 w-full">
-                    <Select
+                    <SearchableSelect
+                      items={reactionsMap}
                       value={overlayNumber.toString()}
                       onValueChange={function handleReaction(val) {
                         setLoading(true);
                         setOverlayNumber(Number(val));
                       }}
-                    >
-                      <SelectTrigger
-                        id="preset"
-                        className="flex-1 min-w-0 w-full overflow-hidden"
-                        style={{ overflow: "hidden" }}
-                      >
-                        <SelectValue
-                          placeholder="Select Preset"
-                          className="truncate"
-                          style={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            display: "block",
-                            width: "100%",
-                          }}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {reactionsMap.map((value, index) => (
-                          <SelectItem
-                            key={index + 1}
-                            value={(index + 1).toString()}
-                          >
-                            <span
-                              style={{
-                                whiteSpace: "normal",
-                                overflow: "visible",
-                                textOverflow: "unset",
-                                display: "block",
-                                width: "100%",
-                              }}
-                            >
-                              {value.title}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      getItemValue={(reaction) => (reactionsMap.indexOf(reaction) + 1).toString()}
+                      getItemLabel={(reaction) => reaction.title}
+                      getItemKey={(reaction) => reaction.title}
+                      placeholder="Select Preset"
+                      searchPlaceholder="Search presets... (e.g. 'gm' for GM!)"
+                      className="flex-1 min-w-0 w-full"
+                      fuseOptions={{
+                        keys: ["title"],
+                        threshold: 0.3,
+                        includeScore: true,
+                      }}
+                    />
                   </div>
                   <Button
                     variant="secondary"
