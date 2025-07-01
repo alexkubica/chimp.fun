@@ -31,6 +31,7 @@ import {
 import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import path from "path";
+import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -482,6 +483,190 @@ const fileToDataUri = (file: File) =>
     reader.readAsDataURL(file);
   });
 
+// NFT Types
+interface UserNFT {
+  identifier: string;
+  collection: string;
+  contract: string;
+  token_standard: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  metadata_url?: string;
+  opensea_url?: string;
+  updated_at?: string;
+  is_disabled?: boolean;
+  is_nsfw?: boolean;
+}
+
+interface NFTApiResponse {
+  nfts: UserNFT[];
+  next?: string;
+}
+
+// NFT Gallery Component
+function NFTGallery({
+  onSelectNFT,
+  supportedCollections,
+}: {
+  onSelectNFT: (contract: string, tokenId: string, imageUrl: string) => void;
+  supportedCollections: Set<string>;
+}) {
+  const { primaryWallet, user } = useDynamicContext();
+  const isLoggedIn = useIsLoggedIn();
+  const [nfts, setNfts] = useState<UserNFT[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+
+  const fetchUserNFTs = useCallback(async (cursor?: string) => {
+    if (!primaryWallet?.address) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const chainMap: Record<string, string> = {
+        '1': 'ethereum',
+        '137': 'matic',
+        '33139': 'ape'  // Note: OpenSea may not support ape chain
+      };
+
+      // Try ethereum chain first
+      const chain = 'ethereum';
+      let url = `https://api.opensea.io/api/v2/chain/${chain}/account/${primaryWallet.address}/nfts?limit=50`;
+      
+      if (cursor) {
+        url += `&next=${cursor}`;
+      }
+
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch NFTs: ${response.status}`);
+      }
+
+      const data: NFTApiResponse = await response.json();
+      
+      // Filter NFTs to only show supported collections
+      const filteredNFTs = data.nfts.filter(nft => 
+        supportedCollections.has(nft.contract.toLowerCase())
+      );
+
+      if (cursor) {
+        setNfts(prev => [...prev, ...filteredNFTs]);
+      } else {
+        setNfts(filteredNFTs);
+      }
+      
+      setNextCursor(data.next || null);
+      setHasMore(!!data.next);
+    } catch (err) {
+      console.error("Error fetching NFTs:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch NFTs");
+    } finally {
+      setLoading(false);
+    }
+  }, [primaryWallet?.address, supportedCollections]);
+
+  useEffect(() => {
+    if (isLoggedIn && primaryWallet?.address) {
+      fetchUserNFTs();
+    }
+  }, [isLoggedIn, primaryWallet?.address, fetchUserNFTs]);
+
+  const loadMore = () => {
+    if (nextCursor && !loading) {
+      fetchUserNFTs(nextCursor);
+    }
+  };
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
+  if (loading && nfts.length === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>Your NFTs</Label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="w-full aspect-square rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>Your NFTs</Label>
+        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (nfts.length === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Label>Your NFTs</Label>
+        <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md text-center">
+          No supported NFTs found in your wallet
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>Your NFTs ({nfts.length} found)</Label>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-64 overflow-y-auto border rounded-md p-2">
+        {nfts.map((nft) => (
+          <button
+            key={`${nft.contract}-${nft.identifier}`}
+            onClick={() => onSelectNFT(nft.contract, nft.identifier, nft.image_url || '')}
+            className="group relative aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50"
+          >
+            {nft.image_url ? (
+              <img
+                src={nft.image_url}
+                alt={nft.name || `NFT ${nft.identifier}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                No Image
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1">
+              <div className="text-[10px] text-white truncate font-medium">
+                {nft.name || `#${nft.identifier}`}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+      {hasMore && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={loadMore}
+          disabled={loading}
+          className="w-full"
+        >
+          {loading ? "Loading..." : "Load More"}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
@@ -513,10 +698,44 @@ export default function Home() {
     null,
   );
 
+  // NFT Gallery state
+  const [selectedFromWallet, setSelectedFromWallet] = useState<{
+    contract: string;
+    tokenId: string;
+    imageUrl: string;
+  } | null>(null);
+
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
   let maxTokenID =
     collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
+
+  // Create supported collections set for filtering
+  const supportedCollections = useMemo(() => {
+    return new Set(
+      collectionsMetadata
+        .map(c => c.contract?.toLowerCase())
+        .filter(Boolean)
+    );
+  }, []);
+
+  // Handle NFT selection from wallet
+  const handleNFTSelect = useCallback((contract: string, tokenId: string, imageUrl: string) => {
+    // Find the collection index for this contract
+    const collectionIdx = collectionsMetadata.findIndex(
+      c => c.contract?.toLowerCase() === contract.toLowerCase()
+    );
+    
+    if (collectionIdx >= 0) {
+      setLoading(true);
+      setCollectionIndex(collectionIdx);
+      setTokenID(tokenId);
+      setTempTokenID(tokenId);
+      setFile(null);
+      setUploadedImageUri(null);
+      setSelectedFromWallet({ contract, tokenId, imageUrl });
+    }
+  }, []);
 
   useEffect(() => {
     if (isFirstRender) {
@@ -805,6 +1024,7 @@ export default function Home() {
     setTokenID(tempTokenID);
     setFile(null);
     setUploadedImageUri(null);
+    setSelectedFromWallet(null); // Clear wallet selection when manually changing token ID
   }, [tempTokenID, minTokenID, maxTokenID]);
 
   const handleRandomClick = useCallback(() => {
@@ -815,6 +1035,7 @@ export default function Home() {
     setLoading(true);
     setFile(null);
     setUploadedImageUri(null);
+    setSelectedFromWallet(null); // Clear wallet selection when using random
   }, [maxTokenID]);
 
   // Helper: Copy first frame of GIF as PNG to clipboard
@@ -1014,6 +1235,7 @@ export default function Home() {
     setLoading(true);
     setFile(null);
     setUploadedImageUri(null);
+    setSelectedFromWallet(null); // Clear wallet selection when feeling lucky
   }, []);
 
   return (
@@ -1033,9 +1255,25 @@ export default function Home() {
           </div>
         </header>
         <section className="flex flex-col gap-4">
+          {/* NFT Gallery - Mobile: under title, Desktop: above collection selector */}
+          <div className="md:hidden">
+            <NFTGallery
+              onSelectNFT={handleNFTSelect}
+              supportedCollections={supportedCollections}
+            />
+          </div>
+          
           <div className="grid md:grid-cols-2 gap-4">
             {/* First column: collection, token id, image, tip */}
             <div className="flex flex-col gap-8">
+              {/* NFT Gallery - Desktop only */}
+              <div className="hidden md:block">
+                <NFTGallery
+                  onSelectNFT={handleNFTSelect}
+                  supportedCollections={supportedCollections}
+                />
+              </div>
+              
               {/* Upload controls */}
               <div className="flex flex-col gap-2">
                 <Label htmlFor="collection">Collection</Label>
@@ -1062,6 +1300,7 @@ export default function Home() {
                       }
                       setFile(null);
                       setUploadedImageUri(null);
+                      setSelectedFromWallet(null); // Clear wallet selection when manually changing collection
                     }}
                     getItemValue={(collection) => collectionsMetadata.indexOf(collection).toString()}
                     getItemLabel={(collection) => collection.name}
@@ -1094,11 +1333,17 @@ export default function Home() {
                       setTempTokenID(randomTokenId);
                       setFile(null);
                       setUploadedImageUri(null);
+                      setSelectedFromWallet(null); // Clear wallet selection when randomly changing collection
                     }}
                   >
                     🎲
                   </Button>
                 </div>
+                {selectedFromWallet && (
+                  <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded border-l-2 border-blue-500">
+                    💳 Selected from your wallet
+                  </div>
+                )}
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="gifNumber">
@@ -1124,6 +1369,7 @@ export default function Home() {
                         setLoading(true);
                         setFile(null);
                         setUploadedImageUri(null);
+                        setSelectedFromWallet(null); // Clear wallet selection when manually changing token ID
                       } else {
                         setErrorMessage(
                           `Invalid Token ID, please choose between ${minTokenID} and ${maxTokenID}`,
