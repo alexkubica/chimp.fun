@@ -14,6 +14,7 @@ import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { collectionsMetadata, reactionsMap } from "@/consts";
 import { ReactionMetadata } from "@/types";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
@@ -1018,21 +1019,246 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
-      <div className="w-full max-w-2xl mx-auto">
-        <header className="text-center mb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight mb-1">
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-extrabold tracking-tight mb-1">
             <a href="/" className="text-inherit no-underline">
               CHIMP.FUN
             </a>
-          </h1>
+          </CardTitle>
           <p className="text-lg font-medium mb-2">NFT Editor</p>
           <div className="flex justify-center mt-2">
             <Button onClick={handleFeelingLucky} variant="secondary">
               I&apos;m Feeling Lucky
             </Button>
           </div>
-        </header>
+        </CardHeader>
+        <CardContent>
         <section className="flex flex-col gap-4">
+          {/* Preview Section - Mobile First */}
+          <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-muted/50">
+            <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
+              {loading ? (
+                isFirstRender ? (
+                  <Skeleton className="w-full h-full rounded-lg" />
+                ) : finalResult ? (
+                  <div className="relative w-full h-full">
+                    {isGIF && !playAnimation && staticGifFrameUrl ? (
+                      <img
+                        src={staticGifFrameUrl}
+                        alt="Preview (static frame)"
+                        className="object-contain w-full h-full rounded-lg opacity-80"
+                        style={{
+                          background: "transparent",
+                          filter: "brightness(0.7) grayscale(0.3)",
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={finalResult}
+                        alt="Preview"
+                        className="object-contain w-full h-full rounded-lg opacity-80"
+                        style={{
+                          background: "transparent",
+                          filter: "brightness(0.7) grayscale(0.3)",
+                        }}
+                      />
+                    )}
+                    {/* Draggable overlay for reaction, always shown if finalResult */}
+                    <ReactionOverlayDraggable
+                      x={x}
+                      y={y}
+                      scale={scale}
+                      imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                      onChange={({ x: newX, y: newY, scale: newScale }) => {
+                        setX(newX);
+                        setY(newY);
+                        setScale(newScale);
+                      }}
+                      containerSize={320}
+                      setDragging={setDragging}
+                      dragging={dragging}
+                      setResizing={setResizing}
+                      resizing={resizing}
+                      onDragEnd={() => {
+                        setDragging(false);
+                        debouncedRenderImageUrl();
+                      }}
+                      onResizeEnd={() => {
+                        setResizing(false);
+                        debouncedRenderImageUrl();
+                      }}
+                      disabled={loading}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Spinner />
+                    </div>
+                  </div>
+                ) : (
+                  <Skeleton className="w-full h-full rounded-lg" />
+                )
+              ) : (
+                finalResult && (
+                  <>
+                    {isGIF && !playAnimation && staticGifFrameUrl ? (
+                      <img
+                        src={staticGifFrameUrl}
+                        alt="Preview (static frame)"
+                        className="object-contain w-full h-full rounded-lg"
+                        style={{ background: "transparent" }}
+                      />
+                    ) : (
+                      <img
+                        src={finalResult}
+                        alt="Preview"
+                        className="object-contain w-full h-full rounded-lg"
+                        style={{ background: "transparent" }}
+                      />
+                    )}
+                    {/* Draggable overlay for reaction */}
+                    <ReactionOverlayDraggable
+                      x={x}
+                      y={y}
+                      scale={scale}
+                      imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                      onChange={({ x: newX, y: newY, scale: newScale }) => {
+                        setX(newX);
+                        setY(newY);
+                        setScale(newScale);
+                      }}
+                      containerSize={320}
+                      setDragging={setDragging}
+                      dragging={dragging}
+                      setResizing={setResizing}
+                      resizing={resizing}
+                      onDragEnd={() => {
+                        setDragging(false);
+                        debouncedRenderImageUrl();
+                      }}
+                      onResizeEnd={() => {
+                        setResizing(false);
+                        debouncedRenderImageUrl();
+                      }}
+                      disabled={loading}
+                    />
+                  </>
+                )
+              )}
+            </div>
+            {/* Compact Action Buttons */}
+            <div className="flex gap-2 w-full max-w-xs">
+              <Button
+                onClick={downloadOutput}
+                size="sm"
+                className="flex-1"
+                aria-label="Download"
+              >
+                <AiOutlineDownload className="w-4 h-4" />
+                <span className="ml-1 hidden sm:inline">Download</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={function handleCopy() {
+                  if (isGIF && !playAnimation && staticGifFrameUrl) {
+                    setCopyStatus(null);
+                    // Copy PNG from staticGifFrameUrl
+                    const blob = dataURLtoBlob(staticGifFrameUrl);
+                    navigator.clipboard
+                      .write([new ClipboardItem({ "image/png": blob })])
+                      .then(() => {
+                        setCopyStatus("Image copied to clipboard!");
+                      })
+                      .catch((err) => {
+                        setCopyStatus(
+                          "Failed to copy image to clipboard. Please try again or download instead.",
+                        );
+                      });
+                    return;
+                  }
+                  if (finalResult) {
+                    setCopyStatus(null);
+                    copyBlobToClipboard(finalResult);
+                  }
+                }}
+                size="sm"
+                className="flex-1"
+                aria-label="Copy"
+              >
+                <AiOutlineCopy className="w-4 h-4" />
+                <span className="ml-1 hidden sm:inline">Copy</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (finalResult && navigator.share) {
+                    // Convert blob URL to file
+                    fetch(finalResult)
+                      .then(res => res.blob())
+                      .then(blob => {
+                        const file = new File([blob], 'nft-edit.png', { type: 'image/png' });
+                        navigator.share({
+                          title: 'My NFT Edit',
+                          text: 'Check out my NFT edit from CHIMP.FUN!',
+                          files: [file]
+                        });
+                      })
+                      .catch(err => {
+                        // Fallback to copying URL to clipboard
+                        navigator.clipboard.writeText(window.location.href);
+                        setCopyStatus("Link copied to clipboard!");
+                      });
+                  } else {
+                    // Fallback to copying URL to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    setCopyStatus("Link copied to clipboard!");
+                  }
+                }}
+                size="sm"
+                className="flex-1"
+                aria-label="Share"
+              >
+                <span className="w-4 h-4">📤</span>
+                <span className="ml-1 hidden sm:inline">Share</span>
+              </Button>
+            </div>
+            {copyStatus && (
+              <div className="text-sm text-center text-muted-foreground">
+                {copyStatus}
+              </div>
+            )}
+            {/* GIF Copy Modal */}
+            {showGifCopyModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
+                  <div className="mb-4 text-center">
+                    <div className="font-semibold mb-2">
+                      Copy GIF as static image?
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Copying GIFs isn&apos;t supported by your browser.
+                      Would you like to copy a static image instead?
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full justify-center">
+                    <Button
+                      onClick={handleGifCopyModalConfirm}
+                      className="flex-1"
+                    >
+                      Copy PNG
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={handleGifCopyModalCancel}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="grid md:grid-cols-2 gap-4">
             {/* First column: collection, token id, image, tip */}
             <div className="flex flex-col gap-8">
@@ -1217,9 +1443,8 @@ export default function Home() {
                 </small>
               </div>
             </div>
-            {/* Second column: preview, download, copy only */}
-            <div className="flex flex-col gap-4 h-full items-stretch">
-              {/* Preset select at the top, full width */}
+            {/* Second column: preset controls only */}
+            <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <Label>Preset</Label>
                 <div className="flex gap-2 items-center w-full">
@@ -1279,191 +1504,6 @@ export default function Home() {
                   <Label htmlFor="overlayEnabled">MADE WITH CHIMP.FUN</Label>
                 </div>
               </div>
-              {/* Preview and controls below */}
-              <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
-                <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
-                  {loading ? (
-                    isFirstRender ? (
-                      <Skeleton className="w-full h-full rounded-lg" />
-                    ) : finalResult ? (
-                      <div className="relative w-full h-full">
-                        {isGIF && !playAnimation && staticGifFrameUrl ? (
-                          <img
-                            src={staticGifFrameUrl}
-                            alt="Preview (static frame)"
-                            className="object-contain w-full h-full rounded-lg opacity-80"
-                            style={{
-                              background: "transparent",
-                              filter: "brightness(0.7) grayscale(0.3)",
-                            }}
-                          />
-                        ) : (
-                          <img
-                            src={finalResult}
-                            alt="Preview"
-                            className="object-contain w-full h-full rounded-lg opacity-80"
-                            style={{
-                              background: "transparent",
-                              filter: "brightness(0.7) grayscale(0.3)",
-                            }}
-                          />
-                        )}
-                        {/* Draggable overlay for reaction, always shown if finalResult */}
-                        <ReactionOverlayDraggable
-                          x={x}
-                          y={y}
-                          scale={scale}
-                          imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                          onChange={({ x: newX, y: newY, scale: newScale }) => {
-                            setX(newX);
-                            setY(newY);
-                            setScale(newScale);
-                          }}
-                          containerSize={320}
-                          setDragging={setDragging}
-                          dragging={dragging}
-                          setResizing={setResizing}
-                          resizing={resizing}
-                          onDragEnd={() => {
-                            setDragging(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          onResizeEnd={() => {
-                            setResizing(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          disabled={loading}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Spinner />
-                        </div>
-                      </div>
-                    ) : (
-                      <Skeleton className="w-full h-full rounded-lg" />
-                    )
-                  ) : (
-                    finalResult && (
-                      <>
-                        {isGIF && !playAnimation && staticGifFrameUrl ? (
-                          <img
-                            src={staticGifFrameUrl}
-                            alt="Preview (static frame)"
-                            className="object-contain w-full h-full rounded-lg"
-                            style={{ background: "transparent" }}
-                          />
-                        ) : (
-                          <img
-                            src={finalResult}
-                            alt="Preview"
-                            className="object-contain w-full h-full rounded-lg"
-                            style={{ background: "transparent" }}
-                          />
-                        )}
-                        {/* Draggable overlay for reaction */}
-                        <ReactionOverlayDraggable
-                          x={x}
-                          y={y}
-                          scale={scale}
-                          imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                          onChange={({ x: newX, y: newY, scale: newScale }) => {
-                            setX(newX);
-                            setY(newY);
-                            setScale(newScale);
-                          }}
-                          containerSize={320}
-                          setDragging={setDragging}
-                          dragging={dragging}
-                          setResizing={setResizing}
-                          resizing={resizing}
-                          onDragEnd={() => {
-                            setDragging(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          onResizeEnd={() => {
-                            setResizing(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          disabled={loading}
-                        />
-                      </>
-                    )
-                  )}
-                </div>
-                <div className="flex flex-col md:flex-row gap-2 w-full mt-2">
-                  <Button
-                    onClick={downloadOutput}
-                    className="w-full md:w-auto"
-                    aria-label="Download"
-                  >
-                    <AiOutlineDownload />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={function handleCopy() {
-                      if (isGIF && !playAnimation && staticGifFrameUrl) {
-                        setCopyStatus(null);
-                        // Copy PNG from staticGifFrameUrl
-                        const blob = dataURLtoBlob(staticGifFrameUrl);
-                        navigator.clipboard
-                          .write([new ClipboardItem({ "image/png": blob })])
-                          .then(() => {
-                            setCopyStatus("Image copied to clipboard!");
-                          })
-                          .catch((err) => {
-                            setCopyStatus(
-                              "Failed to copy image to clipboard. Please try again or download instead.",
-                            );
-                          });
-                        return;
-                      }
-                      if (finalResult) {
-                        setCopyStatus(null);
-                        copyBlobToClipboard(finalResult);
-                      }
-                    }}
-                    className="w-full md:w-auto"
-                    aria-label="Copy"
-                  >
-                    <AiOutlineCopy />
-                  </Button>
-                </div>
-                {copyStatus && (
-                  <div className="text-sm mt-1 text-center text-muted-foreground">
-                    {copyStatus}
-                  </div>
-                )}
-                {/* GIF Copy Modal */}
-                {showGifCopyModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
-                      <div className="mb-4 text-center">
-                        <div className="font-semibold mb-2">
-                          Copy GIF as static image?
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          Copying GIFs isn&apos;t supported by your browser.
-                          Would you like to copy a static image instead?
-                        </div>
-                      </div>
-                      <div className="flex gap-2 w-full justify-center">
-                        <Button
-                          onClick={handleGifCopyModalConfirm}
-                          className="flex-1"
-                        >
-                          Copy PNG
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={handleGifCopyModalCancel}
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
           {/* X, Y, Scale controls under both columns */}
@@ -1471,7 +1511,8 @@ export default function Home() {
             {/* Removed X, Y, Scale controls as requested */}
           </div>
         </section>
-      </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }
