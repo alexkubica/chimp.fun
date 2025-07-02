@@ -32,6 +32,7 @@ import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { middleEllipsis } from "@/lib/utils";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -637,43 +638,70 @@ function UnifiedNFTGallery({
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {nfts.map((nft) => (
-            <button
-              key={`${nft.contract}-${nft.identifier}`}
-              onClick={() =>
-                onSelectNFT(nft.contract, nft.identifier, nft.image_url || "")
-              }
-              className="group relative rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50 flex-shrink-0"
-              style={{
-                width: 132,
-                height: 132,
-                scrollSnapAlign: "start",
-                display: "block",
-              }}
-            >
-              {nft.image_url ? (
-                <img
-                  src={nft.image_url}
-                  alt={nft.name || `NFT ${nft.identifier}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                  No Image
+          {nfts.map((nft) => {
+            // Find collection name for this NFT
+            const collectionObj = collectionsMetadata.find(
+              (c) => c.contract?.toLowerCase() === nft.contract.toLowerCase(),
+            );
+            const collectionName =
+              collectionObj?.name || nft.collection || "Unknown";
+            const truncatedCollection = middleEllipsis(collectionName, 32);
+            return (
+              <button
+                key={`${nft.contract}-${nft.identifier}`}
+                onClick={() =>
+                  onSelectNFT(nft.contract, nft.identifier, nft.image_url || "")
+                }
+                className="group relative rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50 flex-shrink-0"
+                style={{
+                  width: 132,
+                  height: 132,
+                  scrollSnapAlign: "start",
+                  display: "block",
+                }}
+              >
+                {/* Collection name at top, with tooltip */}
+                <div className="absolute top-0 left-0 w-full px-1 pt-1 z-10 flex flex-col items-center pointer-events-none">
+                  <div
+                    className="max-w-full text-xs text-white bg-black/70 rounded px-1 py-0.5 leading-tight font-semibold text-center line-clamp-2 middle-ellipsis-tooltip"
+                    style={{
+                      WebkitLineClamp: 2,
+                      display: "-webkit-box",
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      wordBreak: "break-all",
+                      cursor: "pointer",
+                    }}
+                    tabIndex={0}
+                  >
+                    {truncatedCollection}
+                    <span className="middle-ellipsis-tooltip-content">
+                      {collectionName}
+                    </span>
+                  </div>
                 </div>
-              )}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5">
-                <div
-                  className="text-base md:text-lg text-white truncate font-semibold drop-shadow-md"
-                  style={{ lineHeight: 1.2 }}
-                >
-                  {nft.name || `#${nft.identifier}`}
+                {nft.image_url ? (
+                  <img
+                    src={nft.image_url}
+                    alt={nft.name || `NFT ${nft.identifier}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                    No Image
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                {/* NFT ID at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 flex flex-col items-center">
+                  <div className="text-xs text-white/80 font-mono">
+                    ID: {nft.identifier}
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
       {hasMore && (
@@ -1641,125 +1669,55 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-2 py-4">
-      <div className="w-full max-w-2xl mx-auto">
-        <header className="text-center mb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight mb-1">
-            <a href="/" className="text-inherit no-underline">
-              CHIMP.FUN
-            </a>
-          </h1>
-          <p className="text-lg font-medium mb-2">NFT Editor</p>
-          <div className="flex justify-center mt-2">
-            <Button onClick={handleFeelingLucky} variant="secondary">
-              I&apos;m Feeling Lucky
-            </Button>
-          </div>
-        </header>
-        <section className="flex flex-col gap-4">
-          {/* NFT Gallery - Mobile: under title, Desktop: above collection selector */}
-          <div className="md:hidden flex flex-col gap-4">
-            {/* Simple Tabs - Mobile */}
-            <div className="flex border-b">
-              <button
-                onClick={() => setActiveTab("connected")}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === "connected"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-                disabled={!isLoggedIn}
-              >
-                Your NFTs
-              </button>
-              <button
-                onClick={() => setActiveTab("input")}
-                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === "input"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Browse Wallet
-              </button>
+    <>
+      <main className="min-h-screen flex items-center justify-center px-2 py-4">
+        <div className="w-full max-w-2xl mx-auto">
+          <header className="text-center mb-6">
+            <h1 className="text-3xl font-extrabold tracking-tight mb-1">
+              <a href="/" className="text-inherit no-underline">
+                CHIMP.FUN
+              </a>
+            </h1>
+            <p className="text-lg font-medium mb-2">NFT Editor</p>
+            <div className="flex justify-center mt-2">
+              <Button onClick={handleFeelingLucky} variant="secondary">
+                I&apos;m Feeling Lucky
+              </Button>
             </div>
+          </header>
+          <section className="flex flex-col gap-4">
+            {/* NFT Gallery - Mobile: under title, Desktop: above collection selector */}
+            <div className="md:hidden flex flex-col gap-4">
+              {/* Simple Tabs - Mobile */}
+              <div className="flex border-b">
+                <button
+                  onClick={() => setActiveTab("connected")}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === "connected"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                  disabled={!isLoggedIn}
+                >
+                  Your NFTs
+                </button>
+                <button
+                  onClick={() => setActiveTab("input")}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === "input"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Browse Wallet
+                </button>
+              </div>
 
-            {/* Tab Content - Mobile */}
-            {activeTab === "connected" ? (
-              isLoggedIn ? (
-                (nfts.length > 0 || nftLoading || nftError) &&
-                activeWallet === primaryWallet?.address ? (
-                  <UnifiedNFTGallery
-                    onSelectNFT={handleNFTSelect}
-                    supportedCollections={supportedCollections}
-                    nfts={nfts}
-                    loading={nftLoading}
-                    error={nftError}
-                    hasMore={hasMore}
-                    providerName={providerName}
-                    onLoadMore={() => {
-                      // For connected wallet, we auto-fetch all NFTs, so no manual loading needed
-                      // This shouldn't be called since hasMore is set to false for user wallet
-                    }}
-                    title="Your NFTs"
-                    subtitle={
-                      nfts.length > 0
-                        ? `${nfts.length} NFTs found in your connected wallet`
-                        : undefined
-                    }
-                    showLoadingState={true}
-                  />
-                ) : (
-                  <div className="text-center text-muted-foreground p-4 border rounded-md">
-                    Loading your NFTs...
-                  </div>
-                )
-              ) : (
-                <div className="text-center text-muted-foreground p-4 border rounded-md">
-                  Connect your wallet to see your NFTs
-                </div>
-              )
-            ) : (
-              <div className="flex flex-col gap-4">
-                {/* Wallet Input */}
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="walletInputMobile">
-                    Enter wallet address or ENS name
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="walletInputMobile"
-                      placeholder="0x... or vitalik.eth"
-                      value={walletInput}
-                      onChange={(e) => setWalletInput(e.target.value)}
-                      className="flex-1 min-w-0 font-mono text-sm"
-                      onKeyDown={handleWalletInputKeyDown}
-                    />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handlePasteFromClipboard}
-                      title="Paste from clipboard"
-                    >
-                      📋
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={loadWallet}
-                      disabled={
-                        nftLoading || isResolvingENS || !walletInput.trim()
-                      }
-                    >
-                      {nftLoading || isResolvingENS ? "..." : "Load"}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* External Wallet NFT Gallery */}
-                {activeWallet &&
-                  activeWallet !== primaryWallet?.address &&
-                  (nfts.length > 0 || nftLoading || nftError) && (
+              {/* Tab Content - Mobile */}
+              {activeTab === "connected" ? (
+                isLoggedIn ? (
+                  (nfts.length > 0 || nftLoading || nftError) &&
+                  activeWallet === primaryWallet?.address ? (
                     <UnifiedNFTGallery
                       onSelectNFT={handleNFTSelect}
                       supportedCollections={supportedCollections}
@@ -1769,129 +1727,126 @@ export default function Home() {
                       hasMore={hasMore}
                       providerName={providerName}
                       onLoadMore={() => {
-                        if (nextCursor && !nftLoading) {
-                          fetchWalletNFTs(walletInput.trim(), nextCursor);
-                        }
+                        // For connected wallet, we auto-fetch all NFTs, so no manual loading needed
+                        // This shouldn't be called since hasMore is set to false for user wallet
                       }}
-                      onLoadAll={loadAllFromExternalWallet}
-                      title={getGalleryInfo.title}
-                      subtitle={getGalleryInfo.subtitle}
+                      title="Your NFTs"
+                      subtitle={
+                        nfts.length > 0
+                          ? `${nfts.length} NFTs found in your connected wallet`
+                          : undefined
+                      }
                       showLoadingState={true}
                     />
-                  )}
-              </div>
-            )}
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* First column: collection, token id, image, tip */}
-            <div className="flex flex-col gap-8">
-              {/* Simple Tabs - Desktop */}
-              <div className="hidden md:block">
-                <div className="flex border-b">
-                  <button
-                    onClick={() => setActiveTab("connected")}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                      activeTab === "connected"
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
-                    disabled={!isLoggedIn}
-                  >
-                    Your NFTs
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("input")}
-                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                      activeTab === "input"
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Browse Wallet
-                  </button>
-                </div>
-
-                {/* Tab Content - Desktop */}
-                <div className="mt-4">
-                  {activeTab === "connected" ? (
-                    isLoggedIn ? (
-                      (nfts.length > 0 || nftLoading || nftError) &&
-                      activeWallet === primaryWallet?.address ? (
-                        <UnifiedNFTGallery
-                          onSelectNFT={handleNFTSelect}
-                          supportedCollections={supportedCollections}
-                          nfts={nfts}
-                          loading={nftLoading}
-                          error={nftError}
-                          hasMore={hasMore}
-                          providerName={providerName}
-                          onLoadMore={() => {
-                            // For connected wallet, we auto-fetch all NFTs, so no manual loading needed
-                            // This shouldn't be called since hasMore is set to false for user wallet
-                          }}
-                          title="Your NFTs"
-                          subtitle={
-                            nfts.length > 0
-                              ? `${nfts.length} NFTs found in your connected wallet`
-                              : undefined
-                          }
-                          showLoadingState={true}
-                        />
-                      ) : (
-                        <div className="text-center text-muted-foreground p-4 border rounded-md">
-                          Loading your NFTs...
-                        </div>
-                      )
-                    ) : (
-                      <div className="text-center text-muted-foreground p-4 border rounded-md">
-                        Connect your wallet to see your NFTs
-                      </div>
-                    )
                   ) : (
-                    <div className="flex flex-col gap-4">
-                      {/* Wallet Input */}
-                      <div className="flex flex-col gap-2">
-                        <Label htmlFor="walletInput">
-                          Enter wallet address or ENS name
-                        </Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="walletInput"
-                            placeholder="0x... or vitalik.eth"
-                            value={walletInput}
-                            onChange={(e) => setWalletInput(e.target.value)}
-                            className="flex-1 min-w-0 font-mono text-sm"
-                            onKeyDown={handleWalletInputKeyDown}
-                          />
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handlePasteFromClipboard}
-                            title="Paste from clipboard"
-                          >
-                            📋
-                          </Button>
-                          <Button
-                            variant="outline"
-                            onClick={loadWallet}
-                            disabled={
-                              nftLoading ||
-                              isResolvingENS ||
-                              !walletInput.trim()
-                            }
-                          >
-                            {nftLoading || isResolvingENS
-                              ? "Loading..."
-                              : "Load NFTs"}
-                          </Button>
-                        </div>
-                      </div>
+                    <div className="text-center text-muted-foreground p-4 border rounded-md">
+                      Loading your NFTs...
+                    </div>
+                  )
+                ) : (
+                  <div className="text-center text-muted-foreground p-4 border rounded-md">
+                    Connect your wallet to see your NFTs
+                  </div>
+                )
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {/* Wallet Input */}
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="walletInputMobile">
+                      Enter wallet address or ENS name
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="walletInputMobile"
+                        placeholder="0x... or vitalik.eth"
+                        value={walletInput}
+                        onChange={(e) => setWalletInput(e.target.value)}
+                        className="flex-1 min-w-0 font-mono text-sm"
+                        onKeyDown={handleWalletInputKeyDown}
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handlePasteFromClipboard}
+                        title="Paste from clipboard"
+                      >
+                        📋
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={loadWallet}
+                        disabled={
+                          nftLoading || isResolvingENS || !walletInput.trim()
+                        }
+                      >
+                        {nftLoading || isResolvingENS ? "..." : "Load"}
+                      </Button>
+                    </div>
+                  </div>
 
-                      {/* External Wallet NFT Gallery */}
-                      {activeWallet &&
-                        activeWallet !== primaryWallet?.address &&
-                        (nfts.length > 0 || nftLoading || nftError) && (
+                  {/* External Wallet NFT Gallery */}
+                  {activeWallet &&
+                    activeWallet !== primaryWallet?.address &&
+                    (nfts.length > 0 || nftLoading || nftError) && (
+                      <UnifiedNFTGallery
+                        onSelectNFT={handleNFTSelect}
+                        supportedCollections={supportedCollections}
+                        nfts={nfts}
+                        loading={nftLoading}
+                        error={nftError}
+                        hasMore={hasMore}
+                        providerName={providerName}
+                        onLoadMore={() => {
+                          if (nextCursor && !nftLoading) {
+                            fetchWalletNFTs(walletInput.trim(), nextCursor);
+                          }
+                        }}
+                        onLoadAll={loadAllFromExternalWallet}
+                        title={getGalleryInfo.title}
+                        subtitle={getGalleryInfo.subtitle}
+                        showLoadingState={true}
+                      />
+                    )}
+                </div>
+              )}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* First column: collection, token id, image, tip */}
+              <div className="flex flex-col gap-8">
+                {/* Simple Tabs - Desktop */}
+                <div className="hidden md:block">
+                  <div className="flex border-b">
+                    <button
+                      onClick={() => setActiveTab("connected")}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === "connected"
+                          ? "border-primary text-primary"
+                          : "border-transparent text-muted-foreground hover:text-foreground"
+                      }`}
+                      disabled={!isLoggedIn}
+                    >
+                      Your NFTs
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("input")}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === "input"
+                          ? "border-primary text-primary"
+                          : "border-transparent text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Browse Wallet
+                    </button>
+                  </div>
+
+                  {/* Tab Content - Desktop */}
+                  <div className="mt-4">
+                    {activeTab === "connected" ? (
+                      isLoggedIn ? (
+                        (nfts.length > 0 || nftLoading || nftError) &&
+                        activeWallet === primaryWallet?.address ? (
                           <UnifiedNFTGallery
                             onSelectNFT={handleNFTSelect}
                             supportedCollections={supportedCollections}
@@ -1901,478 +1856,609 @@ export default function Home() {
                             hasMore={hasMore}
                             providerName={providerName}
                             onLoadMore={() => {
-                              if (nextCursor && !nftLoading) {
-                                fetchWalletNFTs(walletInput.trim(), nextCursor);
-                              }
+                              // For connected wallet, we auto-fetch all NFTs, so no manual loading needed
+                              // This shouldn't be called since hasMore is set to false for user wallet
                             }}
-                            onLoadAll={loadAllFromExternalWallet}
-                            title={getGalleryInfo.title}
-                            subtitle={getGalleryInfo.subtitle}
+                            title="Your NFTs"
+                            subtitle={
+                              nfts.length > 0
+                                ? `${nfts.length} NFTs found in your connected wallet`
+                                : undefined
+                            }
                             showLoadingState={true}
                           />
-                        )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Upload controls */}
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="collection">Collection</Label>
-                <div className="flex gap-2">
-                  <SearchableSelect
-                    items={collectionsMetadata}
-                    value={collectionIndex.toString()}
-                    onValueChange={function handleCollectionChange(val) {
-                      const newCollectionIndex = Number(val);
-                      setLoading(true);
-                      setCollectionIndex(newCollectionIndex);
-                      collectionMetadata =
-                        collectionsMetadata[newCollectionIndex];
-                      minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
-                      maxTokenID =
-                        collectionMetadata.total +
-                        (collectionMetadata.tokenIdOffset ?? 0);
-                      if (
-                        Number(tokenID) < minTokenID ||
-                        Number(tokenID) > maxTokenID
-                      ) {
-                        setTokenID(minTokenID);
-                        setTempTokenID(minTokenID);
-                      }
-                      setFile(null);
-                      setUploadedImageUri(null);
-                      setSelectedFromWallet(null); // Clear wallet selection when manually changing collection
-                    }}
-                    getItemValue={(collection) =>
-                      collectionsMetadata.indexOf(collection).toString()
-                    }
-                    getItemLabel={(collection) => collection.name}
-                    getItemKey={(collection) => collection.name}
-                    placeholder="Select collection"
-                    searchPlaceholder="Search collections... (e.g. 'doo' for Doodles)"
-                    className="flex-1 min-w-0 w-full"
-                    fuseOptions={{
-                      keys: ["name"],
-                      threshold: 0.3,
-                      includeScore: true,
-                    }}
-                  />
-                  <Button
-                    variant="secondary"
-                    onClick={function handleRandomCollection() {
-                      const randomIndex = Math.floor(
-                        Math.random() * collectionsMetadata.length,
-                      );
-                      setCollectionIndex(randomIndex);
-                      setLoading(true);
-                      const randomCollection = collectionsMetadata[randomIndex];
-                      const min = 1 + (randomCollection.tokenIdOffset ?? 0);
-                      const max =
-                        randomCollection.total +
-                        (randomCollection.tokenIdOffset ?? 0);
-                      const randomTokenId =
-                        Math.floor(Math.random() * (max - min + 1)) + min;
-                      setTokenID(randomTokenId);
-                      setTempTokenID(randomTokenId);
-                      setFile(null);
-                      setUploadedImageUri(null);
-                      setSelectedFromWallet(null); // Clear wallet selection when randomly changing collection
-                    }}
-                  >
-                    🎲
-                  </Button>
-                </div>
-                {selectedFromWallet && (
-                  <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded border-l-2 border-blue-500">
-                    {selectedFromWallet.source === "your-wallet" ? (
-                      <span>💳 Selected from your wallet</span>
+                        ) : (
+                          <div className="text-center text-muted-foreground p-4 border rounded-md">
+                            Loading your NFTs...
+                          </div>
+                        )
+                      ) : (
+                        <div className="text-center text-muted-foreground p-4 border rounded-md">
+                          Connect your wallet to see your NFTs
+                        </div>
+                      )
                     ) : (
-                      <span>
-                        🔍 Selected from{" "}
-                        {selectedFromWallet.walletAddress
-                          ? `${selectedFromWallet.walletAddress.slice(0, 6)}...${selectedFromWallet.walletAddress.slice(-4)}`
-                          : "external wallet"}
-                      </span>
+                      <div className="flex flex-col gap-4">
+                        {/* Wallet Input */}
+                        <div className="flex flex-col gap-2">
+                          <Label htmlFor="walletInput">
+                            Enter wallet address or ENS name
+                          </Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="walletInput"
+                              placeholder="0x... or vitalik.eth"
+                              value={walletInput}
+                              onChange={(e) => setWalletInput(e.target.value)}
+                              className="flex-1 min-w-0 font-mono text-sm"
+                              onKeyDown={handleWalletInputKeyDown}
+                            />
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={handlePasteFromClipboard}
+                              title="Paste from clipboard"
+                            >
+                              📋
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={loadWallet}
+                              disabled={
+                                nftLoading ||
+                                isResolvingENS ||
+                                !walletInput.trim()
+                              }
+                            >
+                              {nftLoading || isResolvingENS
+                                ? "Loading..."
+                                : "Load NFTs"}
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* External Wallet NFT Gallery */}
+                        {activeWallet &&
+                          activeWallet !== primaryWallet?.address &&
+                          (nfts.length > 0 || nftLoading || nftError) && (
+                            <UnifiedNFTGallery
+                              onSelectNFT={handleNFTSelect}
+                              supportedCollections={supportedCollections}
+                              nfts={nfts}
+                              loading={nftLoading}
+                              error={nftError}
+                              hasMore={hasMore}
+                              providerName={providerName}
+                              onLoadMore={() => {
+                                if (nextCursor && !nftLoading) {
+                                  fetchWalletNFTs(
+                                    walletInput.trim(),
+                                    nextCursor,
+                                  );
+                                }
+                              }}
+                              onLoadAll={loadAllFromExternalWallet}
+                              title={getGalleryInfo.title}
+                              subtitle={getGalleryInfo.subtitle}
+                              showLoadingState={true}
+                            />
+                          )}
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="gifNumber">
-                  Token ID ({minTokenID}-{maxTokenID})
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="gifNumber"
-                    min={minTokenID}
-                    max={maxTokenID}
-                    value={tempTokenID}
-                    onChange={function handleTokenIdInput(e) {
-                      const value = e.target.value;
-                      setTempTokenID(value);
-                      const tokenIdNum = Number(value);
-                      if (
-                        !isNaN(tokenIdNum) &&
-                        tokenIdNum >= minTokenID &&
-                        tokenIdNum <= maxTokenID
-                      ) {
-                        setErrorMessage(null);
-                        setTokenID(tokenIdNum);
+                </div>
+
+                {/* Upload controls */}
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="collection">Collection</Label>
+                  <div className="flex gap-2">
+                    <SearchableSelect
+                      items={collectionsMetadata}
+                      value={collectionIndex.toString()}
+                      onValueChange={function handleCollectionChange(val) {
+                        const newCollectionIndex = Number(val);
                         setLoading(true);
+                        setCollectionIndex(newCollectionIndex);
+                        collectionMetadata =
+                          collectionsMetadata[newCollectionIndex];
+                        minTokenID =
+                          1 + (collectionMetadata.tokenIdOffset ?? 0);
+                        maxTokenID =
+                          collectionMetadata.total +
+                          (collectionMetadata.tokenIdOffset ?? 0);
+                        if (
+                          Number(tokenID) < minTokenID ||
+                          Number(tokenID) > maxTokenID
+                        ) {
+                          setTokenID(minTokenID);
+                          setTempTokenID(minTokenID);
+                        }
                         setFile(null);
                         setUploadedImageUri(null);
-                        setSelectedFromWallet(null); // Clear wallet selection when manually changing token ID
-                      } else {
-                        setErrorMessage(
-                          `Invalid Token ID, please choose between ${minTokenID} and ${maxTokenID}`,
-                        );
-                      }
-                    }}
-                    type="number"
-                    className="flex-1 min-w-0"
-                    style={{ minWidth: 0 }}
-                  />
-                  <Button variant="secondary" onClick={handleRandomClick}>
-                    🎲
-                  </Button>
-                </div>
-                {errorMessage && (
-                  <div className="text-destructive text-sm mt-1">
-                    {errorMessage}
-                  </div>
-                )}
-                {/* OpenSea link below Token ID input */}
-                {uploadedImageUri
-                  ? null
-                  : (() => {
-                      const contract = collectionMetadata.contract;
-                      const chain = collectionMetadata.chain;
-                      const tokenIdNum = Number(tempTokenID);
-                      const validTokenId =
-                        !isNaN(tokenIdNum) &&
-                        tokenIdNum >= minTokenID &&
-                        tokenIdNum <= maxTokenID;
-                      let openseaChainSegment = "";
-                      if (chain === "ape") {
-                        openseaChainSegment = "ape_chain";
-                      } else if (chain === "polygon") {
-                        openseaChainSegment = "polygon";
-                      } else {
-                        openseaChainSegment = "ethereum";
-                      }
-                      if (validTokenId && contract && openseaChainSegment) {
-                        const url = `https://opensea.io/assets/${openseaChainSegment}/${contract}/${tokenIdNum}`;
-                        return (
-                          <a
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline text-sm mt-1"
-                            style={{ wordBreak: "break-all" }}
-                          >
-                            View on OpenSea
-                          </a>
-                        );
-                      }
-                      return null;
-                    })()}
-              </div>
-              <div className="flex flex-col gap-2">
-                <ImagePicker
-                  id="file"
-                  onFileChange={setFile}
-                  accept="image/*"
-                  key={`image-picker-${collectionIndex}-${tokenID}`}
-                />
-                <Button
-                  variant="outline"
-                  onClick={async function handlePasteImage() {
-                    try {
-                      const clipboardItems = await navigator.clipboard.read();
-                      for (const clipboardItem of clipboardItems) {
-                        for (const type of clipboardItem.types) {
-                          if (type.startsWith("image/")) {
-                            const blob = await clipboardItem.getType(type);
-                            const file = new File([blob], "pasted-image", {
-                              type,
-                            });
-                            setFile(file);
-                            return;
-                          }
-                        }
-                      }
-                      alert("No image found in clipboard");
-                    } catch (err) {
-                      console.error("Failed to read clipboard:", err);
-                      alert("Failed to read clipboard");
-                    }
-                  }}
-                >
-                  📋 Paste From Clipboard
-                </Button>
-                <small className="text-muted-foreground">
-                  Tip: Use 1:1 aspect ratio for best results.
-                </small>
-              </div>
-            </div>
-            {/* Second column: preview, download, copy only */}
-            <div className="flex flex-col gap-4 h-full items-stretch">
-              {/* Preset select at the top, full width */}
-              <div className="flex flex-col gap-2">
-                <Label>Preset</Label>
-                <div className="flex gap-2 items-center w-full">
-                  <div className="flex-1 min-w-0 w-full">
-                    <SearchableSelect
-                      items={reactionsMap}
-                      value={overlayNumber.toString()}
-                      onValueChange={function handleReaction(val) {
-                        setLoading(true);
-                        setOverlayNumber(Number(val));
+                        setSelectedFromWallet(null); // Clear wallet selection when manually changing collection
                       }}
-                      getItemValue={(reaction) =>
-                        (reactionsMap.indexOf(reaction) + 1).toString()
+                      getItemValue={(collection) =>
+                        collectionsMetadata.indexOf(collection).toString()
                       }
-                      getItemLabel={(reaction) => reaction.title}
-                      getItemKey={(reaction) => reaction.title}
-                      placeholder="Select Preset"
-                      searchPlaceholder="Search presets... (e.g. 'gm' for GM!)"
+                      getItemLabel={(collection) => collection.name}
+                      getItemKey={(collection) => collection.name}
+                      placeholder="Select collection"
+                      searchPlaceholder="Search collections... (e.g. 'doo' for Doodles)"
                       className="flex-1 min-w-0 w-full"
                       fuseOptions={{
-                        keys: ["title"],
+                        keys: ["name"],
                         threshold: 0.3,
                         includeScore: true,
                       }}
                     />
+                    <Button
+                      variant="secondary"
+                      onClick={function handleRandomCollection() {
+                        const randomIndex = Math.floor(
+                          Math.random() * collectionsMetadata.length,
+                        );
+                        setCollectionIndex(randomIndex);
+                        setLoading(true);
+                        const randomCollection =
+                          collectionsMetadata[randomIndex];
+                        const min = 1 + (randomCollection.tokenIdOffset ?? 0);
+                        const max =
+                          randomCollection.total +
+                          (randomCollection.tokenIdOffset ?? 0);
+                        const randomTokenId =
+                          Math.floor(Math.random() * (max - min + 1)) + min;
+                        setTokenID(randomTokenId);
+                        setTempTokenID(randomTokenId);
+                        setFile(null);
+                        setUploadedImageUri(null);
+                        setSelectedFromWallet(null); // Clear wallet selection when randomly changing collection
+                      }}
+                    >
+                      🎲
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    onClick={function handleRandomReaction() {
-                      const randomReaction =
-                        Math.floor(Math.random() * reactionsMap.length) + 1;
-                      setOverlayNumber(randomReaction);
-                      setLoading(true);
-                    }}
-                  >
-                    🎲
-                  </Button>
-                </div>
-                <div className="flex items-center space-x-2 w-full">
-                  {["Chimpers", "Chimpers Genesis"].includes(
-                    collectionMetadata.name,
-                  ) && (
-                    <>
-                      <Switch
-                        id="playAnimation"
-                        checked={playAnimation}
-                        onCheckedChange={setPlayAnimation}
-                      />
-                      <Label htmlFor="playAnimation">Play animation</Label>
-                    </>
+                  {selectedFromWallet && (
+                    <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded border-l-2 border-blue-500">
+                      {selectedFromWallet.source === "your-wallet" ? (
+                        <span>💳 Selected from your wallet</span>
+                      ) : (
+                        <span>
+                          🔍 Selected from{" "}
+                          {selectedFromWallet.walletAddress
+                            ? `${selectedFromWallet.walletAddress.slice(0, 6)}...${selectedFromWallet.walletAddress.slice(-4)}`
+                            : "external wallet"}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center space-x-2 w-full">
-                  <Switch
-                    id="overlayEnabled"
-                    checked={overlayEnabled}
-                    onCheckedChange={setOverlayEnabled}
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="gifNumber">
+                    Token ID ({minTokenID}-{maxTokenID})
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="gifNumber"
+                      min={minTokenID}
+                      max={maxTokenID}
+                      value={tempTokenID}
+                      onChange={function handleTokenIdInput(e) {
+                        const value = e.target.value;
+                        setTempTokenID(value);
+                        const tokenIdNum = Number(value);
+                        if (
+                          !isNaN(tokenIdNum) &&
+                          tokenIdNum >= minTokenID &&
+                          tokenIdNum <= maxTokenID
+                        ) {
+                          setErrorMessage(null);
+                          setTokenID(tokenIdNum);
+                          setLoading(true);
+                          setFile(null);
+                          setUploadedImageUri(null);
+                          setSelectedFromWallet(null); // Clear wallet selection when manually changing token ID
+                        } else {
+                          setErrorMessage(
+                            `Invalid Token ID, please choose between ${minTokenID} and ${maxTokenID}`,
+                          );
+                        }
+                      }}
+                      type="number"
+                      className="flex-1 min-w-0"
+                      style={{ minWidth: 0 }}
+                    />
+                    <Button variant="secondary" onClick={handleRandomClick}>
+                      🎲
+                    </Button>
+                  </div>
+                  {errorMessage && (
+                    <div className="text-destructive text-sm mt-1">
+                      {errorMessage}
+                    </div>
+                  )}
+                  {/* OpenSea link below Token ID input */}
+                  {uploadedImageUri
+                    ? null
+                    : (() => {
+                        const contract = collectionMetadata.contract;
+                        const chain = collectionMetadata.chain;
+                        const tokenIdNum = Number(tempTokenID);
+                        const validTokenId =
+                          !isNaN(tokenIdNum) &&
+                          tokenIdNum >= minTokenID &&
+                          tokenIdNum <= maxTokenID;
+                        let openseaChainSegment = "";
+                        if (chain === "ape") {
+                          openseaChainSegment = "ape_chain";
+                        } else if (chain === "polygon") {
+                          openseaChainSegment = "polygon";
+                        } else {
+                          openseaChainSegment = "ethereum";
+                        }
+                        if (validTokenId && contract && openseaChainSegment) {
+                          const url = `https://opensea.io/assets/${openseaChainSegment}/${contract}/${tokenIdNum}`;
+                          return (
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline text-sm mt-1"
+                              style={{ wordBreak: "break-all" }}
+                            >
+                              View on OpenSea
+                            </a>
+                          );
+                        }
+                        return null;
+                      })()}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <ImagePicker
+                    id="file"
+                    onFileChange={setFile}
+                    accept="image/*"
+                    key={`image-picker-${collectionIndex}-${tokenID}`}
                   />
-                  <Label htmlFor="overlayEnabled">MADE WITH CHIMP.FUN</Label>
+                  <Button
+                    variant="outline"
+                    onClick={async function handlePasteImage() {
+                      try {
+                        const clipboardItems = await navigator.clipboard.read();
+                        for (const clipboardItem of clipboardItems) {
+                          for (const type of clipboardItem.types) {
+                            if (type.startsWith("image/")) {
+                              const blob = await clipboardItem.getType(type);
+                              const file = new File([blob], "pasted-image", {
+                                type,
+                              });
+                              setFile(file);
+                              return;
+                            }
+                          }
+                        }
+                        alert("No image found in clipboard");
+                      } catch (err) {
+                        console.error("Failed to read clipboard:", err);
+                        alert("Failed to read clipboard");
+                      }
+                    }}
+                  >
+                    📋 Paste From Clipboard
+                  </Button>
+                  <small className="text-muted-foreground">
+                    Tip: Use 1:1 aspect ratio for best results.
+                  </small>
                 </div>
               </div>
-              {/* Preview and controls below */}
-              <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
-                <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
-                  {loading ? (
-                    isFirstRender ? (
-                      <Skeleton className="w-full h-full rounded-lg" />
-                    ) : finalResult ? (
-                      <div className="relative w-full h-full">
-                        {isGIF && !playAnimation && staticGifFrameUrl ? (
-                          <img
-                            src={staticGifFrameUrl}
-                            alt="Preview (static frame)"
-                            className="object-contain w-full h-full rounded-lg opacity-80"
-                            style={{
-                              background: "transparent",
-                              filter: "brightness(0.7) grayscale(0.3)",
-                            }}
-                          />
-                        ) : (
-                          <img
-                            src={finalResult}
-                            alt="Preview"
-                            className="object-contain w-full h-full rounded-lg opacity-80"
-                            style={{
-                              background: "transparent",
-                              filter: "brightness(0.7) grayscale(0.3)",
-                            }}
-                          />
-                        )}
-                        {/* Draggable overlay for reaction, always shown if finalResult */}
-                        <ReactionOverlayDraggable
-                          x={x}
-                          y={y}
-                          scale={scale}
-                          imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                          onChange={({ x: newX, y: newY, scale: newScale }) => {
-                            setX(newX);
-                            setY(newY);
-                            setScale(newScale);
-                          }}
-                          containerSize={320}
-                          setDragging={setDragging}
-                          dragging={dragging}
-                          setResizing={setResizing}
-                          resizing={resizing}
-                          onDragEnd={() => {
-                            setDragging(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          onResizeEnd={() => {
-                            setResizing(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          disabled={loading}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <Spinner />
-                        </div>
-                      </div>
-                    ) : (
-                      <Skeleton className="w-full h-full rounded-lg" />
-                    )
-                  ) : (
-                    finalResult && (
-                      <>
-                        {isGIF && !playAnimation && staticGifFrameUrl ? (
-                          <img
-                            src={staticGifFrameUrl}
-                            alt="Preview (static frame)"
-                            className="object-contain w-full h-full rounded-lg"
-                            style={{ background: "transparent" }}
-                          />
-                        ) : (
-                          <img
-                            src={finalResult}
-                            alt="Preview"
-                            className="object-contain w-full h-full rounded-lg"
-                            style={{ background: "transparent" }}
-                          />
-                        )}
-                        {/* Draggable overlay for reaction */}
-                        <ReactionOverlayDraggable
-                          x={x}
-                          y={y}
-                          scale={scale}
-                          imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                          onChange={({ x: newX, y: newY, scale: newScale }) => {
-                            setX(newX);
-                            setY(newY);
-                            setScale(newScale);
-                          }}
-                          containerSize={320}
-                          setDragging={setDragging}
-                          dragging={dragging}
-                          setResizing={setResizing}
-                          resizing={resizing}
-                          onDragEnd={() => {
-                            setDragging(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          onResizeEnd={() => {
-                            setResizing(false);
-                            debouncedRenderImageUrl();
-                          }}
-                          disabled={loading}
-                        />
-                      </>
-                    )
-                  )}
-                </div>
-                <div className="flex flex-col md:flex-row gap-2 w-full mt-2">
-                  <Button
-                    onClick={downloadOutput}
-                    className="w-full md:w-auto"
-                    aria-label="Download"
-                  >
-                    <AiOutlineDownload />
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={function handleCopy() {
-                      if (isGIF && !playAnimation && staticGifFrameUrl) {
-                        setCopyStatus(null);
-                        // Copy PNG from staticGifFrameUrl
-                        const blob = dataURLtoBlob(staticGifFrameUrl);
-                        navigator.clipboard
-                          .write([new ClipboardItem({ "image/png": blob })])
-                          .then(() => {
-                            setCopyStatus("Image copied to clipboard!");
-                          })
-                          .catch((err) => {
-                            setCopyStatus(
-                              "Failed to copy image to clipboard. Please try again or download instead.",
-                            );
-                          });
-                        return;
-                      }
-                      if (finalResult) {
-                        setCopyStatus(null);
-                        copyBlobToClipboard(finalResult);
-                      }
-                    }}
-                    className="w-full md:w-auto"
-                    aria-label="Copy"
-                  >
-                    <AiOutlineCopy />
-                  </Button>
-                </div>
-                {copyStatus && (
-                  <div className="text-sm mt-1 text-center text-muted-foreground">
-                    {copyStatus}
+              {/* Second column: preview, download, copy only */}
+              <div className="flex flex-col gap-4 h-full items-stretch">
+                {/* Preset select at the top, full width */}
+                <div className="flex flex-col gap-2">
+                  <Label>Preset</Label>
+                  <div className="flex gap-2 items-center w-full">
+                    <div className="flex-1 min-w-0 w-full">
+                      <SearchableSelect
+                        items={reactionsMap}
+                        value={overlayNumber.toString()}
+                        onValueChange={function handleReaction(val) {
+                          setLoading(true);
+                          setOverlayNumber(Number(val));
+                        }}
+                        getItemValue={(reaction) =>
+                          (reactionsMap.indexOf(reaction) + 1).toString()
+                        }
+                        getItemLabel={(reaction) => reaction.title}
+                        getItemKey={(reaction) => reaction.title}
+                        placeholder="Select Preset"
+                        searchPlaceholder="Search presets... (e.g. 'gm' for GM!)"
+                        className="flex-1 min-w-0 w-full"
+                        fuseOptions={{
+                          keys: ["title"],
+                          threshold: 0.3,
+                          includeScore: true,
+                        }}
+                      />
+                    </div>
+                    <Button
+                      variant="secondary"
+                      onClick={function handleRandomReaction() {
+                        const randomReaction =
+                          Math.floor(Math.random() * reactionsMap.length) + 1;
+                        setOverlayNumber(randomReaction);
+                        setLoading(true);
+                      }}
+                    >
+                      🎲
+                    </Button>
                   </div>
-                )}
-                {/* GIF Copy Modal */}
-                {showGifCopyModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
-                      <div className="mb-4 text-center">
-                        <div className="font-semibold mb-2">
-                          Copy GIF as static image?
+                  <div className="flex items-center space-x-2 w-full">
+                    {["Chimpers", "Chimpers Genesis"].includes(
+                      collectionMetadata.name,
+                    ) && (
+                      <>
+                        <Switch
+                          id="playAnimation"
+                          checked={playAnimation}
+                          onCheckedChange={setPlayAnimation}
+                        />
+                        <Label htmlFor="playAnimation">Play animation</Label>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2 w-full">
+                    <Switch
+                      id="overlayEnabled"
+                      checked={overlayEnabled}
+                      onCheckedChange={setOverlayEnabled}
+                    />
+                    <Label htmlFor="overlayEnabled">MADE WITH CHIMP.FUN</Label>
+                  </div>
+                </div>
+                {/* Preview and controls below */}
+                <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
+                  <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
+                    {loading ? (
+                      isFirstRender ? (
+                        <Skeleton className="w-full h-full rounded-lg" />
+                      ) : finalResult ? (
+                        <div className="relative w-full h-full">
+                          {isGIF && !playAnimation && staticGifFrameUrl ? (
+                            <img
+                              src={staticGifFrameUrl}
+                              alt="Preview (static frame)"
+                              className="object-contain w-full h-full rounded-lg opacity-80"
+                              style={{
+                                background: "transparent",
+                                filter: "brightness(0.7) grayscale(0.3)",
+                              }}
+                            />
+                          ) : (
+                            <img
+                              src={finalResult}
+                              alt="Preview"
+                              className="object-contain w-full h-full rounded-lg opacity-80"
+                              style={{
+                                background: "transparent",
+                                filter: "brightness(0.7) grayscale(0.3)",
+                              }}
+                            />
+                          )}
+                          {/* Draggable overlay for reaction, always shown if finalResult */}
+                          <ReactionOverlayDraggable
+                            x={x}
+                            y={y}
+                            scale={scale}
+                            imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                            onChange={({
+                              x: newX,
+                              y: newY,
+                              scale: newScale,
+                            }) => {
+                              setX(newX);
+                              setY(newY);
+                              setScale(newScale);
+                            }}
+                            containerSize={320}
+                            setDragging={setDragging}
+                            dragging={dragging}
+                            setResizing={setResizing}
+                            resizing={resizing}
+                            onDragEnd={() => {
+                              setDragging(false);
+                              debouncedRenderImageUrl();
+                            }}
+                            onResizeEnd={() => {
+                              setResizing(false);
+                              debouncedRenderImageUrl();
+                            }}
+                            disabled={loading}
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Spinner />
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          Copying GIFs isn&apos;t supported by your browser.
-                          Would you like to copy a static image instead?
+                      ) : (
+                        <Skeleton className="w-full h-full rounded-lg" />
+                      )
+                    ) : (
+                      finalResult && (
+                        <>
+                          {isGIF && !playAnimation && staticGifFrameUrl ? (
+                            <img
+                              src={staticGifFrameUrl}
+                              alt="Preview (static frame)"
+                              className="object-contain w-full h-full rounded-lg"
+                              style={{ background: "transparent" }}
+                            />
+                          ) : (
+                            <img
+                              src={finalResult}
+                              alt="Preview"
+                              className="object-contain w-full h-full rounded-lg"
+                              style={{ background: "transparent" }}
+                            />
+                          )}
+                          {/* Draggable overlay for reaction */}
+                          <ReactionOverlayDraggable
+                            x={x}
+                            y={y}
+                            scale={scale}
+                            imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                            onChange={({
+                              x: newX,
+                              y: newY,
+                              scale: newScale,
+                            }) => {
+                              setX(newX);
+                              setY(newY);
+                              setScale(newScale);
+                            }}
+                            containerSize={320}
+                            setDragging={setDragging}
+                            dragging={dragging}
+                            setResizing={setResizing}
+                            resizing={resizing}
+                            onDragEnd={() => {
+                              setDragging(false);
+                              debouncedRenderImageUrl();
+                            }}
+                            onResizeEnd={() => {
+                              setResizing(false);
+                              debouncedRenderImageUrl();
+                            }}
+                            disabled={loading}
+                          />
+                        </>
+                      )
+                    )}
+                  </div>
+                  <div className="flex flex-col md:flex-row gap-2 w-full mt-2">
+                    <Button
+                      onClick={downloadOutput}
+                      className="w-full md:w-auto"
+                      aria-label="Download"
+                    >
+                      <AiOutlineDownload />
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={function handleCopy() {
+                        if (isGIF && !playAnimation && staticGifFrameUrl) {
+                          setCopyStatus(null);
+                          // Copy PNG from staticGifFrameUrl
+                          const blob = dataURLtoBlob(staticGifFrameUrl);
+                          navigator.clipboard
+                            .write([new ClipboardItem({ "image/png": blob })])
+                            .then(() => {
+                              setCopyStatus("Image copied to clipboard!");
+                            })
+                            .catch((err) => {
+                              setCopyStatus(
+                                "Failed to copy image to clipboard. Please try again or download instead.",
+                              );
+                            });
+                          return;
+                        }
+                        if (finalResult) {
+                          setCopyStatus(null);
+                          copyBlobToClipboard(finalResult);
+                        }
+                      }}
+                      className="w-full md:w-auto"
+                      aria-label="Copy"
+                    >
+                      <AiOutlineCopy />
+                    </Button>
+                  </div>
+                  {copyStatus && (
+                    <div className="text-sm mt-1 text-center text-muted-foreground">
+                      {copyStatus}
+                    </div>
+                  )}
+                  {/* GIF Copy Modal */}
+                  {showGifCopyModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                      <div className="bg-white rounded-lg shadow-lg p-6 max-w-xs w-full flex flex-col items-center">
+                        <div className="mb-4 text-center">
+                          <div className="font-semibold mb-2">
+                            Copy GIF as static image?
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Copying GIFs isn&apos;t supported by your browser.
+                            Would you like to copy a static image instead?
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex gap-2 w-full justify-center">
-                        <Button
-                          onClick={handleGifCopyModalConfirm}
-                          className="flex-1"
-                        >
-                          Copy PNG
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={handleGifCopyModalCancel}
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
+                        <div className="flex gap-2 w-full justify-center">
+                          <Button
+                            onClick={handleGifCopyModalConfirm}
+                            className="flex-1"
+                          >
+                            Copy PNG
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={handleGifCopyModalCancel}
+                            className="flex-1"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          {/* X, Y, Scale controls under both columns */}
-          <div className="flex flex-col md:flex-row gap-4 w-full">
-            {/* Removed X, Y, Scale controls as requested */}
-          </div>
-        </section>
-      </div>
-    </main>
+            {/* X, Y, Scale controls under both columns */}
+            <div className="flex flex-col md:flex-row gap-4 w-full">
+              {/* Removed X, Y, Scale controls as requested */}
+            </div>
+          </section>
+        </div>
+      </main>
+      {/* Tooltip CSS for .middle-ellipsis-tooltip */}
+      <style jsx global>{`
+        .middle-ellipsis-tooltip {
+          position: relative;
+        }
+        .middle-ellipsis-tooltip-content {
+          visibility: hidden;
+          opacity: 0;
+          pointer-events: none;
+          position: absolute;
+          left: 50%;
+          top: 100%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.95);
+          color: #fff;
+          padding: 6px 12px;
+          border-radius: 6px;
+          white-space: pre-line;
+          z-index: 100;
+          min-width: 120px;
+          max-width: 220px;
+          font-size: 13px;
+          font-weight: 500;
+          text-align: center;
+          transition: opacity 0.15s;
+          margin-top: 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+        }
+        .middle-ellipsis-tooltip:hover .middle-ellipsis-tooltip-content,
+        .middle-ellipsis-tooltip:focus .middle-ellipsis-tooltip-content {
+          visibility: visible;
+          opacity: 1;
+          pointer-events: auto;
+        }
+        @media (hover: none) {
+          .middle-ellipsis-tooltip:active .middle-ellipsis-tooltip-content,
+          .middle-ellipsis-tooltip:focus .middle-ellipsis-tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+          }
+        }
+      `}</style>
+    </>
   );
 }
