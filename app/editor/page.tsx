@@ -535,6 +535,14 @@ function UnifiedNFTGallery({
   subtitle?: string;
   showLoadingState?: boolean;
 }) {
+  // Lazy load state
+  const [visibleCount, setVisibleCount] = useState(100);
+  useEffect(() => {
+    setVisibleCount(100); // Reset when nfts change
+  }, [nfts]);
+  const visibleNFTs = nfts.slice(0, visibleCount);
+  const canLoadMore = nfts.length > visibleCount;
+
   if (loading && nfts.length === 0 && showLoadingState) {
     return (
       <div className="flex flex-col gap-2">
@@ -601,7 +609,7 @@ function UnifiedNFTGallery({
       {/* NFT horizontal scroll gallery */}
       <div className="relative">
         {/* Left arrow */}
-        {nfts.length > 2 && (
+        {visibleNFTs.length > 2 && (
           <button
             type="button"
             aria-label="Scroll left"
@@ -616,7 +624,7 @@ function UnifiedNFTGallery({
           </button>
         )}
         {/* Right arrow */}
-        {nfts.length > 2 && (
+        {visibleNFTs.length > 2 && (
           <button
             type="button"
             aria-label="Scroll right"
@@ -638,7 +646,7 @@ function UnifiedNFTGallery({
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {nfts.map((nft) => {
+          {visibleNFTs.map((nft) => {
             // Find collection name for this NFT
             const collectionObj = collectionsMetadata.find(
               (c) => c.contract?.toLowerCase() === nft.contract.toLowerCase(),
@@ -704,17 +712,21 @@ function UnifiedNFTGallery({
           })}
         </div>
       </div>
-      {hasMore && (
+      {(hasMore || canLoadMore) && (
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onLoadMore}
-            disabled={loading}
-            className="flex-1"
-          >
-            {loading ? "Loading..." : "Load More"}
-          </Button>
+          {canLoadMore && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setVisibleCount((c) => c + 100)}
+              disabled={loading}
+              className="flex-1"
+            >
+              {loading
+                ? "Loading..."
+                : `Load More (${visibleCount + 1}-${Math.min(visibleCount + 100, nfts.length)} of ${nfts.length})`}
+            </Button>
+          )}
           {onLoadAll && (
             <Button
               variant="secondary"

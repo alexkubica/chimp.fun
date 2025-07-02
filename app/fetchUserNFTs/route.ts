@@ -15,7 +15,7 @@ const NFT_PROVIDERS = {
     },
   },
   opensea: {
-    name: "OpenSea", 
+    name: "OpenSea",
     baseUrl: "https://api.opensea.io/api/v2",
     requiresApiKey: true,
     envKey: "OPENSEA_API_KEY",
@@ -48,25 +48,34 @@ const NFT_PROVIDERS = {
 // Try providers in order of preference
 const PROVIDER_PRIORITY = ["alchemy", "moralis", "opensea"];
 
-async function fetchFromAlchemy(wallet: string, chain: string, limit: string, pageKey?: string, apiKey?: string) {
-  const alchemyChain = NFT_PROVIDERS.alchemy.chains[chain as keyof typeof NFT_PROVIDERS.alchemy.chains] || "eth-mainnet";
-  
+async function fetchFromAlchemy(
+  wallet: string,
+  chain: string,
+  limit: string,
+  pageKey?: string,
+  apiKey?: string,
+) {
+  const alchemyChain =
+    NFT_PROVIDERS.alchemy.chains[
+      chain as keyof typeof NFT_PROVIDERS.alchemy.chains
+    ] || "eth-mainnet";
+
   let url = `https://${alchemyChain}.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner`;
   const params = new URLSearchParams({
     owner: wallet,
     pageSize: limit,
     withMetadata: "true",
   });
-  
+
   if (pageKey) {
     params.append("pageKey", pageKey);
   }
-  
+
   url += `?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
-      "Accept": "application/json",
+      Accept: "application/json",
     },
   });
 
@@ -75,40 +84,55 @@ async function fetchFromAlchemy(wallet: string, chain: string, limit: string, pa
   }
 
   const data = await response.json();
-  
+
   // Transform Alchemy response to our standard format
   return {
-    nfts: data.ownedNfts?.map((nft: any) => ({
-      identifier: nft.tokenId,
-      collection: nft.contract?.name || "Unknown",
-      contract: nft.contract?.address?.toLowerCase(),
-      token_standard: nft.tokenType || "ERC721",
-      name: nft.name || nft.title || `#${nft.tokenId}`,
-      description: nft.description || nft.contract?.name,
-      image_url: nft.image?.originalUrl || nft.image?.cachedUrl || nft.media?.[0]?.gateway,
-      metadata_url: nft.tokenUri?.gateway || nft.tokenUri?.raw,
-      opensea_url: nft.contract?.address ? `https://opensea.io/assets/ethereum/${nft.contract.address}/${nft.tokenId}` : undefined,
-      updated_at: null,
-      is_disabled: false,
-      is_nsfw: false,
-    })) || [],
+    nfts:
+      data.ownedNfts?.map((nft: any) => ({
+        identifier: nft.tokenId,
+        collection: nft.contract?.name || "Unknown",
+        contract: nft.contract?.address?.toLowerCase(),
+        token_standard: nft.tokenType || "ERC721",
+        name: nft.name || nft.title || `#${nft.tokenId}`,
+        description: nft.description || nft.contract?.name,
+        image_url:
+          nft.image?.originalUrl ||
+          nft.image?.cachedUrl ||
+          nft.media?.[0]?.gateway,
+        metadata_url: nft.tokenUri?.gateway || nft.tokenUri?.raw,
+        opensea_url: nft.contract?.address
+          ? `https://opensea.io/assets/ethereum/${nft.contract.address}/${nft.tokenId}`
+          : undefined,
+        updated_at: null,
+        is_disabled: false,
+        is_nsfw: false,
+      })) || [],
     next: data.pageKey || null,
   };
 }
 
-async function fetchFromOpenSea(wallet: string, chain: string, limit: string, next?: string, apiKey?: string) {
-  const openseaChain = NFT_PROVIDERS.opensea.chains[chain as keyof typeof NFT_PROVIDERS.opensea.chains] || "ethereum";
-  
+async function fetchFromOpenSea(
+  wallet: string,
+  chain: string,
+  limit: string,
+  next?: string,
+  apiKey?: string,
+) {
+  const openseaChain =
+    NFT_PROVIDERS.opensea.chains[
+      chain as keyof typeof NFT_PROVIDERS.opensea.chains
+    ] || "ethereum";
+
   let url = `https://api.opensea.io/api/v2/chain/${openseaChain}/account/${wallet}/nfts?limit=${limit}`;
-  
+
   if (next) {
     url += `&next=${next}`;
   }
 
   const headers: Record<string, string> = {
-    "Accept": "application/json",
+    Accept: "application/json",
   };
-  
+
   if (apiKey) {
     headers["X-API-KEY"] = apiKey;
   }
@@ -122,18 +146,27 @@ async function fetchFromOpenSea(wallet: string, chain: string, limit: string, ne
   return await response.json();
 }
 
-async function fetchFromMoralis(wallet: string, chain: string, limit: string, cursor?: string, apiKey?: string) {
-  const moralisChain = NFT_PROVIDERS.moralis.chains[chain as keyof typeof NFT_PROVIDERS.moralis.chains] || "eth";
-  
+async function fetchFromMoralis(
+  wallet: string,
+  chain: string,
+  limit: string,
+  cursor?: string,
+  apiKey?: string,
+) {
+  const moralisChain =
+    NFT_PROVIDERS.moralis.chains[
+      chain as keyof typeof NFT_PROVIDERS.moralis.chains
+    ] || "eth";
+
   let url = `https://deep-index.moralis.io/api/v2.2/${wallet}/nft?chain=${moralisChain}&format=decimal&limit=${limit}&media_items=true`;
-  
+
   if (cursor) {
     url += `&cursor=${cursor}`;
   }
 
   const response = await fetch(url, {
     headers: {
-      "Accept": "application/json",
+      Accept: "application/json",
       "X-API-Key": apiKey || "",
     },
   });
@@ -143,23 +176,24 @@ async function fetchFromMoralis(wallet: string, chain: string, limit: string, cu
   }
 
   const data = await response.json();
-  
+
   // Transform Moralis response to our standard format
   return {
-    nfts: data.result?.map((nft: any) => ({
-      identifier: nft.token_id,
-      collection: nft.name || "Unknown",
-      contract: nft.token_address?.toLowerCase(),
-      token_standard: nft.contract_type || "ERC721",
-      name: nft.metadata?.name || `#${nft.token_id}`,
-      description: nft.metadata?.description,
-      image_url: nft.metadata?.image,
-      metadata_url: nft.token_uri,
-      opensea_url: `https://opensea.io/assets/ethereum/${nft.token_address}/${nft.token_id}`,
-      updated_at: nft.synced_at,
-      is_disabled: false,
-      is_nsfw: false,
-    })) || [],
+    nfts:
+      data.result?.map((nft: any) => ({
+        identifier: nft.token_id,
+        collection: nft.name || "Unknown",
+        contract: nft.token_address?.toLowerCase(),
+        token_standard: nft.contract_type || "ERC721",
+        name: nft.metadata?.name || `#${nft.token_id}`,
+        description: nft.metadata?.description,
+        image_url: nft.metadata?.image,
+        metadata_url: nft.token_uri,
+        opensea_url: `https://opensea.io/assets/ethereum/${nft.token_address}/${nft.token_id}`,
+        updated_at: nft.synced_at,
+        is_disabled: false,
+        is_nsfw: false,
+      })) || [],
     next: data.cursor || null,
   };
 }
@@ -169,26 +203,29 @@ export async function GET(req: NextRequest) {
   const walletAddress = searchParams.get("wallet");
   const chain = searchParams.get("chain") || "ethereum";
   const limit = searchParams.get("limit") || "50";
-  const next = searchParams.get("next") || undefined;
   const provider = searchParams.get("provider") || "auto"; // Allow manual provider selection
 
   if (!walletAddress) {
     return NextResponse.json(
       { error: "Wallet address is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   // Determine which provider to use
   let selectedProvider = null;
-  
+
   if (provider !== "auto" && provider in NFT_PROVIDERS) {
     selectedProvider = provider;
   } else {
     // Auto-select first available provider with API key
     for (const providerName of PROVIDER_PRIORITY) {
-      const providerConfig = NFT_PROVIDERS[providerName as keyof typeof NFT_PROVIDERS];
-      if (!providerConfig.requiresApiKey || process.env[providerConfig.envKey!]) {
+      const providerConfig =
+        NFT_PROVIDERS[providerName as keyof typeof NFT_PROVIDERS];
+      if (
+        !providerConfig.requiresApiKey ||
+        process.env[providerConfig.envKey!]
+      ) {
         selectedProvider = providerName;
         break;
       }
@@ -197,47 +234,100 @@ export async function GET(req: NextRequest) {
 
   if (!selectedProvider) {
     return NextResponse.json(
-      { 
-        error: "No NFT provider available. Please configure at least one API key: ALCHEMY_API_KEY, MORALIS_API_KEY, or OPENSEA_API_KEY",
+      {
+        error:
+          "No NFT provider available. Please configure at least one API key: ALCHEMY_API_KEY, MORALIS_API_KEY, or OPENSEA_API_KEY",
         availableProviders: Object.keys(NFT_PROVIDERS),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
-  const providerConfig = NFT_PROVIDERS[selectedProvider as keyof typeof NFT_PROVIDERS];
-  const apiKey: string | undefined = providerConfig.envKey ? process.env[providerConfig.envKey] : undefined;
+  const providerConfig =
+    NFT_PROVIDERS[selectedProvider as keyof typeof NFT_PROVIDERS];
+  const apiKey: string | undefined = providerConfig.envKey
+    ? process.env[providerConfig.envKey]
+    : undefined;
 
   try {
-    let data;
-    
-    switch (selectedProvider) {
-      case "alchemy":
-        data = await fetchFromAlchemy(walletAddress, chain, limit, next, apiKey);
-        break;
-      case "opensea":
-        data = await fetchFromOpenSea(walletAddress, chain, limit, next, apiKey);
-        break;
-      case "moralis":
-        data = await fetchFromMoralis(walletAddress, chain, limit, next, apiKey);
-        break;
-      default:
-        throw new Error(`Unsupported provider: ${selectedProvider}`);
-    }
+    let allNFTs: any[] = [];
+    let nextCursor: string | undefined = undefined;
+    let firstResponse: any = null;
+    let pageCount = 0;
+    do {
+      let data;
+      switch (selectedProvider) {
+        case "alchemy":
+          data = await fetchFromAlchemy(
+            walletAddress,
+            chain,
+            limit,
+            nextCursor,
+            apiKey,
+          );
+          break;
+        case "opensea":
+          data = await fetchFromOpenSea(
+            walletAddress,
+            chain,
+            limit,
+            nextCursor,
+            apiKey,
+          );
+          // OpenSea's response shape is different
+          data = {
+            nfts:
+              data.nfts?.map((nft: any) => ({
+                identifier: nft.identifier,
+                collection: nft.collection,
+                contract: nft.contract,
+                token_standard: nft.token_standard,
+                name: nft.name,
+                description: nft.description,
+                image_url: nft.image_url,
+                metadata_url: nft.metadata_url,
+                opensea_url: nft.opensea_url,
+                updated_at: nft.updated_at,
+                is_disabled: nft.is_disabled,
+                is_nsfw: nft.is_nsfw,
+              })) || [],
+            next: data.next || null,
+          };
+          break;
+        case "moralis":
+          data = await fetchFromMoralis(
+            walletAddress,
+            chain,
+            limit,
+            nextCursor,
+            apiKey,
+          );
+          break;
+        default:
+          throw new Error(`Unsupported provider: ${selectedProvider}`);
+      }
+      if (!firstResponse) firstResponse = data;
+      allNFTs = allNFTs.concat(data.nfts || []);
+      nextCursor = data.next || null;
+      pageCount++;
+      // Defensive: break after 50 pages to avoid infinite loop
+      if (pageCount > 50) break;
+    } while (nextCursor);
 
     return NextResponse.json({
-      ...data,
+      nfts: allNFTs,
+      next: null,
       provider: selectedProvider,
       providerName: providerConfig.name,
     });
   } catch (error) {
     console.error(`Error fetching NFTs from ${selectedProvider}:`, error);
     return NextResponse.json(
-      { 
-        error: `${providerConfig.name} API error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      {
+        error: `${providerConfig.name} API error: ${error instanceof Error ? error.message : "Unknown error"}`,
         provider: selectedProvider,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
