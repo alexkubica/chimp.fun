@@ -375,6 +375,56 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 80,
     filename: "$DOOD.png",
   },
+  {
+    title: "$ANIME",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "$ANIME.png",
+  },
+  {
+    title: "yo",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "yo.png",
+  },
+  {
+    title: "HMM!",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "HMM!.png",
+  },
+  {
+    title: "Happy\nMutant Monday!",
+    scale: 0.6,
+    x: 500,
+    y: 60,
+    filename: "Happy Mutant Monday!.png",
+  },
+  {
+    title: "Happy Thursday!",
+    scale: 0.7,
+    x: 550,
+    y: 70,
+    filename: "Happy Thursday!.png",
+  },
+  {
+    title: "Happy\nHump Day!",
+    scale: 0.7,
+    x: 550,
+    y: 70,
+    filename: "Happy Hump Day!.png",
+  },
+  {
+    title: "Raid it.",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "Raid it.png",
+  },
+
 ];
 
 export const tokenURIABI = [
