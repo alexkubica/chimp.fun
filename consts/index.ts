@@ -374,7 +374,7 @@ export const reactionsMap: ReactionMetadata[] = [
     x: 600,
     y: 80,
     filename: "$DOOD.png",
-  },,
+  },
   {
     title: "$ANIME",
     scale: 0.8,
