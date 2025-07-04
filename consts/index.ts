@@ -430,7 +430,6 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 80,
     filename: "Raid it.png",
   },
-  ,
   {
     title: "HAPPY\nFRIDAY!",
     scale: 0.7,
