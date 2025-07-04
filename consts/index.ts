@@ -51,11 +51,17 @@ const originalCollections: CollectionMetadata[] = [
 ];
 
 // Filter out duplicates from fetched collections (by contract address or name)
-const existingContracts = new Set(originalCollections.map(c => c.contract?.toLowerCase()));
-const existingNames = new Set(originalCollections.map(c => c.name.toLowerCase()));
+const existingContracts = new Set(
+  originalCollections.map((c) => c.contract?.toLowerCase()),
+);
+const existingNames = new Set(
+  originalCollections.map((c) => c.name.toLowerCase()),
+);
 
-const uniqueNewCollections = fetchedOpenSeaCollections.filter(collection => {
-  const contractExists = collection.contract && existingContracts.has(collection.contract.toLowerCase());
+const uniqueNewCollections = fetchedOpenSeaCollections.filter((collection) => {
+  const contractExists =
+    collection.contract &&
+    existingContracts.has(collection.contract.toLowerCase());
   const nameExists = existingNames.has(collection.name.toLowerCase());
   return !contractExists && !nameExists;
 });
@@ -63,7 +69,7 @@ const uniqueNewCollections = fetchedOpenSeaCollections.filter(collection => {
 // Combine original collections with unique new ones
 export const collectionsMetadata: CollectionMetadata[] = [
   ...originalCollections,
-  ...uniqueNewCollections
+  ...uniqueNewCollections,
 ];
 
 export const reactionsMap: ReactionMetadata[] = [
@@ -424,7 +430,28 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 80,
     filename: "Raid it.png",
   },
-
+  ,
+  {
+    title: "HAPPY\nFRIDAY!",
+    scale: 0.7,
+    x: 550,
+    y: 70,
+    filename: "HAPPY FRIDAY!.png",
+  },
+  {
+    title: "SIUUU",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "SIUUU.png",
+  },
+  {
+    title: "AYOOO!",
+    scale: 0.8,
+    x: 600,
+    y: 80,
+    filename: "AYOOO!.png",
+  },
 ];
 
 export const tokenURIABI = [
