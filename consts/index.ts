@@ -459,6 +459,14 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 120,
     filename: "Where the Heck is Blue.png",
   },
+  ,
+  {
+    title: "Happy 4th\nof July!",
+    scale: 0.8,
+    x: 550,
+    y: 60,
+    filename: "Happy 4th of July!.png",
+  },
 ];
 
 export const tokenURIABI = [
