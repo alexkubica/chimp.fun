@@ -390,7 +390,7 @@ export const reactionsMap: ReactionMetadata[] = [
   },
   {
     title: "yo",
-    scale: 0.8,
+    scale: 0.6,
     x: 600,
     y: 80,
     filename: "yo.png",
@@ -404,14 +404,14 @@ export const reactionsMap: ReactionMetadata[] = [
   },
   {
     title: "Happy\nMutant Monday!",
-    scale: 0.6,
+    scale: 1,
     x: 500,
     y: 60,
     filename: "Happy Mutant Monday!.png",
   },
   {
     title: "Happy Thursday!",
-    scale: 0.7,
+    scale: 1,
     x: 550,
     y: 70,
     filename: "Happy Thursday!.png",
@@ -425,7 +425,7 @@ export const reactionsMap: ReactionMetadata[] = [
   },
   {
     title: "Raid it.",
-    scale: 0.8,
+    scale: 1,
     x: 600,
     y: 80,
     filename: "Raid it.png",
@@ -439,7 +439,7 @@ export const reactionsMap: ReactionMetadata[] = [
   },
   {
     title: "SIUUU",
-    scale: 0.8,
+    scale: 0.6,
     x: 600,
     y: 80,
     filename: "SIUUU.png",
@@ -450,6 +450,14 @@ export const reactionsMap: ReactionMetadata[] = [
     x: 600,
     y: 80,
     filename: "AYOOO!.png",
+  },
+  ,
+  {
+    title: "Where the Heck\nis Blue?",
+    scale: 0.9,
+    x: 550,
+    y: 120,
+    filename: "Where the Heck is Blue.png",
   },
 ];
 
