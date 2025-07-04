@@ -451,7 +451,6 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 80,
     filename: "AYOOO!.png",
   },
-  ,
   {
     title: "Where the Heck\nis Blue?",
     scale: 0.9,
@@ -459,7 +458,6 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 120,
     filename: "Where the Heck is Blue.png",
   },
-  ,
   {
     title: "Happy 4th\nof July!",
     scale: 0.8,
