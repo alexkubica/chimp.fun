@@ -27,6 +27,7 @@ import {
   useState,
   MouseEvent,
   TouchEvent,
+  Suspense,
 } from "react";
 import {
   AiOutlineCopy,
@@ -749,7 +750,7 @@ function UnifiedNFTGallery({
   );
 }
 
-export default function Home() {
+function EditorPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -826,7 +827,7 @@ export default function Home() {
   }, []);
 
   // URL parameter handling functions
-  const parseUrlParams = () => {
+  const parseUrlParams = useCallback(() => {
     const params = new URLSearchParams(window.location.search);
 
     // Parse preset (overlayNumber)
@@ -902,7 +903,7 @@ export default function Home() {
       setWalletInput(walletIdParam);
       setActiveTab("input");
     }
-  };
+  }, []);
 
   const updateUrlParams = useCallback(() => {
     const params = new URLSearchParams();
@@ -1331,7 +1332,7 @@ export default function Home() {
     if (typeof window !== "undefined") {
       parseUrlParams();
     }
-  }, []); // Only run once on mount
+  }, [parseUrlParams]); // Only run once on mount
 
   // Update URL when state changes
   useEffect(() => {
@@ -2653,5 +2654,14 @@ export default function Home() {
         }
       `}</style>
     </>
+  );
+}
+
+// Suspense wrapper to handle useSearchParams during SSG
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditorPage />
+    </Suspense>
   );
 }
