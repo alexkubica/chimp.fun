@@ -1439,9 +1439,19 @@ function EditorPage() {
         if (overlayEnabled) {
           const watermarkFile = watermarkStyle === "oneline" ? "credit-oneline.png" : "credit.png";
           const watermarkPath = watermarkStyle === "oneline" ? "/credit-oneline.png" : "/credit.png";
+          
+          // Try to load the specific watermark, fallback to credit.png if not found
+          let watermarkData;
+          try {
+            watermarkData = await fetchFile(watermarkPath);
+          } catch (error) {
+            console.log(`Fallback: ${watermarkPath} not found, using credit.png`);
+            watermarkData = await fetchFile("/credit.png");
+          }
+          
           await ffmpegRef.current.writeFile(
             watermarkFile,
-            await fetchFile(watermarkPath),
+            watermarkData,
           );
           ffmpegArgs = [
             "-i",
