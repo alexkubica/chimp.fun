@@ -62,21 +62,30 @@ export function useFFmpeg() {
       watermarkPaddingY: number = -30,
       watermarkScale: number = 3,
     ): Promise<string | null> => {
-      if (!ffmpegReady) return null;
+      if (!ffmpegReady) {
+        console.log("FFmpeg not ready yet");
+        return null;
+      }
 
       try {
         let filedata: ArrayBuffer;
 
         if (file) {
           // Use uploaded file
+          console.log("Processing uploaded file:", file.name);
           const dataUri = await fileToDataUri(file);
           const response = await fetch(dataUri as string);
           filedata = await response.arrayBuffer();
-        } else if (imageSource) {
+        } else if (imageSource && imageSource.trim() !== "") {
           // Use image from URL
+          console.log("Processing image from URL:", imageSource);
           const response = await fetch(imageSource);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch image: ${response.statusText}`);
+          }
           filedata = await response.arrayBuffer();
         } else {
+          console.log("No valid image source provided");
           return null;
         }
 

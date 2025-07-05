@@ -67,94 +67,56 @@ export function PreviewPanel({
     }
   };
 
+  console.log("PreviewPanel render:", { loading, isFirstRender, finalResult: !!finalResult });
+  
   return (
     <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
       <div className="relative w-full max-w-xs aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
         {loading ? (
-          isFirstRender ? (
-            <Skeleton className="w-full h-full rounded-lg" />
-          ) : finalResult ? (
-            <div className="relative w-full h-full">
-              {isGIF && !playAnimation && staticGifFrameUrl ? (
-                <img
-                  src={staticGifFrameUrl}
-                  alt="Preview (static frame)"
-                  className="object-contain w-full h-full rounded-lg opacity-80"
-                  style={{
-                    background: "transparent",
-                    filter: "brightness(0.7) grayscale(0.3)",
-                  }}
-                />
-              ) : (
-                <img
-                  src={finalResult}
-                  alt="Preview"
-                  className="object-contain w-full h-full rounded-lg opacity-80"
-                  style={{
-                    background: "transparent",
-                    filter: "brightness(0.7) grayscale(0.3)",
-                  }}
-                />
-              )}
-              {/* Draggable overlay for reaction, always shown if finalResult */}
-              <ReactionOverlayDraggable
-                x={x}
-                y={y}
-                scale={scale}
-                imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                onChange={onOverlayChange}
-                containerSize={320}
-                setDragging={setDragging}
-                dragging={dragging}
-                setResizing={setResizing}
-                resizing={resizing}
-                onDragEnd={onDragEnd}
-                onResizeEnd={onResizeEnd}
-                disabled={loading}
+          <div className="flex flex-col items-center justify-center w-full h-full">
+            <Spinner />
+            <p className="text-sm text-muted-foreground mt-2">Processing...</p>
+          </div>
+        ) : finalResult ? (
+          <>
+            {isGIF && !playAnimation && staticGifFrameUrl ? (
+              <img
+                src={staticGifFrameUrl}
+                alt="Preview (static frame)"
+                className="object-contain w-full h-full rounded-lg"
+                style={{ background: "transparent" }}
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Spinner />
-              </div>
-            </div>
-          ) : (
-            <Skeleton className="w-full h-full rounded-lg" />
-          )
+            ) : (
+              <img
+                src={finalResult}
+                alt="Preview"
+                className="object-contain w-full h-full rounded-lg"
+                style={{ background: "transparent" }}
+              />
+            )}
+            {/* Draggable overlay for reaction */}
+            <ReactionOverlayDraggable
+              x={x}
+              y={y}
+              scale={scale}
+              imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+              onChange={onOverlayChange}
+              containerSize={320}
+              setDragging={setDragging}
+              dragging={dragging}
+              setResizing={setResizing}
+              resizing={resizing}
+              onDragEnd={onDragEnd}
+              onResizeEnd={onResizeEnd}
+              disabled={loading}
+            />
+          </>
         ) : (
-          finalResult && (
-            <>
-              {isGIF && !playAnimation && staticGifFrameUrl ? (
-                <img
-                  src={staticGifFrameUrl}
-                  alt="Preview (static frame)"
-                  className="object-contain w-full h-full rounded-lg"
-                  style={{ background: "transparent" }}
-                />
-              ) : (
-                <img
-                  src={finalResult}
-                  alt="Preview"
-                  className="object-contain w-full h-full rounded-lg"
-                  style={{ background: "transparent" }}
-                />
-              )}
-              {/* Draggable overlay for reaction */}
-              <ReactionOverlayDraggable
-                x={x}
-                y={y}
-                scale={scale}
-                imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                onChange={onOverlayChange}
-                containerSize={320}
-                setDragging={setDragging}
-                dragging={dragging}
-                setResizing={setResizing}
-                resizing={resizing}
-                onDragEnd={onDragEnd}
-                onResizeEnd={onResizeEnd}
-                disabled={loading}
-              />
-            </>
-          )
+          <div className="flex flex-col items-center justify-center w-full h-full text-center">
+            <p className="text-sm text-muted-foreground">
+              {isFirstRender ? "Select an NFT to get started" : "No preview available"}
+            </p>
+          </div>
         )}
       </div>
       

@@ -35,28 +35,35 @@ function EditorPage() {
   // Get image URL based on collection and token
   useEffect(() => {
     (async () => {
+      console.log("Fetching image for tokenID:", editorState.tokenID, "collection:", editorState.collectionMetadata?.name);
+      
       if (
         isNaN(Number(editorState.tokenID)) ||
         Number(editorState.tokenID) < editorState.minTokenID ||
         Number(editorState.tokenID) > editorState.maxTokenID
       ) {
+        console.log("Invalid token ID range");
         return;
       }
 
-             if (editorState.collectionMetadata?.gifOverride) {
-         const gifUrl = editorState.collectionMetadata.gifOverride(editorState.tokenID.toString());
-         editorState.setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
-         return;
-       }
+      if (editorState.collectionMetadata?.gifOverride) {
+        const gifUrl = editorState.collectionMetadata.gifOverride(editorState.tokenID.toString());
+        const proxyUrl = `/proxy?url=${encodeURIComponent(gifUrl)}`;
+        console.log("Using gif override URL:", proxyUrl);
+        editorState.setImageUrl(proxyUrl);
+        return;
+      }
 
       try {
-                 const response = await fetch(
-           `/fetchNFTImage?tokenId=${editorState.tokenID}&contract=${editorState.collectionMetadata?.contract}`,
-         );
+        const response = await fetch(
+          `/fetchNFTImage?tokenId=${editorState.tokenID}&contract=${editorState.collectionMetadata?.contract}`,
+        );
         if (!response.ok) {
           throw new Error(`Error fetching image URL: ${response.statusText}`);
         }
         const { imageUrl } = await response.json();
+        console.log("Fetched image URL:", imageUrl);
+        
         if (imageUrl.includes("ipfs")) {
           editorState.setImageUrl(imageUrl);
         } else {
@@ -98,9 +105,32 @@ function EditorPage() {
   useEffect(() => {
     editorState.parseUrlParams();
   }, []);
+  
+  // Trigger initial processing once FFmpeg is ready
+  useEffect(() => {
+    if (
+      ffmpeg?.ffmpegReady &&
+      !editorState.loading &&
+      !editorState.finalResult &&
+      (encodedImageUrl || editorState.uploadedImageUri)
+    ) {
+      console.log("Triggering initial FFmpeg processing");
+      editorState.setLoading(true);
+    }
+  }, [ffmpeg?.ffmpegReady, encodedImageUrl, editorState.uploadedImageUri]);
 
                  // Process image with FFmpeg when parameters change
    useEffect(() => {
+     console.log("FFmpeg effect triggered:", {
+       ffmpegReady: ffmpeg?.ffmpegReady,
+       hasDebouncedProcessImage: !!ffmpeg?.debouncedProcessImage,
+       encodedImageUrl,
+       uploadedImageUri: editorState.uploadedImageUri,
+       dragging: editorState.dragging,
+       resizing: editorState.resizing,
+       loading: editorState.loading
+     });
+     
      if (
        ffmpeg?.ffmpegReady &&
        ffmpeg?.debouncedProcessImage &&
@@ -109,11 +139,13 @@ function EditorPage() {
        !editorState.resizing
      ) {
        console.log("Starting FFmpeg processing...");
+       editorState.setLoading(true);  // Set loading to true when starting processing
+       
        const processImageFn = ffmpeg.debouncedProcessImage;
        if (processImageFn) {
          // @ts-ignore - Function existence is checked above
          processImageFn(
-         encodedImageUrl || "",
+         encodedImageUrl || editorState.uploadedImageUri || "",
          editorState.file,
          editorState.overlayNumber,
          editorState.x,
@@ -125,8 +157,10 @@ function EditorPage() {
          editorState.watermarkPaddingY,
          editorState.watermarkScale,
                 ).then((result) => {
+           console.log("FFmpeg processing completed, result:", result);
            if (result) {
              editorState.setFinalResult(result);
+             editorState.setIsFirstRender(false);  // Set first render to false when we get first result
            }
            editorState.setLoading(false);
          }).catch((error) => {
