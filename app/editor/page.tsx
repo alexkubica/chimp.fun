@@ -784,6 +784,10 @@ function EditorPage() {
     null,
   );
 
+  // Watermark configuration state
+  const [watermarkStyle, setWatermarkStyle] = useState<"oneline" | "twoline">("twoline");
+  const [watermarkPadding, setWatermarkPadding] = useState(4);
+
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
   const isLoggedIn = useIsLoggedIn();
@@ -1433,9 +1437,11 @@ function EditorPage() {
         );
         let ffmpegArgs;
         if (overlayEnabled) {
+          const watermarkFile = watermarkStyle === "oneline" ? "credit-oneline.png" : "credit.png";
+          const watermarkPath = watermarkStyle === "oneline" ? "/credit-oneline.png" : "/credit.png";
           await ffmpegRef.current.writeFile(
-            "credit.png",
-            await fetchFile(`/credit.png`),
+            watermarkFile,
+            await fetchFile(watermarkPath),
           );
           ffmpegArgs = [
             "-i",
@@ -1443,13 +1449,13 @@ function EditorPage() {
             "-i",
             "reaction.png",
             "-i",
-            "credit.png",
+            watermarkFile,
             "-filter_complex",
             `[0:v]scale=1080:1080[scaled_input]; \
    [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
    [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
    [2:v]scale=iw*5:-1[scaled2]; \
-   [video1][scaled2]overlay=x=W-w-15:y=H-h-15`,
+   [video1][scaled2]overlay=x=W-w-${watermarkPadding}:y=H-h-${watermarkPadding}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1494,6 +1500,8 @@ function EditorPage() {
       x,
       y,
       overlayEnabled,
+      watermarkStyle,
+      watermarkPadding,
     ],
   );
 
@@ -2395,6 +2403,35 @@ function EditorPage() {
                     />
                     <Label htmlFor="overlayEnabled">Watermark</Label>
                   </div>
+                  {overlayEnabled && (
+                    <div className="flex flex-col gap-2 pl-4 border-l-2 border-muted ml-2">
+                      <div className="flex items-center space-x-2 w-full">
+                        <Label htmlFor="watermarkStyle" className="text-sm">Style:</Label>
+                        <select
+                          id="watermarkStyle"
+                          value={watermarkStyle}
+                          onChange={(e) => setWatermarkStyle(e.target.value as "oneline" | "twoline")}
+                          className="px-2 py-1 text-sm border rounded"
+                        >
+                          <option value="twoline">Two Lines</option>
+                          <option value="oneline">One Line</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center space-x-2 w-full">
+                        <Label htmlFor="watermarkPadding" className="text-sm">Padding:</Label>
+                        <input
+                          id="watermarkPadding"
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={watermarkPadding}
+                          onChange={(e) => setWatermarkPadding(Number(e.target.value))}
+                          className="px-2 py-1 text-sm border rounded w-16"
+                        />
+                        <span className="text-xs text-muted-foreground">px</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {/* Preview and controls below */}
                 <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
