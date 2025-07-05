@@ -1278,8 +1278,8 @@ export default function Home() {
             `[0:v]scale=1080:1080[scaled_input]; \
    [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
    [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
-   [2:v]scale=iw/3:-1[scaled2]; \
-   [video1][scaled2]overlay=x=W-w-10:y=H-h-10`,
+   [2:v]scale=iw/2:-1[scaled2]; \
+   [video1][scaled2]overlay=x=W-w-15:y=H-h-15`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
