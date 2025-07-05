@@ -28,11 +28,13 @@ import {
   MouseEvent,
   TouchEvent,
 } from "react";
-import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
+import { AiOutlineCopy, AiOutlineDownload, AiOutlineBarChart } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
+import { perf } from "./utils/performance";
+import { imageCache, nftImagePreloader } from "./utils/image-optimization";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -100,17 +102,32 @@ function ReactionOverlayDraggable({
     height: number;
   } | null>(null);
 
-  // Load image and get natural size
+  // Load image and get natural size with performance monitoring
   useEffect(() => {
     if (!imageUrl) {
       setNaturalSize(null);
       return;
     }
-    const img = new window.Image();
-    img.onload = function () {
-      setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+    
+    const loadImageWithPerf = async () => {
+      perf.start(`reaction_overlay_image_load_${Date.now()}`, { imageUrl });
+      try {
+        const cached = await imageCache.loadImage(imageUrl, { priority: 'high' });
+        setNaturalSize({ width: cached.naturalWidth, height: cached.naturalHeight });
+        perf.end(`reaction_overlay_image_load_${Date.now()}`);
+      } catch (error) {
+        console.error('Failed to load reaction overlay image:', error);
+        perf.end(`reaction_overlay_image_load_${Date.now()}`);
+        // Fallback to original method
+        const img = new window.Image();
+        img.onload = function () {
+          setNaturalSize({ width: img.naturalWidth, height: img.naturalHeight });
+        };
+        img.src = imageUrl;
+      }
     };
-    img.src = imageUrl;
+
+    loadImageWithPerf();
   }, [imageUrl]);
 
   // --- Mouse and Touch Event Helpers ---
@@ -775,6 +792,42 @@ export default function Home() {
     null,
   );
 
+  // Performance diagnostics state
+  const [showPerformanceDiagnostics, setShowPerformanceDiagnostics] = useState(false);
+  const [performanceMetrics, setPerformanceMetrics] = useState<any[]>([]);
+  const [lastPerformanceUpdate, setLastPerformanceUpdate] = useState<Date>(new Date());
+
+  // Performance monitoring functions
+  const refreshPerformanceMetrics = useCallback(() => {
+    const currentMetrics = perf.getMetrics();
+    const cacheStats = imageCache.getCacheStats();
+    setPerformanceMetrics(currentMetrics);
+    setLastPerformanceUpdate(new Date());
+  }, []);
+
+  const copyPerformanceDiagnostics = useCallback(async () => {
+    try {
+      const report = perf.getDiagnosticsReport();
+      const cacheStats = imageCache.getCacheStats();
+      const fullReport = `${report}\n\n=== IMAGE CACHE STATS ===\n${JSON.stringify(cacheStats, null, 2)}`;
+      await navigator.clipboard.writeText(fullReport);
+      setCopyStatus('✓ Performance diagnostics copied!');
+      setTimeout(() => setCopyStatus(null), 2000);
+    } catch (error) {
+      console.error('Failed to copy diagnostics:', error);
+      setCopyStatus('✗ Failed to copy diagnostics');
+      setTimeout(() => setCopyStatus(null), 2000);
+    }
+  }, []);
+
+  // Auto-refresh performance metrics
+  useEffect(() => {
+    if (!showPerformanceDiagnostics) return;
+    
+    const interval = setInterval(refreshPerformanceMetrics, 1000);
+    return () => clearInterval(interval);
+  }, [showPerformanceDiagnostics, refreshPerformanceMetrics]);
+
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
   const isLoggedIn = useIsLoggedIn();
@@ -864,18 +917,24 @@ export default function Home() {
   // Function to fetch ALL NFTs from user's connected wallet (auto-paginate)
   const fetchAllUserNFTs = useCallback(
     async (walletAddress: string) => {
+      perf.start('nft_fetch_all_user', { walletAddress });
+      
       let resolvedAddress = walletAddress.trim();
 
       // Handle ENS resolution
       if (looksLikeENS(resolvedAddress)) {
+        perf.start('ens_resolution', { ensName: resolvedAddress });
         const resolved = await resolveENS(resolvedAddress);
+        perf.end('ens_resolution');
         if (!resolved) {
           setNftError(`Could not resolve ENS name: ${resolvedAddress}`);
+          perf.end('nft_fetch_all_user');
           return;
         }
         resolvedAddress = resolved;
       } else if (!isValidEthereumAddress(resolvedAddress)) {
         setNftError("Invalid wallet");
+        perf.end('nft_fetch_all_user');
         return;
       }
 
@@ -944,11 +1003,20 @@ export default function Home() {
         console.log(
           `Fetched ${allNFTs.length} supported NFTs across ${pageCount} pages`,
         );
+        
+        // Preload first batch of NFT images
+        const imageUrls = allNFTs.slice(0, 10).map(nft => nft.image_url).filter(Boolean);
+        if (imageUrls.length > 0) {
+          nftImagePreloader.queueImages(imageUrls);
+        }
+        
+        perf.end('nft_fetch_all_user');
       } catch (err) {
         console.error("Error fetching all user NFTs:", err);
         setNftError(
           err instanceof Error ? err.message : "Failed to fetch NFTs",
         );
+        perf.end('nft_fetch_all_user');
       } finally {
         setNftLoading(false);
       }
@@ -1224,6 +1292,8 @@ export default function Home() {
         console.warn("FFmpeg not ready yet.");
         return;
       }
+      
+      perf.start('image_render_process', { imageUrl, overlayEnabled });
 
       let overlaySettings: Partial<ReactionMetadata> = {
         title: "",
@@ -1309,8 +1379,10 @@ export default function Home() {
 
         setFinalResult(url);
         console.log("Image URL generated:", url);
+        perf.end('image_render_process');
       } catch (error) {
         console.error("Error during FFmpeg execution:", error);
+        perf.end('image_render_process');
       } finally {
         setLoading(false);
       }
@@ -2471,6 +2543,153 @@ export default function Home() {
           }
         }
       `}</style>
+
+      {/* Performance Diagnostics Panel */}
+      <div className="fixed bottom-4 left-4 z-50">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setShowPerformanceDiagnostics(!showPerformanceDiagnostics)}
+          className="mb-2"
+          title="Toggle Performance Diagnostics"
+        >
+          <AiOutlineBarChart className="w-4 h-4" />
+        </Button>
+        
+        {showPerformanceDiagnostics && (
+          <div className="bg-white shadow-2xl border border-gray-200 rounded-lg w-80 max-h-96 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 border-b">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-medium flex items-center gap-2">
+                  <AiOutlineBarChart className="w-4 h-4" />
+                  Performance Diagnostics
+                </h3>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={refreshPerformanceMetrics}
+                    className="h-6 w-6 p-0"
+                    title="Refresh metrics"
+                  >
+                    ↻
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={copyPerformanceDiagnostics}
+                    className="h-6 w-6 p-0"
+                    title="Copy diagnostics"
+                  >
+                    <AiOutlineCopy className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPerformanceDiagnostics(false)}
+                    className="h-6 w-6 p-0"
+                    title="Close"
+                  >
+                    ✕
+                  </Button>
+                </div>
+              </div>
+              <div className="text-xs text-gray-500">
+                Last updated: {lastPerformanceUpdate.toLocaleTimeString()}
+              </div>
+            </div>
+            
+            <div className="p-3 max-h-80 overflow-y-auto">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-2 text-center mb-3">
+                <div className="bg-blue-50 p-2 rounded text-xs">
+                  <div className="font-semibold text-blue-700">{performanceMetrics.length}</div>
+                  <div className="text-blue-600">Total</div>
+                </div>
+                <div className="bg-green-50 p-2 rounded text-xs">
+                  <div className="font-semibold text-green-700">
+                    {performanceMetrics.filter(m => m.duration !== undefined).length > 0 ? 
+                      (performanceMetrics
+                        .filter(m => m.duration !== undefined)
+                        .reduce((sum, m) => sum + (m.duration || 0), 0) / 
+                       performanceMetrics.filter(m => m.duration !== undefined).length
+                      ).toFixed(1) : '0'}ms
+                  </div>
+                  <div className="text-green-600">Avg</div>
+                </div>
+                <div className="bg-red-50 p-2 rounded text-xs">
+                  <div className="font-semibold text-red-700">
+                    {performanceMetrics.filter(m => m.duration && m.duration > 50).length}
+                  </div>
+                  <div className="text-red-600">Slow</div>
+                </div>
+              </div>
+
+              {/* Image Cache Stats */}
+              <div className="border-t pt-3 mb-3">
+                <div className="text-xs font-medium text-gray-700 mb-2">Image Cache</div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>Images: {imageCache.getCacheStats().size}</div>
+                  <div>Size: {(imageCache.getCacheStats().totalSize / 1024 / 1024).toFixed(1)}MB</div>
+                </div>
+              </div>
+
+              {/* Recent Operations */}
+              <div className="border-t pt-3">
+                <div className="text-xs font-medium text-gray-700 mb-2">Recent Operations</div>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {performanceMetrics.slice(-8).reverse().map((metric, index) => (
+                    <div key={`${metric.name}-${index}`} className="flex items-center justify-between text-xs">
+                      <span className="truncate text-gray-600 flex-1 min-w-0">
+                        {metric.name}
+                      </span>
+                      <span className="ml-2 flex-shrink-0">
+                        {metric.duration ? (
+                          <span className={`px-1 py-0 rounded text-xs ${
+                            metric.duration > 50 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                          }`}>
+                            {metric.duration.toFixed(1)}ms
+                          </span>
+                        ) : (
+                          <span className="px-1 py-0 rounded text-xs bg-blue-100 text-blue-700">
+                            Running
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="border-t pt-3 mt-3">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      perf.clear();
+                      imageCache.clearCache();
+                      refreshPerformanceMetrics();
+                    }}
+                    className="text-xs h-7 flex-1"
+                  >
+                    Clear All
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyPerformanceDiagnostics}
+                    className="text-xs h-7 flex-1"
+                  >
+                    Copy Report
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
