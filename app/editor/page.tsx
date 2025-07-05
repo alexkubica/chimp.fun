@@ -1278,8 +1278,8 @@ export default function Home() {
             `[0:v]scale=1080:1080[scaled_input]; \
    [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
    [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
-   [2:v]scale=iw/1.5:-1[scaled2]; \
-   [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
+   [2:v]scale=iw/3:-1[scaled2]; \
+   [video1][scaled2]overlay=x=W-w-10:y=H-h-10`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -2223,7 +2223,7 @@ export default function Home() {
                       checked={overlayEnabled}
                       onCheckedChange={setOverlayEnabled}
                     />
-                    <Label htmlFor="overlayEnabled">MADE WITH CHIMP.FUN</Label>
+                    <Label htmlFor="overlayEnabled">Watermark</Label>
                   </div>
                 </div>
                 {/* Preview and controls below */}
