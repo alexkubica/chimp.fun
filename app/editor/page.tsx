@@ -35,6 +35,7 @@ import {
   AiOutlineLink,
 } from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
+import { SpeechBubble } from "@/components/ui/SpeechBubble";
 import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
@@ -784,6 +785,80 @@ function EditorPage() {
     null,
   );
 
+  // Custom speech bubble state
+  const [customSpeechBubbleText, setCustomSpeechBubbleText] =
+    useState("!CHIMP");
+  const [customSpeechBubbleDataUrl, setCustomSpeechBubbleDataUrl] = useState<
+    string | null
+  >(null);
+
+  // Helper function to generate speech bubble data URL
+  const generateSpeechBubbleDataUrl = useCallback((text: string) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    const fontSize = 16;
+    const padding = 20;
+    const spikeHeight = 20;
+
+    ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+    // Support multi-line text
+    const lines = text.split("\n");
+    const textWidths = lines.map((line) => ctx.measureText(line).width);
+    const textWidth = Math.max(...textWidths);
+    const textHeight = fontSize * lines.length;
+
+    const bubbleWidth = textWidth + padding * 2;
+    const bubbleHeight = textHeight + padding * 2 + spikeHeight;
+
+    canvas.width = bubbleWidth;
+    canvas.height = bubbleHeight;
+
+    // Reapply font after resizing canvas
+    ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+
+    // Draw speech bubble
+    ctx.fillStyle = "#FFFFFF";
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, bubbleHeight - spikeHeight);
+    ctx.lineTo(bubbleWidth / 2 - 10, bubbleHeight - spikeHeight);
+    ctx.lineTo(bubbleWidth / 2, bubbleHeight);
+    ctx.lineTo(bubbleWidth / 2 + 10, bubbleHeight - spikeHeight);
+    ctx.lineTo(bubbleWidth, bubbleHeight - spikeHeight);
+    ctx.lineTo(bubbleWidth, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw text (multi-line)
+    ctx.fillStyle = "#000000";
+    ctx.textBaseline = "top";
+    lines.forEach((line, i) => {
+      const lineWidth = ctx.measureText(line).width;
+      const x = (canvas.width - lineWidth) / 2; // Center text horizontally
+      ctx.fillText(line, x, padding + i * fontSize);
+    });
+
+    return canvas.toDataURL("image/png");
+  }, []);
+
+  // Update speech bubble data URL when text changes
+  useEffect(() => {
+    if (customSpeechBubbleText.trim()) {
+      const dataUrl = generateSpeechBubbleDataUrl(customSpeechBubbleText);
+      setCustomSpeechBubbleDataUrl(dataUrl);
+
+      // Trigger re-render if we're currently using the custom speech bubble
+      if (reactionsMap[overlayNumber - 1]?.isCustom) {
+        setLoading(true);
+      }
+    }
+  }, [customSpeechBubbleText, generateSpeechBubbleDataUrl, overlayNumber]);
+
   // Watermark configuration state
   const [watermarkStyle, setWatermarkStyle] = useState<"oneline" | "twoline">(
     "twoline",
@@ -1435,10 +1510,19 @@ function EditorPage() {
         setImageExtension(imageExtension);
 
         await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
-        await ffmpegRef.current.writeFile(
-          "reaction.png",
-          await fetchFile(`/reactions/${overlaySettings.filename}`),
-        );
+
+        // Handle custom speech bubble differently
+        if (overlaySettings.isCustom && customSpeechBubbleDataUrl) {
+          await ffmpegRef.current.writeFile(
+            "reaction.png",
+            await fetchFile(customSpeechBubbleDataUrl),
+          );
+        } else {
+          await ffmpegRef.current.writeFile(
+            "reaction.png",
+            await fetchFile(`/reactions/${overlaySettings.filename}`),
+          );
+        }
         let ffmpegArgs;
         if (overlayEnabled) {
           const watermarkFile =
@@ -1515,6 +1599,7 @@ function EditorPage() {
       watermarkPaddingX,
       watermarkPaddingY,
       watermarkScale,
+      customSpeechBubbleDataUrl,
     ],
   );
 
@@ -2394,6 +2479,28 @@ function EditorPage() {
                       🎲
                     </Button>
                   </div>
+                  {/* Custom speech bubble text input */}
+                  {reactionsMap[overlayNumber - 1]?.isCustom && (
+                    <div className="flex flex-col gap-2 mt-2">
+                      <Label htmlFor="customSpeechBubbleText">
+                        Custom Text
+                      </Label>
+                      <textarea
+                        id="customSpeechBubbleText"
+                        value={customSpeechBubbleText}
+                        onChange={(e) =>
+                          setCustomSpeechBubbleText(e.target.value)
+                        }
+                        placeholder="Enter your custom text..."
+                        className="mb-2 w-full text-base p-2 rounded border resize-y min-h-[60px]"
+                        rows={3}
+                      />
+                      <small className="text-muted-foreground">
+                        Press Enter for new lines. Text will be centered in the
+                        speech bubble.
+                      </small>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2 w-full">
                     {["Chimpers", "Chimpers Genesis"].includes(
                       collectionMetadata.name,
@@ -2456,7 +2563,11 @@ function EditorPage() {
                             x={x}
                             y={y}
                             scale={scale}
-                            imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                            imageUrl={
+                              reactionsMap[overlayNumber - 1]?.isCustom
+                                ? customSpeechBubbleDataUrl || ""
+                                : `/reactions/${reactionsMap[overlayNumber - 1].filename}`
+                            }
                             onChange={({
                               x: newX,
                               y: newY,
@@ -2513,7 +2624,11 @@ function EditorPage() {
                             x={x}
                             y={y}
                             scale={scale}
-                            imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                            imageUrl={
+                              reactionsMap[overlayNumber - 1]?.isCustom
+                                ? customSpeechBubbleDataUrl || ""
+                                : `/reactions/${reactionsMap[overlayNumber - 1].filename}`
+                            }
                             onChange={({
                               x: newX,
                               y: newY,
