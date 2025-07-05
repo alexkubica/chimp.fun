@@ -34,6 +34,7 @@ import {
   AiOutlineDownload,
   AiOutlineLink,
 } from "react-icons/ai";
+import Link from "next/link";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
@@ -1882,10 +1883,15 @@ function EditorPage() {
               </a>
             </h1>
             <p className="text-lg font-medium mb-2">NFT Editor</p>
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center gap-2 mt-2">
               <Button onClick={handleFeelingLucky} variant="secondary">
                 I&apos;m Feeling Lucky
               </Button>
+              <Link href="/editor/activity">
+                <Button variant="outline" size="sm">
+                  📊 Activity
+                </Button>
+              </Link>
             </div>
           </header>
           <section className="flex flex-col gap-4">
