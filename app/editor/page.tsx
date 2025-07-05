@@ -785,9 +785,12 @@ function EditorPage() {
   );
 
   // Watermark configuration state
-  const [watermarkStyle, setWatermarkStyle] = useState<"oneline" | "twoline">("twoline");
-  const [watermarkPaddingX, setWatermarkPaddingX] = useState(4);
-  const [watermarkPaddingY, setWatermarkPaddingY] = useState(4);
+  const [watermarkStyle, setWatermarkStyle] = useState<"oneline" | "twoline">(
+    "twoline",
+  );
+  const watermarkPaddingX = -170;
+  const watermarkPaddingY = -30;
+  const watermarkScale = 3;
 
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
@@ -1438,22 +1441,25 @@ function EditorPage() {
         );
         let ffmpegArgs;
         if (overlayEnabled) {
-          const watermarkFile = watermarkStyle === "oneline" ? "credit-oneline.png" : "credit.png";
-          const watermarkPath = watermarkStyle === "oneline" ? "/credit-oneline.png" : "/credit.png";
-          
+          const watermarkFile =
+            watermarkStyle === "oneline" ? "credit-oneline.png" : "credit.png";
+          const watermarkPath =
+            watermarkStyle === "oneline"
+              ? "/credit-oneline.png"
+              : "/credit.png";
+
           // Try to load the specific watermark, fallback to credit.png if not found
           let watermarkData;
           try {
             watermarkData = await fetchFile(watermarkPath);
           } catch (error) {
-            console.log(`Fallback: ${watermarkPath} not found, using credit.png`);
+            console.log(
+              `Fallback: ${watermarkPath} not found, using credit.png`,
+            );
             watermarkData = await fetchFile("/credit.png");
           }
-          
-          await ffmpegRef.current.writeFile(
-            watermarkFile,
-            watermarkData,
-          );
+
+          await ffmpegRef.current.writeFile(watermarkFile, watermarkData);
           ffmpegArgs = [
             "-i",
             `input.${imageExtension}`,
@@ -1462,11 +1468,7 @@ function EditorPage() {
             "-i",
             watermarkFile,
             "-filter_complex",
-            `[0:v]scale=1080:1080[scaled_input]; \
-   [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
-   [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
-   [2:v]scale=iw*5:-1[scaled2]; \
-   [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1477,9 +1479,7 @@ function EditorPage() {
             "-i",
             "reaction.png",
             "-filter_complex",
-            `[0:v]scale=1080:1080[scaled_input]; \
-   [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
-   [scaled_input][scaled1]overlay=${x}:${y}`,
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1514,6 +1514,7 @@ function EditorPage() {
       watermarkStyle,
       watermarkPaddingX,
       watermarkPaddingY,
+      watermarkScale,
     ],
   );
 
@@ -2403,7 +2404,7 @@ function EditorPage() {
                           checked={playAnimation}
                           onCheckedChange={setPlayAnimation}
                         />
-                        <Label htmlFor="playAnimation">Play animation</Label>
+                        <Label htmlFor="playAnimation">Animation</Label>
                       </>
                     )}
                   </div>
@@ -2417,44 +2418,7 @@ function EditorPage() {
                   </div>
                   {overlayEnabled && (
                     <div className="flex flex-col gap-2 pl-4 border-l-2 border-muted ml-2">
-                      <div className="flex items-center space-x-2 w-full">
-                        <Label htmlFor="watermarkStyle" className="text-sm">Style:</Label>
-                        <select
-                          id="watermarkStyle"
-                          value={watermarkStyle}
-                          onChange={(e) => setWatermarkStyle(e.target.value as "oneline" | "twoline")}
-                          className="px-2 py-1 text-sm border rounded"
-                        >
-                          <option value="twoline">Two Lines</option>
-                          <option value="oneline">One Line</option>
-                        </select>
-                      </div>
-                      <div className="flex items-center space-x-2 w-full">
-                        <Label htmlFor="watermarkPaddingX" className="text-sm">Padding X:</Label>
-                        <input
-                          id="watermarkPaddingX"
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={watermarkPaddingX}
-                          onChange={(e) => setWatermarkPaddingX(Number(e.target.value))}
-                          className="px-2 py-1 text-sm border rounded w-16"
-                        />
-                        <span className="text-xs text-muted-foreground">px</span>
-                      </div>
-                      <div className="flex items-center space-x-2 w-full">
-                        <Label htmlFor="watermarkPaddingY" className="text-sm">Padding Y:</Label>
-                        <input
-                          id="watermarkPaddingY"
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={watermarkPaddingY}
-                          onChange={(e) => setWatermarkPaddingY(Number(e.target.value))}
-                          className="px-2 py-1 text-sm border rounded w-16"
-                        />
-                        <span className="text-xs text-muted-foreground">px</span>
-                      </div>
+                      {/* Watermark config UI removed, using fixed values */}
                     </div>
                   )}
                 </div>
