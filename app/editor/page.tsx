@@ -784,6 +784,14 @@ function EditorPage() {
     null,
   );
 
+  // Watermark configuration state
+  const [watermarkStyle, setWatermarkStyle] = useState<"oneline" | "twoline">(
+    "twoline",
+  );
+  const watermarkPaddingX = -170;
+  const watermarkPaddingY = -30;
+  const watermarkScale = 3;
+
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
   const isLoggedIn = useIsLoggedIn();
@@ -1433,23 +1441,34 @@ function EditorPage() {
         );
         let ffmpegArgs;
         if (overlayEnabled) {
-          await ffmpegRef.current.writeFile(
-            "credit.png",
-            await fetchFile(`/credit.png`),
-          );
+          const watermarkFile =
+            watermarkStyle === "oneline" ? "credit-oneline.png" : "credit.png";
+          const watermarkPath =
+            watermarkStyle === "oneline"
+              ? "/credit-oneline.png"
+              : "/credit.png";
+
+          // Try to load the specific watermark, fallback to credit.png if not found
+          let watermarkData;
+          try {
+            watermarkData = await fetchFile(watermarkPath);
+          } catch (error) {
+            console.log(
+              `Fallback: ${watermarkPath} not found, using credit.png`,
+            );
+            watermarkData = await fetchFile("/credit.png");
+          }
+
+          await ffmpegRef.current.writeFile(watermarkFile, watermarkData);
           ffmpegArgs = [
             "-i",
             `input.${imageExtension}`,
             "-i",
             "reaction.png",
             "-i",
-            "credit.png",
+            watermarkFile,
             "-filter_complex",
-            `[0:v]scale=1080:1080[scaled_input]; \
-   [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
-   [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
-   [2:v]scale=iw/1.5:-1[scaled2]; \
-   [video1][scaled2]overlay=x=(W-w)/2:y=H-h`,
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1460,9 +1479,7 @@ function EditorPage() {
             "-i",
             "reaction.png",
             "-filter_complex",
-            `[0:v]scale=1080:1080[scaled_input]; \
-   [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
-   [scaled_input][scaled1]overlay=${x}:${y}`,
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1494,6 +1511,10 @@ function EditorPage() {
       x,
       y,
       overlayEnabled,
+      watermarkStyle,
+      watermarkPaddingX,
+      watermarkPaddingY,
+      watermarkScale,
     ],
   );
 
@@ -2383,7 +2404,7 @@ function EditorPage() {
                           checked={playAnimation}
                           onCheckedChange={setPlayAnimation}
                         />
-                        <Label htmlFor="playAnimation">Play animation</Label>
+                        <Label htmlFor="playAnimation">Animation</Label>
                       </>
                     )}
                   </div>
@@ -2393,8 +2414,13 @@ function EditorPage() {
                       checked={overlayEnabled}
                       onCheckedChange={setOverlayEnabled}
                     />
-                    <Label htmlFor="overlayEnabled">MADE WITH CHIMP.FUN</Label>
+                    <Label htmlFor="overlayEnabled">Watermark</Label>
                   </div>
+                  {overlayEnabled && (
+                    <div className="flex flex-col gap-2 pl-4 border-l-2 border-muted ml-2">
+                      {/* Watermark config UI removed, using fixed values */}
+                    </div>
+                  )}
                 </div>
                 {/* Preview and controls below */}
                 <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/50 mt-2 w-full">
