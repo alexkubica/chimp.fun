@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useCallback, useMemo } from "react";
+import { Suspense, useEffect, useCallback } from "react";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { reactionsMap, collectionsMetadata } from "@/consts";
 
@@ -16,10 +16,10 @@ import {
 } from "./components";
 
 // Import hooks
-import { useEditorState, useNFTManager, useFFmpeg, useImageActions } from "./hooks";
+import { useEditorState, useNFTManager } from "./hooks";
 
 // Import utils
-import { extractFirstFrame } from "./utils";
+import { extractFirstFrame, copyGifFirstFrameAsPng, dataURLtoBlob } from "./utils";
 
 function EditorPage() {
   // Dynamic SDK hooks for wallet context
@@ -29,56 +29,10 @@ function EditorPage() {
   // Custom hooks
   const editorState = useEditorState();
   const nftManager = useNFTManager();
-  const ffmpeg = useFFmpeg();
-  const imageActions = useImageActions();
-
-  // Get image URL based on collection and token
-  useEffect(() => {
-    (async () => {
-      if (
-        isNaN(Number(editorState.tokenID)) ||
-        Number(editorState.tokenID) < editorState.minTokenID ||
-        Number(editorState.tokenID) > editorState.maxTokenID
-      ) {
-        return;
-      }
-
-             if (editorState.collectionMetadata?.gifOverride) {
-         const gifUrl = editorState.collectionMetadata.gifOverride(editorState.tokenID.toString());
-         editorState.setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
-         return;
-       }
-
-      try {
-                 const response = await fetch(
-           `/fetchNFTImage?tokenId=${editorState.tokenID}&contract=${editorState.collectionMetadata?.contract}`,
-         );
-        if (!response.ok) {
-          throw new Error(`Error fetching image URL: ${response.statusText}`);
-        }
-        const { imageUrl } = await response.json();
-        if (imageUrl.includes("ipfs")) {
-          editorState.setImageUrl(imageUrl);
-        } else {
-          editorState.setImageUrl(`/proxy?url=${imageUrl}`);
-        }
-      } catch (error) {
-        console.error("Failed to fetch image:", error);
-      }
-    })();
-  }, [editorState.collectionIndex, editorState.tokenID]);
-
-  // Encoded image URL for processing
-  const encodedImageUrl = useMemo(() => {
-    if (!editorState.imageUrl) {
-      return null;
-    }
-    return editorState.imageUrl;
-  }, [editorState.imageUrl]);
 
   // Load user's own NFTs when they sign in and switch to connected tab
   useEffect(() => {
-    if (isLoggedIn && primaryWallet?.address && nftManager.fetchAllUserNFTs) {
+    if (isLoggedIn && primaryWallet?.address) {
       editorState.setActiveTab("connected");
       if (!nftManager.activeWallet || nftManager.activeWallet !== primaryWallet.address) {
         editorState.setWalletInput("");
@@ -99,83 +53,6 @@ function EditorPage() {
     editorState.parseUrlParams();
   }, []);
 
-                 // Process image with FFmpeg when parameters change
-   useEffect(() => {
-     if (
-       ffmpeg?.ffmpegReady &&
-       ffmpeg?.debouncedProcessImage &&
-       (encodedImageUrl || editorState.uploadedImageUri) &&
-       !editorState.dragging &&
-       !editorState.resizing
-     ) {
-       console.log("Starting FFmpeg processing...");
-       const processImageFn = ffmpeg.debouncedProcessImage;
-       if (processImageFn) {
-         // @ts-ignore - Function existence is checked above
-         processImageFn(
-         encodedImageUrl || "",
-         editorState.file,
-         editorState.overlayNumber,
-         editorState.x,
-         editorState.y,
-         editorState.scale,
-         editorState.overlayEnabled,
-         editorState.watermarkStyle,
-         editorState.watermarkPaddingX,
-         editorState.watermarkPaddingY,
-         editorState.watermarkScale,
-                ).then((result) => {
-           if (result) {
-             editorState.setFinalResult(result);
-           }
-           editorState.setLoading(false);
-         }).catch((error) => {
-           console.error("FFmpeg processing error:", error);
-           editorState.setLoading(false);
-         });
-       }
-     }
-   }, [
-     ffmpeg?.ffmpegReady,
-     encodedImageUrl,
-     editorState.uploadedImageUri,
-     editorState.file,
-     editorState.overlayNumber,
-     editorState.x,
-     editorState.y,
-     editorState.scale,
-     editorState.overlayEnabled,
-     editorState.watermarkStyle,
-     editorState.watermarkPaddingX,
-     editorState.watermarkPaddingY,
-     editorState.watermarkScale,
-     editorState.dragging,
-     editorState.resizing,
-   ]);
-
-  // Extract static GIF frame when needed
-  useEffect(() => {
-    if (editorState.isGIF && editorState.finalResult && !editorState.playAnimation) {
-      extractFirstFrame(editorState.finalResult).then((staticFrame) => {
-        if (staticFrame) {
-          editorState.setStaticGifFrameUrl(staticFrame);
-        }
-      });
-    } else {
-      editorState.setStaticGifFrameUrl(null);
-    }
-  }, [editorState.isGIF, editorState.finalResult, editorState.playAnimation]);
-
-  // Reset overlay position when preset changes
-  useEffect(() => {
-    const overlaySettings = reactionsMap[editorState.overlayNumber - 1];
-    if (overlaySettings) {
-      editorState.setX(overlaySettings.x);
-      editorState.setY(overlaySettings.y);
-      editorState.setScale(overlaySettings.scale);
-    }
-  }, [editorState.overlayNumber]);
-
   // Handle "Feeling Lucky" - randomize everything
   const handleFeelingLucky = useCallback(() => {
     const randomCollection = Math.floor(Math.random() * collectionsMetadata.length);
@@ -184,7 +61,7 @@ function EditorPage() {
     editorState.handleCollectionChange(randomCollection);
     editorState.handlePresetChange(randomReaction);
     
-    // Random token ID
+    // Random token ID will be set by collection change handler
     const metadata = collectionsMetadata[randomCollection];
     const min = 1 + (metadata.tokenIdOffset ?? 0);
     const max = metadata.total + (metadata.tokenIdOffset ?? 0);
@@ -192,9 +69,7 @@ function EditorPage() {
     editorState.handleTokenIdChange(randomTokenId);
     
     editorState.clearWalletSelection();
-    editorState.setWalletInput("");
-    nftManager.resetNFTs();
-  }, [editorState, nftManager]);
+  }, [editorState]);
 
   // Handle NFT selection from wallet
   const handleNFTSelect = useCallback(
@@ -244,7 +119,7 @@ function EditorPage() {
   }, [editorState.walletInput, nftManager]);
 
   const loadAllFromExternalWallet = useCallback(() => {
-    if (editorState.walletInput.trim() && nftManager.loadAllNFTs) {
+    if (editorState.walletInput.trim()) {
       nftManager.loadAllNFTs();
     }
   }, [editorState.walletInput, nftManager]);
@@ -261,57 +136,32 @@ function EditorPage() {
 
   const handleDragEnd = useCallback(() => {
     editorState.setDragging(false);
+    // TODO: Add debounced render and URL update
     editorState.debouncedUpdateUrlParams();
   }, [editorState]);
 
   const handleResizeEnd = useCallback(() => {
     editorState.setResizing(false);
+    // TODO: Add debounced render and URL update
     editorState.debouncedUpdateUrlParams();
   }, [editorState]);
 
-     // Download handler
-   const handleDownload = useCallback(() => {
-     if (imageActions?.downloadImage && ffmpeg?.imageExtension) {
-       imageActions.downloadImage(
-         editorState.finalResult,
-         editorState.isGIF,
-         editorState.playAnimation,
-         editorState.staticGifFrameUrl,
-         editorState.collectionMetadata.name,
-         editorState.tokenID,
-         editorState.overlayNumber,
-         ffmpeg.imageExtension,
-       );
-     }
-   }, [
-     imageActions,
-     editorState.finalResult,
-     editorState.isGIF,
-     editorState.playAnimation,
-     editorState.staticGifFrameUrl,
-     editorState.collectionMetadata.name,
-     editorState.tokenID,
-     editorState.overlayNumber,
-     ffmpeg?.imageExtension,
-   ]);
+  // TODO: Implement these functions (extracted from original file)
+  const downloadOutput = () => {
+    console.log("Download function to be implemented");
+  };
 
-     // Copy handler
-   const handleCopy = useCallback(() => {
-     if (imageActions?.copyToClipboard) {
-       imageActions.copyToClipboard(
-         editorState.finalResult,
-         editorState.isGIF,
-         editorState.playAnimation,
-         editorState.staticGifFrameUrl,
-       );
-     }
-   }, [
-     imageActions,
-     editorState.finalResult,
-     editorState.isGIF,
-     editorState.playAnimation,
-     editorState.staticGifFrameUrl,
-   ]);
+  const copyBlobToClipboard = () => {
+    console.log("Copy function to be implemented");
+  };
+
+  const handleGifCopyModalConfirm = () => {
+    console.log("GIF copy confirm to be implemented");
+  };
+
+  const handleGifCopyModalCancel = () => {
+    console.log("GIF copy cancel to be implemented");
+  };
 
   // Wallet browser props
   const walletBrowserProps = {
@@ -440,12 +290,12 @@ function EditorPage() {
                   setResizing={editorState.setResizing}
                   onDragEnd={handleDragEnd}
                   onResizeEnd={handleResizeEnd}
-                                   onDownload={handleDownload}
-                 onCopy={handleCopy}
-                 copyStatus={imageActions?.copyStatus}
-                 showGifCopyModal={imageActions?.showGifCopyModal}
-                 onGifCopyConfirm={imageActions?.handleGifCopyModalConfirm}
-                 onGifCopyCancel={imageActions?.handleGifCopyModalCancel}
+                  onDownload={downloadOutput}
+                  onCopy={copyBlobToClipboard}
+                  copyStatus={editorState.copyStatus}
+                  showGifCopyModal={editorState.showGifCopyModal}
+                  onGifCopyConfirm={handleGifCopyModalConfirm}
+                  onGifCopyCancel={handleGifCopyModalCancel}
                 />
               </div>
             </div>
