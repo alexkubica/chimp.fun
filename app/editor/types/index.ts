@@ -25,6 +25,22 @@ export interface NFTApiResponse {
   providerName?: string;
 }
 
+// Asset Types for Multi-Asset Presets
+export interface AssetSettings {
+  x: number;
+  y: number;
+  scale: number;
+  imageUrl: string;
+  filename: string;
+  id: string; // unique identifier for the asset
+}
+
+// Multi-Asset Preset Types
+export interface MultiAssetPreset {
+  title: string;
+  assets: AssetSettings[];
+}
+
 // Reaction Overlay Types
 export type ReactionOverlayDraggableProps = {
   x: number;
@@ -40,6 +56,24 @@ export type ReactionOverlayDraggableProps = {
   resizing: boolean;
   onResizeEnd?: () => void;
   disabled?: boolean;
+  assetId?: string; // for multi-asset support
+};
+
+// Multi-Asset Overlay Types
+export type MultiAssetOverlayProps = {
+  assets: AssetSettings[];
+  containerSize?: number;
+  onChange: (
+    assetId: string,
+    vals: { x: number; y: number; scale: number },
+  ) => void;
+  setDragging: (dragging: boolean) => void;
+  dragging: boolean;
+  onDragEnd?: () => void;
+  setResizing: (resizing: boolean) => void;
+  resizing: boolean;
+  onResizeEnd?: () => void;
+  disabled?: boolean;
 };
 
 // Editor State Types
@@ -48,6 +82,13 @@ export interface ReactionSettings {
   y: number;
   scale: number;
   overlayNumber: number;
+  overlayEnabled: boolean;
+}
+
+// Multi-Asset Settings
+export interface MultiAssetSettings {
+  assets: AssetSettings[];
+  presetNumber: number;
   overlayEnabled: boolean;
 }
 
@@ -104,6 +145,7 @@ export interface PresetSelectorProps {
   overlayEnabled: boolean;
   onOverlayEnabledChange: (enabled: boolean) => void;
   collectionName: string;
+  isMultiAsset?: boolean; // indicates if this is a multi-asset preset
 }
 
 export interface ImageUploaderProps {
@@ -136,6 +178,13 @@ export interface PreviewPanelProps {
   showGifCopyModal: boolean;
   onGifCopyConfirm: () => void;
   onGifCopyCancel: () => void;
+  // Multi-asset support
+  multiAssetSettings?: MultiAssetSettings;
+  onMultiAssetChange?: (
+    assetId: string,
+    vals: { x: number; y: number; scale: number },
+  ) => void;
+  isMultiAsset?: boolean;
 }
 
 export interface WalletBrowserProps {

@@ -14,7 +14,11 @@ import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { collectionsMetadata, reactionsMap } from "@/consts";
+import {
+  collectionsMetadata,
+  reactionsMap,
+  multiAssetPresetsMap,
+} from "@/consts";
 import { ReactionMetadata } from "@/types";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
@@ -39,6 +43,7 @@ import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AssetSettings, MultiAssetSettings } from "@/app/editor/types";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -70,6 +75,7 @@ type ReactionOverlayDraggableProps = {
   resizing: boolean;
   onResizeEnd?: () => void;
   disabled?: boolean;
+  assetId?: string;
 };
 
 function ReactionOverlayDraggable({
@@ -86,6 +92,7 @@ function ReactionOverlayDraggable({
   resizing,
   onResizeEnd,
   disabled = false,
+  assetId,
 }: ReactionOverlayDraggableProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [start, setStart] = useState({
@@ -427,6 +434,77 @@ function ReactionOverlayDraggable({
           />
         )}
       </div>
+    </div>
+  );
+}
+
+// Multi-Asset Overlay Component
+function MultiAssetOverlay({
+  assets,
+  containerSize = 320,
+  onChange,
+  setDragging,
+  dragging,
+  onDragEnd,
+  setResizing,
+  resizing,
+  onResizeEnd,
+  disabled = false,
+}: {
+  assets: AssetSettings[];
+  containerSize?: number;
+  onChange: (
+    assetId: string,
+    vals: { x: number; y: number; scale: number },
+  ) => void;
+  setDragging: (dragging: boolean) => void;
+  dragging: boolean;
+  onDragEnd?: () => void;
+  setResizing: (resizing: boolean) => void;
+  resizing: boolean;
+  onResizeEnd?: () => void;
+  disabled?: boolean;
+}) {
+  const [activeAsset, setActiveAsset] = useState<string | null>(null);
+
+  const handleAssetChange = (
+    assetId: string,
+    vals: { x: number; y: number; scale: number },
+  ) => {
+    setActiveAsset(assetId);
+    onChange(assetId, vals);
+  };
+
+  return (
+    <div
+      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 10 }}
+    >
+      {assets.map((asset) => (
+        <ReactionOverlayDraggable
+          key={asset.id}
+          x={asset.x}
+          y={asset.y}
+          scale={asset.scale}
+          imageUrl={asset.imageUrl}
+          containerSize={containerSize}
+          onChange={(vals) => handleAssetChange(asset.id, vals)}
+          setDragging={setDragging}
+          dragging={dragging && activeAsset === asset.id}
+          onDragEnd={() => {
+            setActiveAsset(null);
+            if (onDragEnd) onDragEnd();
+          }}
+          setResizing={setResizing}
+          resizing={resizing && activeAsset === asset.id}
+          onResizeEnd={() => {
+            setActiveAsset(null);
+            if (onResizeEnd) onResizeEnd();
+          }}
+          disabled={disabled}
+          assetId={asset.id}
+        />
+      ))}
     </div>
   );
 }
@@ -784,6 +862,16 @@ function EditorPage() {
     null,
   );
 
+  // Multi-asset preset state
+  const [isMultiAssetMode, setIsMultiAssetMode] = useState(false);
+  const [multiAssetPresetNumber, setMultiAssetPresetNumber] = useState(0);
+  const [multiAssetSettings, setMultiAssetSettings] =
+    useState<MultiAssetSettings>({
+      assets: [],
+      presetNumber: 0,
+      overlayEnabled: true,
+    });
+
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
   const isLoggedIn = useIsLoggedIn();
@@ -830,14 +918,30 @@ function EditorPage() {
   const parseUrlParams = useCallback(() => {
     const params = new URLSearchParams(window.location.search);
 
-    // Parse preset (overlayNumber)
+    // Parse preset (overlayNumber or multi-asset preset)
     const presetParam = params.get("preset");
     if (presetParam) {
-      const presetIndex = reactionsMap.findIndex(
+      // Check if it's a multi-asset preset first
+      const multiAssetIndex = multiAssetPresetsMap.findIndex(
         (r) => r.title.toLowerCase() === presetParam.toLowerCase(),
       );
-      if (presetIndex >= 0) {
-        setOverlayNumber(presetIndex + 1);
+      if (multiAssetIndex >= 0) {
+        setIsMultiAssetMode(true);
+        setMultiAssetPresetNumber(multiAssetIndex);
+        setMultiAssetSettings({
+          assets: multiAssetPresetsMap[multiAssetIndex].assets,
+          presetNumber: multiAssetIndex,
+          overlayEnabled: true,
+        });
+      } else {
+        // Check single asset presets
+        const presetIndex = reactionsMap.findIndex(
+          (r) => r.title.toLowerCase() === presetParam.toLowerCase(),
+        );
+        if (presetIndex >= 0) {
+          setIsMultiAssetMode(false);
+          setOverlayNumber(presetIndex + 1);
+        }
       }
     } else {
       // Default to CHIMP preset if not specified
@@ -845,6 +949,7 @@ function EditorPage() {
         r.title.toLowerCase().includes("chimp"),
       );
       if (chimpIndex >= 0) {
+        setIsMultiAssetMode(false);
         setOverlayNumber(chimpIndex + 1);
       }
     }
@@ -897,6 +1002,27 @@ function EditorPage() {
       setScale(Number(scaleParam));
     }
 
+    // Parse multi-asset settings
+    const multiAssetDataParam = params.get("multiAssetData");
+    if (multiAssetDataParam && isMultiAssetMode) {
+      try {
+        const multiAssetData = JSON.parse(
+          decodeURIComponent(multiAssetDataParam),
+        );
+        setMultiAssetSettings((prev) => ({
+          ...prev,
+          assets: multiAssetData.assets || prev.assets,
+        }));
+      } catch (error) {
+        console.error("Failed to parse multi-asset data:", error);
+      }
+    }
+
+    // Set the overlay enabled state correctly for multi-asset mode
+    if (isMultiAssetMode) {
+      setOverlayEnabled(multiAssetSettings.overlayEnabled);
+    }
+
     // Parse wallet id
     const walletIdParam = params.get("walletId");
     if (walletIdParam && isValidEthereumAddress(walletIdParam)) {
@@ -908,10 +1034,27 @@ function EditorPage() {
   const updateUrlParams = useCallback(() => {
     const params = new URLSearchParams();
 
-    // Add preset (reaction title)
-    const currentReaction = reactionsMap[overlayNumber - 1];
-    if (currentReaction) {
-      params.set("preset", currentReaction.title);
+    // Add preset (reaction title or multi-asset preset title)
+    if (isMultiAssetMode) {
+      const currentMultiAssetPreset =
+        multiAssetPresetsMap[multiAssetPresetNumber];
+      if (currentMultiAssetPreset) {
+        params.set("preset", currentMultiAssetPreset.title);
+        // Add multi-asset data
+        params.set(
+          "multiAssetData",
+          encodeURIComponent(
+            JSON.stringify({
+              assets: multiAssetSettings.assets,
+            }),
+          ),
+        );
+      }
+    } else {
+      const currentReaction = reactionsMap[overlayNumber - 1];
+      if (currentReaction) {
+        params.set("preset", currentReaction.title);
+      }
     }
 
     // Add collection
@@ -929,10 +1072,12 @@ function EditorPage() {
     // Add animated
     params.set("animated", playAnimation.toString());
 
-    // Add position and scale
-    params.set("x", x.toString());
-    params.set("y", y.toString());
-    params.set("scale", scale.toString());
+    // Add position and scale (for single asset mode)
+    if (!isMultiAssetMode) {
+      params.set("x", x.toString());
+      params.set("y", y.toString());
+      params.set("scale", scale.toString());
+    }
 
     // Add wallet id if available
     if (activeWallet && activeWallet !== primaryWallet?.address) {
@@ -942,6 +1087,9 @@ function EditorPage() {
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, "", newUrl);
   }, [
+    isMultiAssetMode,
+    multiAssetPresetNumber,
+    multiAssetSettings,
     overlayNumber,
     collectionIndex,
     tokenID,
@@ -972,6 +1120,67 @@ function EditorPage() {
       setTimeout(() => setCopyStatus(null), 3000);
     }
   }, []);
+
+  // Multi-asset change handler
+  const handleMultiAssetChange = useCallback(
+    (assetId: string, vals: { x: number; y: number; scale: number }) => {
+      setMultiAssetSettings((prev) => ({
+        ...prev,
+        assets: prev.assets.map((asset) =>
+          asset.id === assetId ? { ...asset, ...vals } : asset,
+        ),
+      }));
+    },
+    [],
+  );
+
+  // Combined preset options for select
+  const allPresetOptions = useMemo(() => {
+    const singleAssetOptions = reactionsMap.map((reaction, index) => ({
+      value: `single-${index + 1}`,
+      label: reaction.title,
+      type: "single" as const,
+      index: index + 1,
+    }));
+
+    const multiAssetOptions = multiAssetPresetsMap.map((preset, index) => ({
+      value: `multi-${index}`,
+      label: preset.title,
+      type: "multi" as const,
+      index: index,
+    }));
+
+    return [...singleAssetOptions, ...multiAssetOptions];
+  }, []);
+
+  // Handle preset selection
+  const handlePresetChange = useCallback(
+    (value: string) => {
+      const option = allPresetOptions.find((opt) => opt.value === value);
+      if (!option) return;
+
+      if (option.type === "single") {
+        setIsMultiAssetMode(false);
+        setOverlayNumber(option.index);
+        // Reset multi-asset settings
+        setMultiAssetSettings({
+          assets: [],
+          presetNumber: 0,
+          overlayEnabled: true,
+        });
+      } else {
+        setIsMultiAssetMode(true);
+        setMultiAssetPresetNumber(option.index);
+        const preset = multiAssetPresetsMap[option.index];
+        setMultiAssetSettings({
+          assets: preset.assets,
+          presetNumber: option.index,
+          overlayEnabled: true,
+        });
+      }
+    },
+    [allPresetOptions],
+  );
 
   // Helper function to validate Ethereum address
   const isValidEthereumAddress = (address: string): boolean => {
@@ -2340,22 +2549,24 @@ function EditorPage() {
                   <div className="flex gap-2 items-center w-full">
                     <div className="flex-1 min-w-0 w-full">
                       <SearchableSelect
-                        items={reactionsMap}
-                        value={overlayNumber.toString()}
+                        items={allPresetOptions}
+                        value={
+                          isMultiAssetMode
+                            ? `multi-${multiAssetPresetNumber}`
+                            : `single-${overlayNumber}`
+                        }
                         onValueChange={function handleReaction(val) {
                           setLoading(true);
-                          setOverlayNumber(Number(val));
+                          handlePresetChange(val);
                         }}
-                        getItemValue={(reaction) =>
-                          (reactionsMap.indexOf(reaction) + 1).toString()
-                        }
-                        getItemLabel={(reaction) => reaction.title}
-                        getItemKey={(reaction) => reaction.title}
+                        getItemValue={(option) => option.value}
+                        getItemLabel={(option) => option.label}
+                        getItemKey={(option) => option.value}
                         placeholder="Select Preset"
-                        searchPlaceholder="Search presets... (e.g. 'gm' for GM!)"
+                        searchPlaceholder="Search presets... (e.g. 'gm' for GM!, 'hat test' for Hat Test)"
                         className="flex-1 min-w-0 w-full"
                         fuseOptions={{
-                          keys: ["title"],
+                          keys: ["label"],
                           threshold: 0.3,
                           includeScore: true,
                         }}
@@ -2364,10 +2575,12 @@ function EditorPage() {
                     <Button
                       variant="secondary"
                       onClick={function handleRandomReaction() {
-                        const randomReaction =
-                          Math.floor(Math.random() * reactionsMap.length) + 1;
-                        setOverlayNumber(randomReaction);
+                        const randomOption =
+                          allPresetOptions[
+                            Math.floor(Math.random() * allPresetOptions.length)
+                          ];
                         setLoading(true);
+                        handlePresetChange(randomOption.value);
                       }}
                     >
                       🎲
@@ -2426,37 +2639,60 @@ function EditorPage() {
                             />
                           )}
                           {/* Draggable overlay for reaction, always shown if finalResult */}
-                          <ReactionOverlayDraggable
-                            x={x}
-                            y={y}
-                            scale={scale}
-                            imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                            onChange={({
-                              x: newX,
-                              y: newY,
-                              scale: newScale,
-                            }) => {
-                              setX(newX);
-                              setY(newY);
-                              setScale(newScale);
-                            }}
-                            containerSize={320}
-                            setDragging={setDragging}
-                            dragging={dragging}
-                            setResizing={setResizing}
-                            resizing={resizing}
-                            onDragEnd={() => {
-                              setDragging(false);
-                              debouncedRenderImageUrl();
-                              debouncedUpdateUrlParams();
-                            }}
-                            onResizeEnd={() => {
-                              setResizing(false);
-                              debouncedRenderImageUrl();
-                              debouncedUpdateUrlParams();
-                            }}
-                            disabled={loading}
-                          />
+                          {isMultiAssetMode ? (
+                            <MultiAssetOverlay
+                              assets={multiAssetSettings.assets}
+                              containerSize={320}
+                              onChange={handleMultiAssetChange}
+                              setDragging={setDragging}
+                              dragging={dragging}
+                              setResizing={setResizing}
+                              resizing={resizing}
+                              onDragEnd={() => {
+                                setDragging(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              onResizeEnd={() => {
+                                setResizing(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              disabled={loading}
+                            />
+                          ) : (
+                            <ReactionOverlayDraggable
+                              x={x}
+                              y={y}
+                              scale={scale}
+                              imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                              onChange={({
+                                x: newX,
+                                y: newY,
+                                scale: newScale,
+                              }) => {
+                                setX(newX);
+                                setY(newY);
+                                setScale(newScale);
+                              }}
+                              containerSize={320}
+                              setDragging={setDragging}
+                              dragging={dragging}
+                              setResizing={setResizing}
+                              resizing={resizing}
+                              onDragEnd={() => {
+                                setDragging(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              onResizeEnd={() => {
+                                setResizing(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              disabled={loading}
+                            />
+                          )}
                           <div className="absolute inset-0 flex items-center justify-center">
                             <Spinner />
                           </div>
@@ -2483,37 +2719,60 @@ function EditorPage() {
                             />
                           )}
                           {/* Draggable overlay for reaction */}
-                          <ReactionOverlayDraggable
-                            x={x}
-                            y={y}
-                            scale={scale}
-                            imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
-                            onChange={({
-                              x: newX,
-                              y: newY,
-                              scale: newScale,
-                            }) => {
-                              setX(newX);
-                              setY(newY);
-                              setScale(newScale);
-                            }}
-                            containerSize={320}
-                            setDragging={setDragging}
-                            dragging={dragging}
-                            setResizing={setResizing}
-                            resizing={resizing}
-                            onDragEnd={() => {
-                              setDragging(false);
-                              debouncedRenderImageUrl();
-                              debouncedUpdateUrlParams();
-                            }}
-                            onResizeEnd={() => {
-                              setResizing(false);
-                              debouncedRenderImageUrl();
-                              debouncedUpdateUrlParams();
-                            }}
-                            disabled={loading}
-                          />
+                          {isMultiAssetMode ? (
+                            <MultiAssetOverlay
+                              assets={multiAssetSettings.assets}
+                              containerSize={320}
+                              onChange={handleMultiAssetChange}
+                              setDragging={setDragging}
+                              dragging={dragging}
+                              setResizing={setResizing}
+                              resizing={resizing}
+                              onDragEnd={() => {
+                                setDragging(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              onResizeEnd={() => {
+                                setResizing(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              disabled={loading}
+                            />
+                          ) : (
+                            <ReactionOverlayDraggable
+                              x={x}
+                              y={y}
+                              scale={scale}
+                              imageUrl={`/reactions/${reactionsMap[overlayNumber - 1].filename}`}
+                              onChange={({
+                                x: newX,
+                                y: newY,
+                                scale: newScale,
+                              }) => {
+                                setX(newX);
+                                setY(newY);
+                                setScale(newScale);
+                              }}
+                              containerSize={320}
+                              setDragging={setDragging}
+                              dragging={dragging}
+                              setResizing={setResizing}
+                              resizing={resizing}
+                              onDragEnd={() => {
+                                setDragging(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              onResizeEnd={() => {
+                                setResizing(false);
+                                debouncedRenderImageUrl();
+                                debouncedUpdateUrlParams();
+                              }}
+                              disabled={loading}
+                            />
+                          )}
                         </>
                       )
                     )}

@@ -1,5 +1,6 @@
 import { CollectionMetadata, ReactionMetadata } from "@/types";
 import { fetchedOpenSeaCollections } from "../scripts/fetchOpenSeaCollections";
+import { MultiAssetPreset } from "@/app/editor/types";
 
 // Original collections (keeping existing ones for backward compatibility)
 const originalCollections: CollectionMetadata[] = [
@@ -464,6 +465,31 @@ export const reactionsMap: ReactionMetadata[] = [
     x: 550,
     y: 60,
     filename: "Happy 4th of July!.png",
+  },
+];
+
+// Multi-Asset Presets Map
+export const multiAssetPresetsMap: MultiAssetPreset[] = [
+  {
+    title: "Hat Test",
+    assets: [
+      {
+        id: "gm_bubble",
+        x: 650,
+        y: 70,
+        scale: 3,
+        filename: "18.png",
+        imageUrl: "/reactions/18.png",
+      },
+      {
+        id: "wizard_hat",
+        x: 450,
+        y: 20,
+        scale: 2,
+        filename: "wizard_hat.png",
+        imageUrl: "/reactions/wizard_hat.png",
+      },
+    ],
   },
 ];
 
