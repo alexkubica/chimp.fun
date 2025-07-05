@@ -786,7 +786,8 @@ function EditorPage() {
 
   // Watermark configuration state
   const [watermarkStyle, setWatermarkStyle] = useState<"oneline" | "twoline">("twoline");
-  const [watermarkPadding, setWatermarkPadding] = useState(4);
+  const [watermarkPaddingX, setWatermarkPaddingX] = useState(4);
+  const [watermarkPaddingY, setWatermarkPaddingY] = useState(4);
 
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
@@ -1465,7 +1466,7 @@ function EditorPage() {
    [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; \
    [scaled_input][scaled1]overlay=${x}:${y}[video1]; \
    [2:v]scale=iw*5:-1[scaled2]; \
-   [video1][scaled2]overlay=x=W-w-${watermarkPadding}:y=H-h-${watermarkPadding}`,
+   [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1511,7 +1512,8 @@ function EditorPage() {
       y,
       overlayEnabled,
       watermarkStyle,
-      watermarkPadding,
+      watermarkPaddingX,
+      watermarkPaddingY,
     ],
   );
 
@@ -2428,14 +2430,27 @@ function EditorPage() {
                         </select>
                       </div>
                       <div className="flex items-center space-x-2 w-full">
-                        <Label htmlFor="watermarkPadding" className="text-sm">Padding:</Label>
+                        <Label htmlFor="watermarkPaddingX" className="text-sm">Padding X:</Label>
                         <input
-                          id="watermarkPadding"
+                          id="watermarkPaddingX"
                           type="number"
                           min="0"
                           max="50"
-                          value={watermarkPadding}
-                          onChange={(e) => setWatermarkPadding(Number(e.target.value))}
+                          value={watermarkPaddingX}
+                          onChange={(e) => setWatermarkPaddingX(Number(e.target.value))}
+                          className="px-2 py-1 text-sm border rounded w-16"
+                        />
+                        <span className="text-xs text-muted-foreground">px</span>
+                      </div>
+                      <div className="flex items-center space-x-2 w-full">
+                        <Label htmlFor="watermarkPaddingY" className="text-sm">Padding Y:</Label>
+                        <input
+                          id="watermarkPaddingY"
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={watermarkPaddingY}
+                          onChange={(e) => setWatermarkPaddingY(Number(e.target.value))}
                           className="px-2 py-1 text-sm border rounded w-16"
                         />
                         <span className="text-xs text-muted-foreground">px</span>
