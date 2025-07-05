@@ -465,6 +465,14 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 60,
     filename: "Happy 4th of July!.png",
   },
+  {
+    title: "Custom Speech Bubble",
+    scale: 1,
+    x: 650,
+    y: 70,
+    filename: "custom-speech-bubble",
+    isCustom: true,
+  },
 ];
 
 export const tokenURIABI = [
