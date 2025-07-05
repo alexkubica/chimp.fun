@@ -27,12 +27,18 @@ import {
   useState,
   MouseEvent,
   TouchEvent,
+  Suspense,
 } from "react";
-import { AiOutlineCopy, AiOutlineDownload } from "react-icons/ai";
+import {
+  AiOutlineCopy,
+  AiOutlineDownload,
+  AiOutlineLink,
+} from "react-icons/ai";
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -744,7 +750,10 @@ function UnifiedNFTGallery({
   );
 }
 
-export default function Home() {
+function EditorPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
   const [loading, setLoading] = useState(true);
@@ -815,6 +824,153 @@ export default function Home() {
     return new Set(
       collectionsMetadata.map((c) => c.contract?.toLowerCase()).filter(Boolean),
     );
+  }, []);
+
+  // URL parameter handling functions
+  const parseUrlParams = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Parse preset (overlayNumber)
+    const presetParam = params.get("preset");
+    if (presetParam) {
+      const presetIndex = reactionsMap.findIndex(
+        (r) => r.title.toLowerCase() === presetParam.toLowerCase(),
+      );
+      if (presetIndex >= 0) {
+        setOverlayNumber(presetIndex + 1);
+      }
+    } else {
+      // Default to CHIMP preset if not specified
+      const chimpIndex = reactionsMap.findIndex((r) =>
+        r.title.toLowerCase().includes("chimp"),
+      );
+      if (chimpIndex >= 0) {
+        setOverlayNumber(chimpIndex + 1);
+      }
+    }
+
+    // Parse collection
+    const collectionParam = params.get("collection");
+    if (collectionParam) {
+      const collectionIdx = collectionsMetadata.findIndex(
+        (c) => c.name.toLowerCase() === collectionParam.toLowerCase(),
+      );
+      if (collectionIdx >= 0) {
+        setCollectionIndex(collectionIdx);
+      }
+    }
+
+    // Parse id (tokenID)
+    const idParam = params.get("id");
+    if (idParam && !isNaN(Number(idParam))) {
+      setTokenID(Number(idParam));
+      setTempTokenID(Number(idParam));
+    }
+
+    // Parse watermark (overlayEnabled)
+    const watermarkParam = params.get("watermark");
+    if (watermarkParam !== null) {
+      setOverlayEnabled(
+        watermarkParam.toLowerCase() === "true" ||
+          watermarkParam === "made with chimp.fun",
+      );
+    }
+
+    // Parse animated (playAnimation)
+    const animatedParam = params.get("animated");
+    if (animatedParam !== null) {
+      setPlayAnimation(animatedParam.toLowerCase() === "true");
+    }
+
+    // Parse position and scale
+    const xParam = params.get("x");
+    const yParam = params.get("y");
+    const scaleParam = params.get("scale");
+
+    if (xParam && !isNaN(Number(xParam))) {
+      setX(Number(xParam));
+    }
+    if (yParam && !isNaN(Number(yParam))) {
+      setY(Number(yParam));
+    }
+    if (scaleParam && !isNaN(Number(scaleParam))) {
+      setScale(Number(scaleParam));
+    }
+
+    // Parse wallet id
+    const walletIdParam = params.get("walletId");
+    if (walletIdParam && isValidEthereumAddress(walletIdParam)) {
+      setWalletInput(walletIdParam);
+      setActiveTab("input");
+    }
+  }, []);
+
+  const updateUrlParams = useCallback(() => {
+    const params = new URLSearchParams();
+
+    // Add preset (reaction title)
+    const currentReaction = reactionsMap[overlayNumber - 1];
+    if (currentReaction) {
+      params.set("preset", currentReaction.title);
+    }
+
+    // Add collection
+    const currentCollection = collectionsMetadata[collectionIndex];
+    if (currentCollection) {
+      params.set("collection", currentCollection.name);
+    }
+
+    // Add id (tokenID)
+    params.set("id", tokenID.toString());
+
+    // Add watermark
+    params.set("watermark", overlayEnabled ? "made with chimp.fun" : "false");
+
+    // Add animated
+    params.set("animated", playAnimation.toString());
+
+    // Add position and scale
+    params.set("x", x.toString());
+    params.set("y", y.toString());
+    params.set("scale", scale.toString());
+
+    // Add wallet id if available
+    if (activeWallet && activeWallet !== primaryWallet?.address) {
+      params.set("walletId", activeWallet);
+    }
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, "", newUrl);
+  }, [
+    overlayNumber,
+    collectionIndex,
+    tokenID,
+    overlayEnabled,
+    playAnimation,
+    x,
+    y,
+    scale,
+    activeWallet,
+    primaryWallet?.address,
+  ]);
+
+  // Debounced URL update for drag/resize operations
+  const debouncedUpdateUrlParams = useMemo(
+    () => debounce(updateUrlParams, 500),
+    [updateUrlParams],
+  );
+
+  const copyUrlToClipboard = useCallback(async () => {
+    try {
+      const url = window.location.href;
+      await navigator.clipboard.writeText(url);
+      setCopyStatus("URL copied to clipboard!");
+      setTimeout(() => setCopyStatus(null), 3000);
+    } catch (err) {
+      console.error("Failed to copy URL:", err);
+      setCopyStatus("Failed to copy URL. Please try again.");
+      setTimeout(() => setCopyStatus(null), 3000);
+    }
   }, []);
 
   // Helper function to validate Ethereum address
@@ -1170,6 +1326,20 @@ export default function Home() {
       setIsFirstRender(false);
     }
   }, [isFirstRender]);
+
+  // Parse URL parameters on initial load
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      parseUrlParams();
+    }
+  }, [parseUrlParams]); // Only run once on mount
+
+  // Update URL when state changes
+  useEffect(() => {
+    if (typeof window !== "undefined" && !isFirstRender) {
+      updateUrlParams();
+    }
+  }, [updateUrlParams, isFirstRender]);
 
   useEffect(() => {
     (async () => {
@@ -2278,10 +2448,12 @@ export default function Home() {
                             onDragEnd={() => {
                               setDragging(false);
                               debouncedRenderImageUrl();
+                              debouncedUpdateUrlParams();
                             }}
                             onResizeEnd={() => {
                               setResizing(false);
                               debouncedRenderImageUrl();
+                              debouncedUpdateUrlParams();
                             }}
                             disabled={loading}
                           />
@@ -2333,10 +2505,12 @@ export default function Home() {
                             onDragEnd={() => {
                               setDragging(false);
                               debouncedRenderImageUrl();
+                              debouncedUpdateUrlParams();
                             }}
                             onResizeEnd={() => {
                               setResizing(false);
                               debouncedRenderImageUrl();
+                              debouncedUpdateUrlParams();
                             }}
                             disabled={loading}
                           />
@@ -2380,6 +2554,14 @@ export default function Home() {
                       aria-label="Copy"
                     >
                       <AiOutlineCopy />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={copyUrlToClipboard}
+                      className="w-full md:w-auto"
+                      aria-label="Share Template"
+                    >
+                      <AiOutlineLink />
                     </Button>
                   </div>
                   {copyStatus && (
@@ -2472,5 +2654,14 @@ export default function Home() {
         }
       `}</style>
     </>
+  );
+}
+
+// Suspense wrapper to handle useSearchParams during SSG
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditorPage />
+    </Suspense>
   );
 }
