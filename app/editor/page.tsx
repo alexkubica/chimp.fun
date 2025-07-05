@@ -822,6 +822,10 @@ function EditorPage() {
     "connected",
   );
 
+  // Add state for render management
+  const [renderInProgress, setRenderInProgress] = useState(false);
+  const renderAbortControllerRef = useRef<AbortController | null>(null);
+
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
   let maxTokenID =
@@ -1351,36 +1355,43 @@ function EditorPage() {
 
   useEffect(() => {
     (async () => {
-      if (
-        isNaN(Number(tokenID)) ||
-        Number(tokenID) < minTokenID ||
-        Number(tokenID) > maxTokenID
-      ) {
-        return;
-      }
+      try {
+        if (
+          isNaN(Number(tokenID)) ||
+          Number(tokenID) < minTokenID ||
+          Number(tokenID) > maxTokenID
+        ) {
+          return;
+        }
 
-      if (collectionMetadata.gifOverride) {
-        const gifUrl = collectionMetadata.gifOverride(tokenID.toString());
-        // r3bell api
-        // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
+        if (collectionMetadata.gifOverride) {
+          const gifUrl = collectionMetadata.gifOverride(tokenID.toString());
+          // r3bell api
+          // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
 
-        setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
-        return;
-      }
+          setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
+          return;
+        }
 
-      const response = await fetch(
-        `/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
-      );
-      if (!response.ok) {
-        throw new Error(
-          `Error fetching Chimpers image URL: ${response.statusText}`,
+        const response = await fetch(
+          `/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
         );
-      }
-      const { imageUrl } = await response.json();
-      if (imageUrl.includes("ipfs")) {
-        setImageUrl(imageUrl);
-      } else {
-        setImageUrl(`/proxy?url=${imageUrl}`);
+        if (!response.ok) {
+          console.error(`Error fetching NFT image URL: ${response.statusText}`);
+          // Don't throw error - just log it and skip setting image URL
+          // This prevents crashes when the server returns 500 errors
+          return;
+        }
+        const { imageUrl } = await response.json();
+        if (imageUrl.includes("ipfs")) {
+          setImageUrl(imageUrl);
+        } else {
+          setImageUrl(`/proxy?url=${imageUrl}`);
+        }
+      } catch (error) {
+        console.error('Error in NFT image fetching:', error);
+        // Don't crash the app - just log the error
+        // This prevents unhandled promise rejections
       }
     })();
   }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
@@ -1403,6 +1414,21 @@ function EditorPage() {
         return;
       }
 
+      // Prevent multiple simultaneous renders
+      if (renderInProgress) {
+        console.log("Render already in progress, skipping...");
+        return;
+      }
+
+      // Cancel any previous render operation
+      if (renderAbortControllerRef.current) {
+        renderAbortControllerRef.current.abort();
+      }
+
+      // Create new abort controller for this render
+      const abortController = new AbortController();
+      renderAbortControllerRef.current = abortController;
+
       let overlaySettings: Partial<ReactionMetadata> = {
         title: "",
         filename: "",
@@ -1411,13 +1437,36 @@ function EditorPage() {
       overlaySettings = reactionsMap[overlayNumber - 1];
 
       try {
-        let filedata;
+        setRenderInProgress(true);
         setLoading(true);
-        if (uploadedImageUri) {
-          filedata = await fetchFile(uploadedImageUri);
-        } else {
-          filedata = await fetchFile(imageUrl);
+
+        // Check if operation was cancelled
+        if (abortController.signal.aborted) {
+          return;
         }
+
+        let filedata;
+        try {
+          if (uploadedImageUri) {
+            filedata = await fetchFile(uploadedImageUri);
+          } else {
+            filedata = await fetchFile(imageUrl);
+          }
+        } catch (fetchError) {
+          console.error("Error fetching image:", fetchError);
+          // If this is a network error, don't crash - just log and return
+          if (fetchError instanceof Error && fetchError.message.includes("Internal Server Error")) {
+            console.warn("Server temporarily unavailable, skipping render");
+            return;
+          }
+          throw fetchError;
+        }
+
+        // Check if operation was cancelled after file fetch
+        if (abortController.signal.aborted) {
+          return;
+        }
+
         const imageBytes = new Uint8Array(filedata);
 
         const isPNG =
@@ -1434,11 +1483,28 @@ function EditorPage() {
         const imageExtension = isPNG ? "png" : isGIF ? "gif" : "jpg";
         setImageExtension(imageExtension);
 
+        // Check if operation was cancelled before FFmpeg operations
+        if (abortController.signal.aborted) {
+          return;
+        }
+
         await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
+        
+        // Check if operation was cancelled
+        if (abortController.signal.aborted) {
+          return;
+        }
+
         await ffmpegRef.current.writeFile(
           "reaction.png",
           await fetchFile(`/reactions/${overlaySettings.filename}`),
         );
+
+        // Check if operation was cancelled
+        if (abortController.signal.aborted) {
+          return;
+        }
+
         let ffmpegArgs;
         if (overlayEnabled) {
           const watermarkFile =
@@ -1457,6 +1523,11 @@ function EditorPage() {
               `Fallback: ${watermarkPath} not found, using credit.png`,
             );
             watermarkData = await fetchFile("/credit.png");
+          }
+
+          // Check if operation was cancelled
+          if (abortController.signal.aborted) {
+            return;
           }
 
           await ffmpegRef.current.writeFile(watermarkFile, watermarkData);
@@ -1484,8 +1555,19 @@ function EditorPage() {
             `output.${imageExtension}`,
           ];
         }
+
+        // Check if operation was cancelled before FFmpeg execution
+        if (abortController.signal.aborted) {
+          return;
+        }
+
         await ffmpegRef.current.exec(ffmpegArgs);
         console.log("FFmpeg command executed successfully");
+
+        // Check if operation was cancelled before final processing
+        if (abortController.signal.aborted) {
+          return;
+        }
 
         const data = await ffmpegRef.current.readFile(
           `output.${imageExtension}`,
@@ -1497,9 +1579,18 @@ function EditorPage() {
         setFinalResult(url);
         console.log("Image URL generated:", url);
       } catch (error) {
-        console.error("Error during FFmpeg execution:", error);
+        // Only log errors if the operation wasn't cancelled
+        if (!abortController.signal.aborted) {
+          console.error("Error during FFmpeg execution:", error);
+          // Don't crash the app - just log the error
+        }
       } finally {
+        setRenderInProgress(false);
         setLoading(false);
+        // Clear the abort controller reference if this was the current one
+        if (renderAbortControllerRef.current === abortController) {
+          renderAbortControllerRef.current = null;
+        }
       }
     }, 200),
     [
@@ -1515,6 +1606,7 @@ function EditorPage() {
       watermarkPaddingX,
       watermarkPaddingY,
       watermarkScale,
+      renderInProgress,
     ],
   );
 
@@ -1576,6 +1668,11 @@ function EditorPage() {
   useEffect(() => {
     return () => {
       debouncedRenderImageUrl.cancel(); // Cleanup the debounce on unmount
+      // Cancel any ongoing render operations
+      if (renderAbortControllerRef.current) {
+        renderAbortControllerRef.current.abort();
+        renderAbortControllerRef.current = null;
+      }
     };
   }, [debouncedRenderImageUrl]);
 
@@ -1815,6 +1912,18 @@ function EditorPage() {
   }, [isGIF, finalResult, playAnimation]);
 
   const handleFeelingLucky = useCallback(() => {
+    // Prevent rapid clicks if render is in progress
+    if (renderInProgress) {
+      console.log("Render in progress, ignoring feeling lucky click");
+      return;
+    }
+
+    // Cancel any ongoing render operations before starting new one
+    if (renderAbortControllerRef.current) {
+      renderAbortControllerRef.current.abort();
+      renderAbortControllerRef.current = null;
+    }
+
     // Randomize collection
     const randomCollectionIndex = Math.floor(
       Math.random() * collectionsMetadata.length,
@@ -1859,7 +1968,7 @@ function EditorPage() {
     setNfts([]);
     setNftError(null);
     setActiveWallet(null);
-  }, []);
+  }, [renderInProgress]);
 
   // Handle Enter key for wallet input
   const handleWalletInputKeyDown = (
@@ -1873,7 +1982,7 @@ function EditorPage() {
 
   return (
     <>
-      <main className="min-h-screen flex items-center justify-center px-2 py-4">
+      <main className="min-h-screen flex items-center justify-center px-2 py-4" data-testid="editor-page">
         <div className="w-full max-w-2xl mx-auto">
           <header className="text-center mb-6">
             <h1 className="text-3xl font-extrabold tracking-tight mb-1">
@@ -1883,8 +1992,12 @@ function EditorPage() {
             </h1>
             <p className="text-lg font-medium mb-2">NFT Editor</p>
             <div className="flex justify-center mt-2">
-              <Button onClick={handleFeelingLucky} variant="secondary">
-                I&apos;m Feeling Lucky
+              <Button 
+                onClick={handleFeelingLucky} 
+                variant="secondary"
+                disabled={renderInProgress}
+              >
+                {renderInProgress ? "Rendering..." : "I'm Feeling Lucky"}
               </Button>
             </div>
           </header>
