@@ -99,45 +99,59 @@ function EditorPage() {
     editorState.parseUrlParams();
   }, []);
 
-  // Process image with FFmpeg when parameters change
-  useEffect(() => {
-    if (
-      ffmpeg.ffmpegReady &&
-      (encodedImageUrl || editorState.uploadedImageUri) &&
-      !editorState.dragging &&
-      !editorState.resizing
-    ) {
-      ffmpeg.debouncedProcessImage(
-        encodedImageUrl || "",
-        editorState.file,
-        editorState.overlayNumber,
-        editorState.x,
-        editorState.y,
-        editorState.scale,
-        editorState.overlayEnabled,
-        editorState.watermarkStyle,
-        editorState.watermarkPaddingX,
-        editorState.watermarkPaddingY,
-        editorState.watermarkScale,
-      ).then((result) => {
-        if (result) {
-          editorState.setFinalResult(result);
-        }
-        editorState.setLoading(false);
-      });
-    }
-  }, [
-    ffmpeg.ffmpegReady,
-    editorState.uploadedImageUri,
-    encodedImageUrl,
-    editorState.overlayNumber,
-    editorState.x,
-    editorState.y,
-    editorState.scale,
-    editorState.overlayEnabled,
-    editorState.dragging,
-    editorState.resizing,
-  ]);
+                 // Process image with FFmpeg when parameters change
+   useEffect(() => {
+     if (
+       ffmpeg &&
+       ffmpeg.ffmpegReady &&
+       ffmpeg.debouncedProcessImage &&
+       (encodedImageUrl || editorState.uploadedImageUri) &&
+       !editorState.dragging &&
+       !editorState.resizing
+     ) {
+       const processImageFn = ffmpeg.debouncedProcessImage;
+       if (processImageFn) {
+         // @ts-ignore - Function existence is checked above
+         processImageFn(
+         encodedImageUrl || "",
+         editorState.file,
+         editorState.overlayNumber,
+         editorState.x,
+         editorState.y,
+         editorState.scale,
+         editorState.overlayEnabled,
+         editorState.watermarkStyle,
+         editorState.watermarkPaddingX,
+         editorState.watermarkPaddingY,
+         editorState.watermarkScale,
+                ).then((result) => {
+           if (result) {
+             editorState.setFinalResult(result);
+           }
+           editorState.setLoading(false);
+         }).catch((error) => {
+           console.error("FFmpeg processing error:", error);
+           editorState.setLoading(false);
+         });
+       }
+     }
+   }, [
+     ffmpeg,
+     encodedImageUrl,
+     editorState.uploadedImageUri,
+     editorState.file,
+     editorState.overlayNumber,
+     editorState.x,
+     editorState.y,
+     editorState.scale,
+     editorState.overlayEnabled,
+     editorState.watermarkStyle,
+     editorState.watermarkPaddingX,
+     editorState.watermarkPaddingY,
+     editorState.watermarkScale,
+     editorState.dragging,
+     editorState.resizing,
+   ]);
 
   // Extract static GIF frame when needed
   useEffect(() => {
@@ -255,45 +269,49 @@ function EditorPage() {
     editorState.debouncedUpdateUrlParams();
   }, [editorState]);
 
-  // Download handler
-  const handleDownload = useCallback(() => {
-    imageActions.downloadImage(
-      editorState.finalResult,
-      editorState.isGIF,
-      editorState.playAnimation,
-      editorState.staticGifFrameUrl,
-      editorState.collectionMetadata.name,
-      editorState.tokenID,
-      editorState.overlayNumber,
-      ffmpeg.imageExtension,
-    );
-  }, [
-    imageActions,
-    editorState.finalResult,
-    editorState.isGIF,
-    editorState.playAnimation,
-    editorState.staticGifFrameUrl,
-    editorState.collectionMetadata.name,
-    editorState.tokenID,
-    editorState.overlayNumber,
-    ffmpeg.imageExtension,
-  ]);
+     // Download handler
+   const handleDownload = useCallback(() => {
+     if (imageActions?.downloadImage && ffmpeg?.imageExtension) {
+       imageActions.downloadImage(
+         editorState.finalResult,
+         editorState.isGIF,
+         editorState.playAnimation,
+         editorState.staticGifFrameUrl,
+         editorState.collectionMetadata.name,
+         editorState.tokenID,
+         editorState.overlayNumber,
+         ffmpeg.imageExtension,
+       );
+     }
+   }, [
+     imageActions,
+     editorState.finalResult,
+     editorState.isGIF,
+     editorState.playAnimation,
+     editorState.staticGifFrameUrl,
+     editorState.collectionMetadata.name,
+     editorState.tokenID,
+     editorState.overlayNumber,
+     ffmpeg?.imageExtension,
+   ]);
 
-  // Copy handler
-  const handleCopy = useCallback(() => {
-    imageActions.copyToClipboard(
-      editorState.finalResult,
-      editorState.isGIF,
-      editorState.playAnimation,
-      editorState.staticGifFrameUrl,
-    );
-  }, [
-    imageActions,
-    editorState.finalResult,
-    editorState.isGIF,
-    editorState.playAnimation,
-    editorState.staticGifFrameUrl,
-  ]);
+     // Copy handler
+   const handleCopy = useCallback(() => {
+     if (imageActions?.copyToClipboard) {
+       imageActions.copyToClipboard(
+         editorState.finalResult,
+         editorState.isGIF,
+         editorState.playAnimation,
+         editorState.staticGifFrameUrl,
+       );
+     }
+   }, [
+     imageActions,
+     editorState.finalResult,
+     editorState.isGIF,
+     editorState.playAnimation,
+     editorState.staticGifFrameUrl,
+   ]);
 
   // Wallet browser props
   const walletBrowserProps = {
@@ -422,12 +440,12 @@ function EditorPage() {
                   setResizing={editorState.setResizing}
                   onDragEnd={handleDragEnd}
                   onResizeEnd={handleResizeEnd}
-                  onDownload={handleDownload}
-                  onCopy={handleCopy}
-                  copyStatus={imageActions.copyStatus}
-                  showGifCopyModal={imageActions.showGifCopyModal}
-                  onGifCopyConfirm={imageActions.handleGifCopyModalConfirm}
-                  onGifCopyCancel={imageActions.handleGifCopyModalCancel}
+                                   onDownload={handleDownload}
+                 onCopy={handleCopy}
+                 copyStatus={imageActions?.copyStatus}
+                 showGifCopyModal={imageActions?.showGifCopyModal}
+                 onGifCopyConfirm={imageActions?.handleGifCopyModalConfirm}
+                 onGifCopyCancel={imageActions?.handleGifCopyModalCancel}
                 />
               </div>
             </div>

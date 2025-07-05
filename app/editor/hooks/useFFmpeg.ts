@@ -173,8 +173,8 @@ export function useFFmpeg() {
 
   // Debounced version of processImage
   const debouncedProcessImage = useMemo(
-    () => debounce(processImage, 200),
-    [processImage],
+    () => ffmpegReady ? debounce(processImage, 200) : null,
+    [processImage, ffmpegReady],
   );
 
   return {
