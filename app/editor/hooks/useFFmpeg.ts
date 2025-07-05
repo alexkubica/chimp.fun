@@ -177,11 +177,11 @@ export function useFFmpeg() {
     [processImage, ffmpegReady],
   );
 
-  return {
+  return useMemo(() => ({
     ffmpegReady,
     ffmpegLoading,
     imageExtension,
     processImage,
     debouncedProcessImage,
-  };
+  }), [ffmpegReady, ffmpegLoading, imageExtension, processImage, debouncedProcessImage]);
 }

@@ -66,7 +66,7 @@ function EditorPage() {
         console.error("Failed to fetch image:", error);
       }
     })();
-  }, [editorState.collectionIndex, editorState.collectionMetadata, editorState.maxTokenID, editorState.minTokenID, editorState.tokenID]);
+  }, [editorState.collectionIndex, editorState.tokenID]);
 
   // Encoded image URL for processing
   const encodedImageUrl = useMemo(() => {
@@ -78,7 +78,7 @@ function EditorPage() {
 
   // Load user's own NFTs when they sign in and switch to connected tab
   useEffect(() => {
-    if (isLoggedIn && primaryWallet?.address) {
+    if (isLoggedIn && primaryWallet?.address && nftManager.fetchAllUserNFTs) {
       editorState.setActiveTab("connected");
       if (!nftManager.activeWallet || nftManager.activeWallet !== primaryWallet.address) {
         editorState.setWalletInput("");
@@ -102,13 +102,13 @@ function EditorPage() {
                  // Process image with FFmpeg when parameters change
    useEffect(() => {
      if (
-       ffmpeg &&
-       ffmpeg.ffmpegReady &&
-       ffmpeg.debouncedProcessImage &&
+       ffmpeg?.ffmpegReady &&
+       ffmpeg?.debouncedProcessImage &&
        (encodedImageUrl || editorState.uploadedImageUri) &&
        !editorState.dragging &&
        !editorState.resizing
      ) {
+       console.log("Starting FFmpeg processing...");
        const processImageFn = ffmpeg.debouncedProcessImage;
        if (processImageFn) {
          // @ts-ignore - Function existence is checked above
@@ -136,7 +136,7 @@ function EditorPage() {
        }
      }
    }, [
-     ffmpeg,
+     ffmpeg?.ffmpegReady,
      encodedImageUrl,
      editorState.uploadedImageUri,
      editorState.file,
@@ -244,7 +244,7 @@ function EditorPage() {
   }, [editorState.walletInput, nftManager]);
 
   const loadAllFromExternalWallet = useCallback(() => {
-    if (editorState.walletInput.trim()) {
+    if (editorState.walletInput.trim() && nftManager.loadAllNFTs) {
       nftManager.loadAllNFTs();
     }
   }, [editorState.walletInput, nftManager]);

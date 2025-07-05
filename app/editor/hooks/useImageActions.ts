@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { reactionsMap } from "@/consts";
 import { dataURLtoBlob, copyGifFirstFrameAsPng } from "../utils";
 
@@ -148,7 +148,7 @@ export function useImageActions() {
     setGifBlobToCopy(null);
   }, []);
 
-  return {
+  return useMemo(() => ({
     // State
     copyStatus,
     setCopyStatus,
@@ -164,5 +164,9 @@ export function useImageActions() {
     handleGifCopyModalConfirm,
     handleGifCopyModalCancel,
     clearCopyStatus,
-  };
+  }), [
+    copyStatus, showGifCopyModal, gifBlobToCopy,
+    downloadImage, copyToClipboard, copyUrlToClipboard,
+    handleGifCopyModalConfirm, handleGifCopyModalCancel, clearCopyStatus
+  ]);
 }

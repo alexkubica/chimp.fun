@@ -136,7 +136,7 @@ export function useNFTManager() {
     setActiveWallet(null);
   }, []);
 
-  return {
+  return useMemo(() => ({
     // State
     nfts,
     nftLoading,
@@ -155,5 +155,9 @@ export function useNFTManager() {
     loadMoreNFTs,
     loadAllNFTs,
     resetNFTs,
-  };
+  }), [
+    nfts, nftLoading, nftError, hasMore, nextCursor, provider, providerName,
+    activeWallet, isResolvingENS, supportedCollections,
+    fetchAllUserNFTs, fetchWalletNFTs, loadMoreNFTs, loadAllNFTs, resetNFTs
+  ]);
 }

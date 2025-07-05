@@ -259,7 +259,7 @@ export function useEditorState() {
     setSelectedFromWallet(null);
   }, []);
 
-  return {
+  return useMemo(() => ({
     // Core state
     loading,
     setLoading,
@@ -335,5 +335,15 @@ export function useEditorState() {
     handlePresetChange,
     copyUrlToClipboard,
     clearWalletSelection,
-  };
+  }), [
+    loading, tokenID, tempTokenID, isFirstRender, collectionIndex, x, y, scale,
+    overlayNumber, file, uploadedImageUri, finalResult, imageUrl, overlayEnabled,
+    errorMessage, dragging, resizing, playAnimation, staticGifFrameUrl, copyStatus,
+    showGifCopyModal, gifBlobToCopy, selectedFromWallet, walletInput, activeTab,
+    watermarkStyle, watermarkPaddingX, watermarkPaddingY, watermarkScale,
+    collectionMetadata, minTokenID, maxTokenID, isGIF,
+    parseUrlParams, updateUrlParams, debouncedUpdateUrlParams, handleCollectionChange,
+    handleTokenIdChange, handleRandomTokenId, handlePresetChange, copyUrlToClipboard,
+    clearWalletSelection
+  ]);
 }
