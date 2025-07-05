@@ -6,6 +6,7 @@ export type ReactionMetadata = {
   x: number;
   y: number;
   filename: string;
+  isCustom?: boolean;
 };
 
 export type CollectionMetadata = {
