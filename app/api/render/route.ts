@@ -5,6 +5,7 @@ import { tmpdir } from "os";
 import { existsSync } from "fs";
 import { exec } from "child_process";
 import { promisify } from "util";
+import ffmpegPath from "ffmpeg-ffprobe-static";
 
 const execAsync = promisify(exec);
 
@@ -68,10 +69,10 @@ export async function POST(request: NextRequest) {
         );
 
         // FFmpeg command with watermark
-        ffmpegCommand = `ffmpeg -y -i "${inputImagePath}" -i "${reactionImagePath}" -i "${watermarkImagePath}" -filter_complex "[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}" ${imageExtension === "gif" ? "-f gif" : ""} "${outputPath}"`;
+        ffmpegCommand = `"${ffmpegPath}" -y -i "${inputImagePath}" -i "${reactionImagePath}" -i "${watermarkImagePath}" -filter_complex "[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}" ${imageExtension === "gif" ? "-f gif" : ""} "${outputPath}"`;
       } else {
         // FFmpeg command without watermark
-        ffmpegCommand = `ffmpeg -y -i "${inputImagePath}" -i "${reactionImagePath}" -filter_complex "[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}" ${imageExtension === "gif" ? "-f gif" : ""} "${outputPath}"`;
+        ffmpegCommand = `"${ffmpegPath}" -y -i "${inputImagePath}" -i "${reactionImagePath}" -filter_complex "[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}" ${imageExtension === "gif" ? "-f gif" : ""} "${outputPath}"`;
       }
 
       // Execute FFmpeg command
