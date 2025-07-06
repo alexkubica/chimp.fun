@@ -28,6 +28,10 @@ interface MainScene extends Phaser.Scene {
   spawnCollectible: (firstSpawn?: boolean) => void;
   collectible: Phaser.GameObjects.Sprite | null;
   _hasSpawnedFirstCollectible: boolean;
+  // New properties for survival mechanics
+  health: number;
+  obstacles: Phaser.GameObjects.Group | null;
+  bananas: Phaser.GameObjects.Group | null;
 }
 
 interface ChimpHUDProps {
@@ -35,6 +39,8 @@ interface ChimpHUDProps {
   timer: number;
   countdownText: string;
   pointsRef: MutableRefObject<number>;
+  // Add health prop
+  health: number;
   setGameStatus: Dispatch<
     SetStateAction<"idle" | "countdown" | "running" | "finished">
   >;
@@ -62,6 +68,7 @@ function ChimpCountdown({ countdownText }: { countdownText: string }) {
 
 function ChimpScoreShare({
   points,
+  timer,
   setGameStatus,
   setChimpPoints,
   setCountdownText,
@@ -70,6 +77,7 @@ function ChimpScoreShare({
   sceneRef,
 }: {
   points: number;
+  timer: number;
   setGameStatus: Dispatch<
     SetStateAction<"idle" | "countdown" | "running" | "finished">
   >;
@@ -83,6 +91,12 @@ function ChimpScoreShare({
     <div className="flex flex-col items-center gap-2 mt-2">
       <div
         className="text-4xl font-bold text-white drop-shadow-lg"
+        style={{ fontFamily: '"Press Start 2P", monospace' }}
+      >
+        Survived: {timer.toFixed(1)}s
+      </div>
+      <div
+        className="text-2xl font-bold text-yellow-300 drop-shadow-lg"
         style={{ fontFamily: '"Press Start 2P", monospace' }}
       >
         Score: {points}
@@ -117,7 +131,7 @@ function ChimpScoreShare({
         </button>
         <button
           onClick={() => {
-            const tweetText = `I !CHIMPED ${points} points in the @ChimpersNFT game made by @mrcryptoalex's game, can you beat me?\nPlay for FREE instantly in your browser 👉 https://chimp.fun/game !CHIMP 🙉`;
+            const tweetText = `I survived ${timer.toFixed(1)} seconds and scored ${points} points in the !CHIMP survival game! 🍌⚡\nCan you beat me? Play for FREE 👉 https://chimp.fun/game !CHIMP 🙉`;
             const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
             window.open(tweetUrl, "_blank", "noopener,noreferrer");
           }}
@@ -135,6 +149,7 @@ function ChimpHUD({
   timer,
   countdownText,
   pointsRef,
+  health,
   setGameStatus,
   setChimpPoints,
   setCountdownText,
@@ -146,89 +161,116 @@ function ChimpHUD({
   return (
     <>
       {gameStatus === "idle" && (
-        <button
-          onClick={() => {
-            confetti({
-              particleCount: 100,
-              spread: 360,
-              startVelocity: 30,
-              decay: 0.9,
-              gravity: 1,
-              drift: 0,
-              ticks: 200,
-              origin: { x: 0.5, y: 0.5 },
-              colors: [
-                "#ff0000",
-                "#00ff00",
-                "#0000ff",
-                "#ffff00",
-                "#ff00ff",
-                "#00ffff",
-              ],
-              scalar: 0.7,
-              shapes: ["circle", "square"],
-            });
-            setGameStatus("countdown");
-            pointsRef.current = 0;
-            setChimpPoints(0);
-            (window as any).__GAME_STATUS__ = "countdown";
-            // Spawn the first collectible during countdown
-            if (
-              sceneRef.current &&
-              !sceneRef.current._hasSpawnedFirstCollectible
-            ) {
-              sceneRef.current.spawnCollectible(true);
-            }
-            let count = 3;
-            setCountdownText(count.toString());
-            if (countdownIntervalRef.current)
-              clearInterval(countdownIntervalRef.current);
-            countdownIntervalRef.current = setInterval(() => {
-              count--;
-              if (count > 0) {
-                setCountdownText(count.toString());
-              } else if (count === 0) {
-                setCountdownText("!CHIMP");
-                confetti({
-                  particleCount: 150,
-                  spread: 360,
-                  startVelocity: 35,
-                  decay: 0.9,
-                  gravity: 1,
-                  drift: 0,
-                  ticks: 200,
-                  origin: { x: 0.5, y: 0.5 },
-                  colors: [
-                    "#ff0000",
-                    "#00ff00",
-                    "#0000ff",
-                    "#ffff00",
-                    "#ff00ff",
-                    "#00ffff",
-                  ],
-                  scalar: 0.8,
-                  shapes: ["circle", "square"],
-                });
-                (window as any).__GAME_STATUS__ = "running";
-                setTimeout(() => {
-                  setGameStatus("running");
-                  (window as any).__GAME_STATUS__ = "running";
-                  setTimer(30);
-                }, 800);
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={() => {
+              confetti({
+                particleCount: 100,
+                spread: 360,
+                startVelocity: 30,
+                decay: 0.9,
+                gravity: 1,
+                drift: 0,
+                ticks: 200,
+                origin: { x: 0.5, y: 0.5 },
+                colors: [
+                  "#ff0000",
+                  "#00ff00",
+                  "#0000ff",
+                  "#ffff00",
+                  "#ff00ff",
+                  "#00ffff",
+                ],
+                scalar: 0.7,
+                shapes: ["circle", "square"],
+              });
+              setGameStatus("countdown");
+              pointsRef.current = 0;
+              setChimpPoints(0);
+              (window as any).__GAME_STATUS__ = "countdown";
+              // Reset health to 3 bananas
+              if (sceneRef.current) {
+                sceneRef.current.health = 3;
               }
-            }, 800);
-          }}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
-        >
-          START
-        </button>
+              // Spawn the first collectible during countdown
+              if (
+                sceneRef.current &&
+                !sceneRef.current._hasSpawnedFirstCollectible
+              ) {
+                sceneRef.current.spawnCollectible(true);
+              }
+              let count = 3;
+              setCountdownText(count.toString());
+              if (countdownIntervalRef.current)
+                clearInterval(countdownIntervalRef.current);
+              countdownIntervalRef.current = setInterval(() => {
+                count--;
+                if (count > 0) {
+                  setCountdownText(count.toString());
+                } else if (count === 0) {
+                  setCountdownText("!CHIMP");
+                  confetti({
+                    particleCount: 150,
+                    spread: 360,
+                    startVelocity: 35,
+                    decay: 0.9,
+                    gravity: 1,
+                    drift: 0,
+                    ticks: 200,
+                    origin: { x: 0.5, y: 0.5 },
+                    colors: [
+                      "#ff0000",
+                      "#00ff00",
+                      "#0000ff",
+                      "#ffff00",
+                      "#ff00ff",
+                      "#00ffff",
+                    ],
+                    scalar: 0.8,
+                    shapes: ["circle", "square"],
+                  });
+                  (window as any).__GAME_STATUS__ = "running";
+                  setTimeout(() => {
+                    setGameStatus("running");
+                    (window as any).__GAME_STATUS__ = "running";
+                    setTimer(0); // Start timer from 0
+                  }, 800);
+                }
+              }, 800);
+            }}
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xl font-bold transition-colors"
+          >
+            START SURVIVAL
+          </button>
+          <div className="text-white text-center max-w-md">
+            <p className="text-sm">🍌 Start with 3 bananas (health)</p>
+            <p className="text-sm">⚠️ Avoid metal spikes!</p>
+            <p className="text-sm">🍌 Collect bananas to restore health</p>
+            <p className="text-sm">🏆 Survive as long as possible!</p>
+          </div>
+        </div>
       )}
       {gameStatus === "running" && (
-        <div
-          className="text-4xl font-bold text-white drop-shadow-lg"
-          style={{ fontFamily: '"Press Start 2P", monospace' }}
-        >
-          {timer.toFixed(3)}
+        <div className="flex flex-col items-center gap-2">
+          <div
+            className="text-4xl font-bold text-white drop-shadow-lg"
+            style={{ fontFamily: '"Press Start 2P", monospace' }}
+          >
+            {timer.toFixed(1)}s
+          </div>
+          {/* Health display */}
+          <div className="flex items-center gap-1">
+            {Array.from({ length: 3 }, (_, i) => (
+              <span
+                key={i}
+                className={`text-2xl ${
+                  i < health ? "opacity-100" : "opacity-30"
+                }`}
+              >
+                🍌
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </>
@@ -553,9 +595,10 @@ export default function PhaserGame({
   const [gameStatus, setGameStatus] = useState<
     "idle" | "countdown" | "running" | "finished"
   >("idle");
-  const [timer, setTimer] = useState(30);
+  const [timer, setTimer] = useState(0);
   const [countdownText, setCountdownText] = useState("");
   const [fps, setFps] = useState(0);
+  const [health, setHealth] = useState(3);
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneRef = useRef<MainScene | null>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -704,6 +747,15 @@ export default function PhaserGame({
         // Add state for pin stop logic
         private _stoppedAtPin: boolean = false;
         private _lastPinPos: { x: number; y: number } | null = null;
+        // New properties for survival mechanics
+        health: number = 3;
+        obstacles: Phaser.GameObjects.Group | null = null;
+        bananas: Phaser.GameObjects.Group | null = null;
+        private _obstacleSpawnTimer: number = 0;
+        private _bananaSpawnTimer: number = 0;
+        private _lastDamageTime: number = 0;
+        private _damageInvulnerabilityMs: number = 1000; // 1 second invulnerability
+        private _gameStartTime: number = 0;
 
         constructor() {
           super({ key: "MainScene" });
@@ -733,6 +785,36 @@ export default function PhaserGame({
               frameHeight: 360,
               endFrame: 8,
             },
+          );
+
+          // Load obstacle and banana assets
+          this.load.image(
+            "spike",
+            "data:image/svg+xml;base64," +
+              btoa(`
+            <svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="32,8 8,56 56,56" fill="#666" stroke="#333" stroke-width="2"/>
+              <polygon points="32,8 8,56 56,56" fill="url(#gradient)" />
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#888;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#444;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+            </svg>
+          `),
+          );
+
+          this.load.image(
+            "banana",
+            "data:image/svg+xml;base64," +
+              btoa(`
+            <svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="24" cy="24" rx="16" ry="20" fill="#FFD700" stroke="#FFA500" stroke-width="2"/>
+              <ellipse cx="24" cy="20" rx="6" ry="8" fill="#FFF8DC"/>
+              <path d="M24,12 C22,8 18,6 16,8 C18,10 22,12 24,12 Z" fill="#8B4513"/>
+            </svg>
+          `),
           );
         }
 
@@ -807,6 +889,10 @@ export default function PhaserGame({
           if (this.chimp) {
             this.chimp.setPosition(x + width / 2, y + height / 2);
           }
+
+          // Initialize obstacles and bananas groups
+          this.obstacles = this.add.group();
+          this.bananas = this.add.group();
 
           // Only spawn collectible if game is running
           if ((window as any).__GAME_STATUS__ === "running") {
@@ -1242,6 +1328,141 @@ export default function PhaserGame({
           this.collectible.play(asset.anim);
         }
 
+        spawnObstacle() {
+          if (!this.obstacles) return;
+
+          // Calculate boundary dimensions
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+
+          // Random position within bounds
+          const randomX = Phaser.Math.Between(x + 50, x + width - 50);
+          const randomY = Phaser.Math.Between(y + 50, y + height - 50);
+
+          // Don't spawn too close to chimp
+          if (this.chimp) {
+            const distance = Phaser.Math.Distance.Between(
+              randomX,
+              randomY,
+              this.chimp.x,
+              this.chimp.y,
+            );
+            if (distance < 100) return; // Too close, skip this spawn
+          }
+
+          const spike = this.add
+            .image(randomX, randomY, "spike")
+            .setScale(0.8)
+            .setDepth(1);
+          this.obstacles.add(spike);
+        }
+
+        spawnBanana() {
+          if (!this.bananas) return;
+
+          // Calculate boundary dimensions
+          const width = MainScene.MIN_BOUNDARY_WIDTH;
+          const height = MainScene.MIN_BOUNDARY_HEIGHT;
+          const x = (this.scale.width - width) / 2;
+          const y = (this.scale.height - height) / 2;
+
+          // Random position within bounds
+          const randomX = Phaser.Math.Between(x + 50, x + width - 50);
+          const randomY = Phaser.Math.Between(y + 50, y + height - 50);
+
+          const banana = this.add
+            .image(randomX, randomY, "banana")
+            .setScale(0.6)
+            .setDepth(1);
+          this.bananas.add(banana);
+        }
+
+        checkCollisions() {
+          if (!this.chimp) return;
+
+          const currentTime = Date.now();
+
+          // Check obstacle collisions (damage)
+          if (
+            this.obstacles &&
+            currentTime - this._lastDamageTime > this._damageInvulnerabilityMs
+          ) {
+            this.obstacles.children.entries.forEach((obstacle) => {
+              const spike = obstacle as Phaser.GameObjects.Image;
+              const distance = Phaser.Math.Distance.Between(
+                this.chimp!.x,
+                this.chimp!.y,
+                spike.x,
+                spike.y,
+              );
+
+              if (distance < 40) {
+                // Collision threshold
+                this.health -= 1;
+                this._lastDamageTime = currentTime;
+
+                // Visual feedback for damage
+                this.chimp!.setTint(0xff0000);
+                this.time.delayedCall(200, () => {
+                  if (this.chimp) this.chimp.clearTint();
+                });
+
+                // Remove the spike that was hit
+                spike.destroy();
+
+                // Check for game over
+                if (this.health <= 0) {
+                  (window as any).__GAME_STATUS__ = "finished";
+                }
+
+                return; // Only one collision per frame
+              }
+            });
+          }
+
+          // Check banana collisions (healing)
+          if (this.bananas) {
+            this.bananas.children.entries.forEach((banana) => {
+              const bananaSprite = banana as Phaser.GameObjects.Image;
+              const distance = Phaser.Math.Distance.Between(
+                this.chimp!.x,
+                this.chimp!.y,
+                bananaSprite.x,
+                bananaSprite.y,
+              );
+
+              if (distance < 40) {
+                // Collision threshold
+                if (this.health < 3) {
+                  this.health += 1;
+
+                  // Visual feedback for healing
+                  this.chimp!.setTint(0x00ff00);
+                  this.time.delayedCall(200, () => {
+                    if (this.chimp) this.chimp.clearTint();
+                  });
+                }
+
+                // Remove the banana that was collected
+                bananaSprite.destroy();
+
+                // Add small confetti for banana collection
+                confetti({
+                  particleCount: 10,
+                  spread: 60,
+                  startVelocity: 15,
+                  decay: 0.9,
+                  gravity: 1,
+                  colors: ["#FFD700", "#FFA500"],
+                  origin: { x: 0.5, y: 0.5 },
+                });
+              }
+            });
+          }
+        }
+
         updateBoundaries() {
           const width = MainScene.MIN_BOUNDARY_WIDTH;
           const height = MainScene.MIN_BOUNDARY_HEIGHT;
@@ -1664,6 +1885,34 @@ export default function PhaserGame({
             this.chimp.setFlipX(this.lastDirection === -1);
           }
 
+          // --- Survival game mechanics ---
+          if ((window as any).__GAME_STATUS__ === "running") {
+            // Update spawn timers
+            this._obstacleSpawnTimer += delta;
+            this._bananaSpawnTimer += delta;
+
+            // Spawn obstacles periodically (every 3-5 seconds)
+            if (this._obstacleSpawnTimer > Phaser.Math.Between(3000, 5000)) {
+              this.spawnObstacle();
+              this._obstacleSpawnTimer = 0;
+            }
+
+            // Spawn bananas periodically (every 8-12 seconds)
+            if (this._bananaSpawnTimer > Phaser.Math.Between(8000, 12000)) {
+              this.spawnBanana();
+              this._bananaSpawnTimer = 0;
+            }
+
+            // Check collisions
+            this.checkCollisions();
+
+            // Update points based on survival time
+            const currentTime = performance.now();
+            const survivalTime =
+              (currentTime - (this as any)._gameStartTime) / 1000;
+            pointsRef.current = Math.floor(survivalTime * 10); // 10 points per second
+          }
+
           // --- Collectible collision optimization ---
           // Only allow collectible collision and point increment when running
           if ((window as any).__GAME_STATUS__ === "running") {
@@ -1823,6 +2072,11 @@ export default function PhaserGame({
         // Reset points when game starts
         pointsRef.current = 0;
         setChimpPoints(0);
+        // Reset health
+        setHealth(3);
+        if (sceneRef.current) {
+          sceneRef.current.health = 3;
+        }
         // Reset collectible spawn flag
         if (sceneRef.current) {
           sceneRef.current._hasSpawnedFirstCollectible = false;
@@ -1843,6 +2097,13 @@ export default function PhaserGame({
           sceneRef.current.collectible.destroy();
           sceneRef.current.collectible = null;
         }
+        // Clear obstacles and bananas
+        if (sceneRef.current.obstacles) {
+          sceneRef.current.obstacles.clear(true, true);
+        }
+        if (sceneRef.current.bananas) {
+          sceneRef.current.bananas.clear(true, true);
+        }
         // Reset collectible spawn flag
         sceneRef.current._hasSpawnedFirstCollectible = false;
       }
@@ -1854,6 +2115,16 @@ export default function PhaserGame({
       }
     }
   }, [gameStatus]);
+
+  // Add health sync effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (sceneRef.current && sceneRef.current.health !== health) {
+        setHealth(sceneRef.current.health);
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [health]);
 
   // Add points display update effect
   useEffect(() => {
@@ -1874,13 +2145,22 @@ export default function PhaserGame({
   // Add timer update effect
   useEffect(() => {
     if (gameStatus === "running") {
+      // Initialize game start time
+      if (sceneRef.current) {
+        (sceneRef.current as any)._gameStartTime = performance.now();
+      }
+
       const updateTimer = () => {
         const currentTime = performance.now();
         const deltaTime = (currentTime - lastRenderTimeRef.current) / 1000;
         lastRenderTimeRef.current = currentTime;
 
         setTimer((prev) => {
-          if (prev <= 0) {
+          // Count up instead of down
+          const newTime = prev + deltaTime;
+
+          // Check if game should end due to health
+          if (sceneRef.current && sceneRef.current.health <= 0) {
             setGameStatus("finished");
             (window as any).__GAME_STATUS__ = "finished";
             // Big confetti for game end
@@ -1904,9 +2184,10 @@ export default function PhaserGame({
               shapes: ["circle", "square"],
               scalar: 1.2,
             });
-            return 0;
+            return newTime;
           }
-          return Math.max(0, prev - deltaTime);
+
+          return newTime;
         });
 
         animationFrameRef.current = requestAnimationFrame(updateTimer);
@@ -2081,6 +2362,7 @@ export default function PhaserGame({
               timer={timer}
               countdownText={countdownText}
               pointsRef={pointsRef}
+              health={health}
               setGameStatus={setGameStatus}
               setChimpPoints={setChimpPoints}
               setCountdownText={setCountdownText}
@@ -2097,6 +2379,7 @@ export default function PhaserGame({
             {gameStatus === "finished" && (
               <ChimpScoreShare
                 points={chimpPoints}
+                timer={timer}
                 setGameStatus={setGameStatus}
                 setChimpPoints={setChimpPoints}
                 setCountdownText={setCountdownText}
@@ -2155,7 +2438,7 @@ export default function PhaserGame({
                 '"Press Start 2P", monospace, "VT323", "Courier New", Courier',
             }}
           >
-            {pointsRef.current} !CHIMP POINTS
+            {pointsRef.current} POINTS • {timer.toFixed(1)}s
           </div>
         )}
       </div>

@@ -8,6 +8,15 @@ interface MainScene extends Phaser.Scene {
   loadChimp: (id: number) => void;
   createBackground: () => void;
   bg: Phaser.GameObjects.TileSprite | null;
+  chimp: Phaser.GameObjects.Sprite | null;
+  updateBoundaries: () => void;
+  spawnCollectible: (firstSpawn?: boolean) => void;
+  collectible: Phaser.GameObjects.Sprite | null;
+  _hasSpawnedFirstCollectible: boolean;
+  // New properties for survival mechanics
+  health: number;
+  obstacles: Phaser.GameObjects.Group | null;
+  bananas: Phaser.GameObjects.Group | null;
 }
 
 export default function GamePage() {
