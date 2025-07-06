@@ -5,7 +5,7 @@ import { tmpdir } from "os";
 import { existsSync } from "fs";
 import { exec } from "child_process";
 import { promisify } from "util";
-import ffmpegPath from "ffmpeg-ffprobe-static";
+import { ffmpegPath } from "ffmpeg-ffprobe-static";
 
 const execAsync = promisify(exec);
 
