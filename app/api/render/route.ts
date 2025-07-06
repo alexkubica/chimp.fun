@@ -8,13 +8,128 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 
 // Get FFmpeg path at runtime to avoid build-time path resolution issues
-function getFfmpegPath() {
+async function getFfmpegPath() {
+  console.log("Getting FFmpeg path...");
+  console.log(
+    "Environment: VERCEL =",
+    process.env.VERCEL,
+    "AWS_LAMBDA =",
+    process.env.AWS_LAMBDA_FUNCTION_NAME,
+  );
+  console.log("Current working directory:", process.cwd());
+  console.log("__dirname:", __dirname);
+
+  // First, always try system FFmpeg since it's most reliable
+  const systemPaths = [
+    "ffmpeg", // System PATH
+    "/usr/bin/ffmpeg", // Common system location
+    "/opt/bin/ffmpeg", // Lambda layer location
+  ];
+
+  for (const path of systemPaths) {
+    try {
+      console.log(`Trying system FFmpeg at: ${path}`);
+      await execAsync(`"${path}" -version`);
+      console.log(`✅ Found working system FFmpeg at: ${path}`);
+      return path;
+    } catch (e) {
+      console.log(`❌ System FFmpeg not found at: ${path}`);
+      continue;
+    }
+  }
+
+  console.log("No system FFmpeg found, trying package binary...");
+
   try {
+    // Try the package approach as fallback
     const ffmpegStatic = require("ffmpeg-ffprobe-static");
-    return ffmpegStatic.ffmpegPath;
+    let ffmpegPath = ffmpegStatic.ffmpegPath;
+
+    console.log("Package reported FFmpeg path:", ffmpegPath);
+
+    // Check if the path exists
+    if (existsSync(ffmpegPath)) {
+      console.log("✅ Package FFmpeg binary exists");
+
+      // Try to make it executable
+      try {
+        await execAsync(`chmod +x "${ffmpegPath}"`);
+        console.log("Made FFmpeg executable");
+      } catch (chmodError: any) {
+        console.warn("Could not make FFmpeg executable:", chmodError.message);
+      }
+
+      // Test if it actually works
+      try {
+        await execAsync(`"${ffmpegPath}" -version`);
+        console.log("✅ Package FFmpeg is working");
+        return ffmpegPath;
+      } catch (testError: any) {
+        console.error("❌ Package FFmpeg failed test:", testError.message);
+      }
+    } else {
+      console.log("❌ Package FFmpeg binary does not exist at reported path");
+
+      // Try to find it in alternative locations
+      const possiblePaths = [
+        join(
+          require.resolve("ffmpeg-ffprobe-static/package.json"),
+          "..",
+          "ffmpeg",
+        ),
+        join(process.cwd(), "node_modules", "ffmpeg-ffprobe-static", "ffmpeg"),
+        join(
+          __dirname,
+          "..",
+          "..",
+          "..",
+          "..",
+          "node_modules",
+          "ffmpeg-ffprobe-static",
+          "ffmpeg",
+        ),
+      ];
+
+      console.log("Searching for FFmpeg in alternative locations...");
+      for (const path of possiblePaths) {
+        console.log(`Checking: ${path}`);
+        try {
+          if (existsSync(path)) {
+            console.log(`Found FFmpeg at: ${path}`);
+
+            // Try to make it executable
+            try {
+              await execAsync(`chmod +x "${path}"`);
+            } catch (chmodError: any) {
+              console.warn(
+                "Could not make FFmpeg executable:",
+                chmodError.message,
+              );
+            }
+
+            // Test if it works
+            try {
+              await execAsync(`"${path}" -version`);
+              console.log("✅ Alternative FFmpeg is working");
+              return path;
+            } catch (testError: any) {
+              console.error(
+                "❌ Alternative FFmpeg failed test:",
+                testError.message,
+              );
+            }
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+
+    console.error("❌ No working FFmpeg binary found anywhere");
+    throw new Error("FFmpeg not available - no working binary found");
   } catch (error) {
     console.error("Failed to load ffmpeg-ffprobe-static:", error);
-    throw new Error("FFmpeg not available");
+    throw new Error("FFmpeg not available - package not found");
   }
 }
 
@@ -68,7 +183,7 @@ export async function POST(request: NextRequest) {
       );
 
       let ffmpegCommand: string;
-      const ffmpegPath = getFfmpegPath();
+      const ffmpegPath = await getFfmpegPath();
 
       if (overlayEnabled && watermarkImageFile) {
         // Save watermark file
