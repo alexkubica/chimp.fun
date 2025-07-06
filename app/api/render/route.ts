@@ -5,9 +5,18 @@ import { tmpdir } from "os";
 import { existsSync } from "fs";
 import { exec } from "child_process";
 import { promisify } from "util";
-import { ffmpegPath } from "ffmpeg-ffprobe-static";
-
 const execAsync = promisify(exec);
+
+// Get FFmpeg path at runtime to avoid build-time path resolution issues
+function getFfmpegPath() {
+  try {
+    const ffmpegStatic = require("ffmpeg-ffprobe-static");
+    return ffmpegStatic.ffmpegPath;
+  } catch (error) {
+    console.error("Failed to load ffmpeg-ffprobe-static:", error);
+    throw new Error("FFmpeg not available");
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,6 +68,7 @@ export async function POST(request: NextRequest) {
       );
 
       let ffmpegCommand: string;
+      const ffmpegPath = getFfmpegPath();
 
       if (overlayEnabled && watermarkImageFile) {
         // Save watermark file
