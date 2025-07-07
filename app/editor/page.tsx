@@ -16,7 +16,8 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { collectionsMetadata, reactionsMap } from "@/consts";
 import { ReactionMetadata } from "@/types";
-// FFmpeg imports removed since we're using server-side API
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { debounce } from "lodash";
 import {
   useCallback,
@@ -754,6 +755,7 @@ function EditorPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
   const [loading, setLoading] = useState(true);
   const [tokenID, setTokenID] = useState<string | number>(2956);
@@ -764,6 +766,9 @@ function EditorPage() {
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
   const [overlayNumber, setOverlayNumber] = useState(18);
+  const [ffmpegReady, setFfmpegReady] = useState(false);
+  const [ffmpegLoading, setFfmpegLoading] = useState(false);
+  const ffmpegLoadPromise = useRef<Promise<boolean> | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [uploadedImageUri, setUploadedImageUri] = useState<string | null>(null);
   const [finalResult, setFinalResult] = useState<string | null>(null);
@@ -1468,6 +1473,10 @@ function EditorPage() {
       if (!imageUrl || !encodedImageUrl) {
         return;
       }
+      if (!ffmpegReady) {
+        console.warn("FFmpeg not ready yet.");
+        return;
+      }
 
       let overlaySettings: Partial<ReactionMetadata> = {
         title: "",
@@ -1477,19 +1486,15 @@ function EditorPage() {
       overlaySettings = reactionsMap[overlayNumber - 1];
 
       try {
+        let filedata;
         setLoading(true);
-
-        // Get the input image data
-        let inputImageResponse;
         if (uploadedImageUri) {
-          inputImageResponse = await fetch(uploadedImageUri);
+          filedata = await fetchFile(uploadedImageUri);
         } else {
-          inputImageResponse = await fetch(imageUrl);
+          filedata = await fetchFile(imageUrl);
         }
-        const inputImageBlob = await inputImageResponse.blob();
+        const imageBytes = new Uint8Array(filedata);
 
-        // Determine image extension
-        const imageBytes = new Uint8Array(await inputImageBlob.arrayBuffer());
         const isPNG =
           imageBytes[0] === 0x89 &&
           imageBytes[1] === 0x50 &&
@@ -1504,73 +1509,85 @@ function EditorPage() {
         const imageExtension = isPNG ? "png" : isGIF ? "gif" : "jpg";
         setImageExtension(imageExtension);
 
-        // Get the reaction image data
-        let reactionImageResponse;
+        await ffmpegRef.current.writeFile(`input.${imageExtension}`, filedata);
+
+        // Handle custom speech bubble differently
         if (overlaySettings.isCustom && customSpeechBubbleDataUrl) {
-          reactionImageResponse = await fetch(customSpeechBubbleDataUrl);
+          await ffmpegRef.current.writeFile(
+            "reaction.png",
+            await fetchFile(customSpeechBubbleDataUrl),
+          );
         } else {
-          reactionImageResponse = await fetch(
-            `/reactions/${overlaySettings.filename}`,
+          await ffmpegRef.current.writeFile(
+            "reaction.png",
+            await fetchFile(`/reactions/${overlaySettings.filename}`),
           );
         }
-        const reactionImageBlob = await reactionImageResponse.blob();
-
-        // Prepare form data for the API call
-        const formData = new FormData();
-        formData.append("inputImage", inputImageBlob);
-        formData.append("reactionImage", reactionImageBlob);
-        formData.append("x", x.toString());
-        formData.append("y", y.toString());
-        formData.append("scale", scale.toString());
-        formData.append("overlayEnabled", overlayEnabled.toString());
-        formData.append("watermarkScale", watermarkScale.toString());
-        formData.append("watermarkPaddingX", watermarkPaddingX.toString());
-        formData.append("watermarkPaddingY", watermarkPaddingY.toString());
-        formData.append("imageExtension", imageExtension);
-
-        // Add watermark if overlay is enabled
+        let ffmpegArgs;
         if (overlayEnabled) {
+          const watermarkFile =
+            watermarkStyle === "oneline" ? "credit-oneline.png" : "credit.png";
           const watermarkPath =
             watermarkStyle === "oneline"
               ? "/credit-oneline.png"
               : "/credit.png";
 
           // Try to load the specific watermark, fallback to credit.png if not found
-          let watermarkResponse;
+          let watermarkData;
           try {
-            watermarkResponse = await fetch(watermarkPath);
+            watermarkData = await fetchFile(watermarkPath);
           } catch (error) {
             console.log(
               `Fallback: ${watermarkPath} not found, using credit.png`,
             );
-            watermarkResponse = await fetch("/credit.png");
+            watermarkData = await fetchFile("/credit.png");
           }
-          const watermarkBlob = await watermarkResponse.blob();
-          formData.append("watermarkImage", watermarkBlob);
+
+          await ffmpegRef.current.writeFile(watermarkFile, watermarkData);
+          ffmpegArgs = [
+            "-i",
+            `input.${imageExtension}`,
+            "-i",
+            "reaction.png",
+            "-i",
+            watermarkFile,
+            "-filter_complex",
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
+            ...(isGIF ? ["-f", "gif"] : []),
+            `output.${imageExtension}`,
+          ];
+        } else {
+          ffmpegArgs = [
+            "-i",
+            `input.${imageExtension}`,
+            "-i",
+            "reaction.png",
+            "-filter_complex",
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}`,
+            ...(isGIF ? ["-f", "gif"] : []),
+            `output.${imageExtension}`,
+          ];
         }
+        await ffmpegRef.current.exec(ffmpegArgs);
+        console.log("FFmpeg command executed successfully");
 
-        // Call the render API
-        const response = await fetch("/api/render", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status}`);
-        }
-
-        const resultBlob = await response.blob();
-        const url = URL.createObjectURL(resultBlob);
+        const data = await ffmpegRef.current.readFile(
+          `output.${imageExtension}`,
+        );
+        const url = URL.createObjectURL(
+          new Blob([data], { type: `image/${imageExtension}` }),
+        );
 
         setFinalResult(url);
         console.log("Image URL generated:", url);
       } catch (error) {
-        console.error("Error during image processing:", error);
+        console.error("Error during FFmpeg execution:", error);
       } finally {
         setLoading(false);
       }
     }, 200),
     [
+      ffmpegReady,
       uploadedImageUri,
       encodedImageUrl,
       overlayNumber,
@@ -1586,7 +1603,32 @@ function EditorPage() {
     ],
   );
 
-  // FFmpeg loading is no longer needed since we're using the server-side API
+  useEffect(() => {
+    const loadFfmpeg = async () => {
+      try {
+        const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+        const ffmpeg = ffmpegRef.current;
+        ffmpeg.on("log", ({ message }) => {
+          console.log(message);
+        });
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            "text/javascript",
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            "application/wasm",
+          ),
+        });
+        setFfmpegReady(true);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    loadFfmpeg();
+  }, []);
 
   useEffect(() => {
     if (file) {
@@ -1599,10 +1641,16 @@ function EditorPage() {
   }, [file]);
 
   useEffect(() => {
-    if ((encodedImageUrl || uploadedImageUri) && !dragging && !resizing) {
+    if (
+      ffmpegReady &&
+      (encodedImageUrl || uploadedImageUri) &&
+      !dragging &&
+      !resizing
+    ) {
       debouncedRenderImageUrl();
     }
   }, [
+    ffmpegReady,
     uploadedImageUri,
     debouncedRenderImageUrl,
     encodedImageUrl,
