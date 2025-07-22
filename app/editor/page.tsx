@@ -553,7 +553,7 @@ function UnifiedNFTGallery({
   const [walletPreviewPage, setWalletPreviewPage] = useState(1);
   const [showWalletPagination, setShowWalletPagination] = useState(false);
   const walletPreviewItemsPerPage = 24;
-  
+
   useEffect(() => {
     setWalletPreviewPage(1); // Reset when nfts change
     setShowWalletPagination(false); // Reset pagination view
@@ -561,31 +561,48 @@ function UnifiedNFTGallery({
 
   // Decide whether to show horizontal scroll or pagination
   const shouldPaginate = nfts.length > 100;
-  
+
   const paginatedNFTs = useMemo(() => {
     if (!shouldPaginate || !showWalletPagination) {
       // Show first 100 in horizontal scroll
       return nfts.slice(0, 100);
     }
-    
+
     // Show paginated view
     const startIndex = (walletPreviewPage - 1) * walletPreviewItemsPerPage;
-    const endIndex = Math.min(startIndex + walletPreviewItemsPerPage, nfts.length);
+    const endIndex = Math.min(
+      startIndex + walletPreviewItemsPerPage,
+      nfts.length,
+    );
     return nfts.slice(startIndex, endIndex);
-  }, [nfts, shouldPaginate, showWalletPagination, walletPreviewPage, walletPreviewItemsPerPage]);
+  }, [
+    nfts,
+    shouldPaginate,
+    showWalletPagination,
+    walletPreviewPage,
+    walletPreviewItemsPerPage,
+  ]);
 
   const paginationInfo = useMemo(() => {
     if (!shouldPaginate) return null;
-    
+
     const totalPages = Math.ceil(nfts.length / walletPreviewItemsPerPage);
     return {
       totalPages,
       hasNext: walletPreviewPage < totalPages,
       hasPrev: walletPreviewPage > 1,
       startIndex: (walletPreviewPage - 1) * walletPreviewItemsPerPage + 1,
-      endIndex: Math.min(walletPreviewPage * walletPreviewItemsPerPage, nfts.length),
+      endIndex: Math.min(
+        walletPreviewPage * walletPreviewItemsPerPage,
+        nfts.length,
+      ),
     };
-  }, [nfts.length, walletPreviewPage, walletPreviewItemsPerPage, shouldPaginate]);
+  }, [
+    nfts.length,
+    walletPreviewPage,
+    walletPreviewItemsPerPage,
+    shouldPaginate,
+  ]);
 
   if (loading && nfts.length === 0 && showLoadingState) {
     return (
@@ -741,73 +758,77 @@ function UnifiedNFTGallery({
             }}
           >
             {paginatedNFTs.map((nft) => {
-            // Find collection name for this NFT
-            const collectionObj = collectionsMetadata.find(
-              (c) => c.contract?.toLowerCase() === nft.contract.toLowerCase(),
-            );
-            const collectionName =
-              collectionObj?.name || nft.collection || "Unknown";
-            const truncatedCollection = middleEllipsis(collectionName, 32);
-            return (
-              <button
-                key={`${nft.contract}-${nft.identifier}`}
-                onClick={() =>
-                  onSelectNFT(nft.contract, nft.identifier, nft.image_url || "")
-                }
-                className="group relative rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50 flex-shrink-0"
-                style={{
-                  width: 132,
-                  height: 132,
-                  scrollSnapAlign: "start",
-                  display: "block",
-                }}
-              >
-                {/* Collection name at top, with tooltip */}
-                <div className="absolute top-0 left-0 w-full px-1 pt-1 z-10 flex flex-col items-center pointer-events-none">
-                  <div
-                    className="max-w-full text-xs text-white bg-black/70 rounded px-1 py-0.5 leading-tight font-semibold text-center line-clamp-2 middle-ellipsis-tooltip"
-                    style={{
-                      WebkitLineClamp: 2,
-                      display: "-webkit-box",
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      wordBreak: "break-all",
-                      cursor: "pointer",
-                    }}
-                    tabIndex={0}
-                  >
-                    {truncatedCollection}
-                    <span className="middle-ellipsis-tooltip-content">
-                      {collectionName}
-                    </span>
+              // Find collection name for this NFT
+              const collectionObj = collectionsMetadata.find(
+                (c) => c.contract?.toLowerCase() === nft.contract.toLowerCase(),
+              );
+              const collectionName =
+                collectionObj?.name || nft.collection || "Unknown";
+              const truncatedCollection = middleEllipsis(collectionName, 32);
+              return (
+                <button
+                  key={`${nft.contract}-${nft.identifier}`}
+                  onClick={() =>
+                    onSelectNFT(
+                      nft.contract,
+                      nft.identifier,
+                      nft.image_url || "",
+                    )
+                  }
+                  className="group relative rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50 flex-shrink-0"
+                  style={{
+                    width: 132,
+                    height: 132,
+                    scrollSnapAlign: "start",
+                    display: "block",
+                  }}
+                >
+                  {/* Collection name at top, with tooltip */}
+                  <div className="absolute top-0 left-0 w-full px-1 pt-1 z-10 flex flex-col items-center pointer-events-none">
+                    <div
+                      className="max-w-full text-xs text-white bg-black/70 rounded px-1 py-0.5 leading-tight font-semibold text-center line-clamp-2 middle-ellipsis-tooltip"
+                      style={{
+                        WebkitLineClamp: 2,
+                        display: "-webkit-box",
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        wordBreak: "break-all",
+                        cursor: "pointer",
+                      }}
+                      tabIndex={0}
+                    >
+                      {truncatedCollection}
+                      <span className="middle-ellipsis-tooltip-content">
+                        {collectionName}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                {nft.image_url ? (
-                  <img
-                    src={nft.image_url}
-                    alt={nft.name || `NFT ${nft.identifier}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                    No Image
+                  {nft.image_url ? (
+                    <img
+                      src={nft.image_url}
+                      alt={nft.name || `NFT ${nft.identifier}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                      No Image
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                  {/* NFT ID at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 flex flex-col items-center">
+                    <div className="text-xs text-white/80 font-mono">
+                      ID: {nft.identifier}
+                    </div>
                   </div>
-                )}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                {/* NFT ID at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 flex flex-col items-center">
-                  <div className="text-xs text-white/80 font-mono">
-                    ID: {nft.identifier}
-                  </div>
-                </div>
-              </button>
+                </button>
               );
             })}
           </div>
         </div>
       )}
-      
+
       {/* Pagination or Load More Controls */}
       {shouldPaginate && (
         <div className="flex flex-col gap-2">
@@ -834,45 +855,57 @@ function UnifiedNFTGallery({
                 </Button>
               )}
             </div>
-          ) : paginationInfo && (
-            /* Pagination controls */
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Showing {paginationInfo.startIndex}-{paginationInfo.endIndex} of {nfts.length} NFTs
+          ) : (
+            paginationInfo && (
+              /* Pagination controls */
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Showing {paginationInfo.startIndex}-{paginationInfo.endIndex}{" "}
+                  of {nfts.length} NFTs
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setWalletPreviewPage(Math.max(1, walletPreviewPage - 1))
+                    }
+                    disabled={!paginationInfo.hasPrev}
+                  >
+                    ← Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {walletPreviewPage} of {paginationInfo.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setWalletPreviewPage(
+                        Math.min(
+                          paginationInfo.totalPages,
+                          walletPreviewPage + 1,
+                        ),
+                      )
+                    }
+                    disabled={!paginationInfo.hasNext}
+                  >
+                    Next →
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowWalletPagination(false)}
+                  >
+                    Show Less
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setWalletPreviewPage(Math.max(1, walletPreviewPage - 1))}
-                  disabled={!paginationInfo.hasPrev}
-                >
-                  ← Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  Page {walletPreviewPage} of {paginationInfo.totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setWalletPreviewPage(Math.min(paginationInfo.totalPages, walletPreviewPage + 1))}
-                  disabled={!paginationInfo.hasNext}
-                >
-                  Next →
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowWalletPagination(false)}
-                >
-                  Show Less
-                </Button>
-              </div>
-            </div>
+            )
           )}
         </div>
       )}
-      
+
       {/* Regular load more for smaller collections */}
       {!shouldPaginate && hasMore && (
         <div className="flex gap-2">
@@ -1055,6 +1088,11 @@ function EditorPage() {
   const [allNFTsPage, setAllNFTsPage] = useState(1);
   const [allNFTsPerPage] = useState(24);
 
+  // NFT owner state
+  const [nftOwner, setNftOwner] = useState<string | null>(null);
+  const [ownerLoading, setOwnerLoading] = useState(false);
+  const [ownerError, setOwnerError] = useState<string | null>(null);
+
   // Create supported collections set for filtering
   const supportedCollections = useMemo(() => {
     return new Set(
@@ -1213,6 +1251,18 @@ function EditorPage() {
     } catch (err) {
       console.error("Failed to copy URL:", err);
       setCopyStatus("Failed to copy URL. Please try again.");
+      setTimeout(() => setCopyStatus(null), 3000);
+    }
+  }, []);
+
+  const copyOwnerToClipboard = useCallback(async (address: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopyStatus("Address copied to clipboard!");
+      setTimeout(() => setCopyStatus(null), 3000);
+    } catch (err) {
+      console.error("Failed to copy address:", err);
+      setCopyStatus("Failed to copy address. Please try again.");
       setTimeout(() => setCopyStatus(null), 3000);
     }
   }, []);
@@ -1510,7 +1560,7 @@ function EditorPage() {
 
         // Scroll up to the preview when an NFT is selected
         setTimeout(() => {
-          const preview = document.querySelector('.aspect-square');
+          const preview = document.querySelector(".aspect-square");
           if (preview) {
             preview.scrollIntoView({ behavior: "smooth", block: "center" });
           }
@@ -1700,6 +1750,7 @@ function EditorPage() {
         return;
       }
 
+      // Fetch NFT image
       if (collectionMetadata.gifOverride) {
         const gifUrl = collectionMetadata.gifOverride(tokenID.toString());
         setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
@@ -1707,26 +1758,63 @@ function EditorPage() {
           "Set imageUrl:",
           `/proxy?url=${encodeURIComponent(gifUrl)}`,
         );
-        return;
+      } else {
+        try {
+          const response = await fetch(
+            `/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
+          );
+          if (!response.ok) {
+            throw new Error(`Error fetching image URL: ${response.statusText}`);
+          }
+          const { imageUrl } = await response.json();
+          if (imageUrl.includes("ipfs")) {
+            setImageUrl(imageUrl);
+          } else {
+            setImageUrl(`/proxy?url=${imageUrl}`);
+          }
+          console.log("Set imageUrl:", imageUrl);
+        } catch (error) {
+          console.error("Error fetching image:", error);
+        }
       }
 
-      const response = await fetch(
-        `/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
-      );
-      if (!response.ok) {
-        throw new Error(
-          `Error fetching Chimpers image URL: ${response.statusText}`,
-        );
-      }
-      const { imageUrl } = await response.json();
-      if (imageUrl.includes("ipfs")) {
-        setImageUrl(imageUrl);
+      // Fetch NFT owner (only for manual token ID input, not for wallet-selected NFTs)
+      if (!selectedFromWallet) {
+        setOwnerLoading(true);
+        setOwnerError(null);
+        try {
+          const ownerResponse = await fetch(
+            `/fetchNFTOwner?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
+          );
+          if (ownerResponse.ok) {
+            const { owner } = await ownerResponse.json();
+            setNftOwner(owner);
+          } else {
+            setOwnerError("Could not fetch owner");
+            setNftOwner(null);
+          }
+        } catch (error) {
+          console.error("Error fetching NFT owner:", error);
+          setOwnerError("Failed to fetch owner");
+          setNftOwner(null);
+        } finally {
+          setOwnerLoading(false);
+        }
       } else {
-        setImageUrl(`/proxy?url=${imageUrl}`);
+        // If NFT was selected from wallet, use the wallet address as owner
+        setNftOwner(selectedFromWallet.walletAddress || null);
+        setOwnerLoading(false);
+        setOwnerError(null);
       }
-      console.log("Set imageUrl:", imageUrl);
     })();
-  }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
+  }, [
+    collectionIndex,
+    collectionMetadata,
+    maxTokenID,
+    minTokenID,
+    tokenID,
+    selectedFromWallet,
+  ]);
 
   const encodedImageUrl = useMemo(() => {
     console.log("encodedImageUrl useMemo:", imageUrl);
@@ -1982,6 +2070,10 @@ function EditorPage() {
         setLoading(true);
         console.log("upload file");
         setFile(e.target.files[0]);
+        // Clear owner info when uploading a file
+        setNftOwner(null);
+        setOwnerError(null);
+        setSelectedFromWallet(null);
       }
     },
     [],
@@ -2012,6 +2104,9 @@ function EditorPage() {
     setFile(null);
     setUploadedImageUri(null);
     setSelectedFromWallet(null); // Clear wallet selection when manually changing token ID
+    // Clear owner state since we're manually changing the token
+    setNftOwner(null);
+    setOwnerError(null);
   }, [tempTokenID, minTokenID, maxTokenID]);
 
   const handleRandomClick = useCallback(() => {
@@ -2023,6 +2118,9 @@ function EditorPage() {
     setFile(null);
     setUploadedImageUri(null);
     setSelectedFromWallet(null); // Clear wallet selection when using random
+    // Clear owner state since we're using random
+    setNftOwner(null);
+    setOwnerError(null);
   }, [maxTokenID]);
 
   // Helper: Copy first frame of GIF as PNG to clipboard
@@ -2223,6 +2321,9 @@ function EditorPage() {
     setFile(null);
     setUploadedImageUri(null);
     setSelectedFromWallet(null); // Clear wallet selection when feeling lucky
+    // Clear owner state since we're feeling lucky
+    setNftOwner(null);
+    setOwnerError(null);
     // Clear unified wallet browsing state
     setWalletInput("");
     setNfts([]);
@@ -2464,6 +2565,9 @@ function EditorPage() {
                     setFile(null);
                     setUploadedImageUri(null);
                     setSelectedFromWallet(null);
+                    // Clear owner state when changing collection
+                    setNftOwner(null);
+                    setOwnerError(null);
                   }}
                   getItemValue={(collection) =>
                     collectionsMetadata.indexOf(collection).toString()
@@ -2499,6 +2603,9 @@ function EditorPage() {
                     setFile(null);
                     setUploadedImageUri(null);
                     setSelectedFromWallet(null);
+                    // Clear owner state when changing collection
+                    setNftOwner(null);
+                    setOwnerError(null);
                   }}
                 >
                   🎲
@@ -2572,8 +2679,67 @@ function EditorPage() {
                   {errorMessage}
                 </div>
               )}
-              {/* Load Wallet button above OpenSea link */}
+              {/* NFT Owner Display */}
               {!uploadedImageUri && (
+                <div className="mt-2">
+                  {ownerLoading ? (
+                    <div className="text-sm text-muted-foreground">
+                      Loading owner...
+                    </div>
+                  ) : ownerError ? (
+                    <div className="text-sm text-muted-foreground">
+                      {ownerError}
+                    </div>
+                  ) : nftOwner ? (
+                    <div className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded-md">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          {selectedFromWallet ? "Selected from" : "Owned by"}
+                        </span>
+                        <span className="text-sm font-mono">
+                          {middleEllipsis(nftOwner, 20)}'s NFTs
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyOwnerToClipboard(nftOwner)}
+                        title="Copy address"
+                      >
+                        <AiOutlineCopy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+              {/* Load Wallet button above OpenSea link */}
+              {!uploadedImageUri && nftOwner && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setActiveTab("loadwallet");
+                    // Fill the wallet input with the current NFT owner
+                    setWalletInput(nftOwner);
+                    // Scroll to wallet input after a brief delay
+                    setTimeout(() => {
+                      const walletInput =
+                        document.getElementById("walletInput");
+                      if (walletInput) {
+                        walletInput.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
+                        walletInput.focus();
+                      }
+                    }, 100);
+                  }}
+                  className="w-full mt-1"
+                >
+                  🔍 Load This Wallet to Browse NFTs
+                </Button>
+              )}
+              {!uploadedImageUri && !nftOwner && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -2581,9 +2747,13 @@ function EditorPage() {
                     setActiveTab("loadwallet");
                     // Scroll to wallet input after a brief delay
                     setTimeout(() => {
-                      const walletInput = document.getElementById("walletInput");
+                      const walletInput =
+                        document.getElementById("walletInput");
                       if (walletInput) {
-                        walletInput.scrollIntoView({ behavior: "smooth", block: "center" });
+                        walletInput.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
                         walletInput.focus();
                       }
                     }, 100);

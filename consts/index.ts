@@ -478,3 +478,7 @@ export const reactionsMap: ReactionMetadata[] = [
 export const tokenURIABI = [
   "function tokenURI(uint256 tokenId) external view returns (string memory)",
 ];
+
+export const ownerOfABI = [
+  "function ownerOf(uint256 tokenId) external view returns (address)",
+];
