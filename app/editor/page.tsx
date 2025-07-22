@@ -2096,6 +2096,18 @@ function EditorPage() {
 
   console.log("Top-level render:", { ffmpegReady, imageUrl });
 
+  // Handler for Add to Watchlist button
+  function handleAddToWatchlist() {
+    return async function () {
+      console.log("Add to Watchlist clicked", walletInput);
+      const result = await watchlist.addWallet(walletInput.trim());
+      console.log("addWallet result", result);
+      if (result) {
+        // Optionally clear input or show feedback
+      }
+    };
+  }
+
   return (
     <>
       <main className="min-h-screen flex items-center justify-center px-2 py-4">
