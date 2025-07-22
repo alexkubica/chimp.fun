@@ -37,7 +37,11 @@ import {
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import { SpeechBubble } from "@/components/ui/SpeechBubble";
 import path from "path";
-import { useDynamicContext, useIsLoggedIn, DynamicConnectButton } from "@dynamic-labs/sdk-react-core";
+import {
+  useDynamicContext,
+  useIsLoggedIn,
+  DynamicConnectButton,
+} from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useWatchlist } from "./hooks/useNFTFetcher";
@@ -997,7 +1001,7 @@ function EditorPage() {
     const walletIdParam = params.get("walletId");
     if (walletIdParam && isValidEthereumAddress(walletIdParam)) {
       setWalletInput(walletIdParam);
-      setActiveTab("input");
+      setActiveTab("loadwallet");
     }
   }, []);
 
@@ -1281,7 +1285,7 @@ function EditorPage() {
   // Load user's own NFTs when they sign in and switch to connected tab
   useEffect(() => {
     if (isLoggedIn && primaryWallet?.address) {
-      setActiveTab("connected"); // Switch to connected tab when logged in
+      setActiveTab("loadwallet"); // Switch to load wallet tab when logged in
       if (!activeWallet || activeWallet !== primaryWallet.address) {
         setWalletInput(""); // Clear input when loading user's wallet
         fetchAllUserNFTs(primaryWallet.address); // Fetch ALL user NFTs automatically
@@ -1307,8 +1311,9 @@ function EditorPage() {
 
   // Switch tab logic
   useEffect(() => {
-    if (!isLoggedIn && activeTab === "connected") {
-      setActiveTab("input");
+    if (!isLoggedIn && activeTab === "loadwallet") {
+      // Keep on load wallet tab when logged out
+      setActiveTab("loadwallet");
     }
   }, [isLoggedIn, activeTab]);
 
@@ -2097,10 +2102,11 @@ function EditorPage() {
   console.log("Top-level render:", { ffmpegReady, imageUrl });
 
   // Handler for Add to Watchlist button
-  function handleAddToWatchlist() {
+  function handleAddToWatchlist(address?: string) {
     return async function () {
-      console.log("Add to Watchlist clicked", walletInput);
-      const result = await watchlist.addWallet(walletInput.trim());
+      const addressToAdd = address || walletInput.trim();
+      console.log("Add to Watchlist clicked", addressToAdd);
+      const result = await watchlist.addWallet(addressToAdd);
       console.log("addWallet result", result);
       if (result) {
         // Optionally clear input or show feedback
@@ -2548,44 +2554,208 @@ function EditorPage() {
 
           {/* 7. Tab Content */}
           <div className="mt-4">
-            {activeTab === "connected" &&
-              (isLoggedIn ? (
-                (nfts.length > 0 || nftLoading || nftError) &&
-                activeWallet === primaryWallet?.address ? (
-                  <UnifiedNFTGallery
-                    onSelectNFT={(contract, tokenId, imageUrl) =>
+            {activeTab === "watchlist" && (
+              <div className="space-y-6">
+                <WatchlistManager
+                  watchlist={watchlist}
+                  supportedCollections={supportedCollections}
+                  onSelectNFT={handleNFTSelect}
+                  isResolvingENS={isResolvingENS}
+                />
+                {allWatchlistNFTs.allNFTs.length > 0 && (
+                  <NFTPagination
+                    nfts={allWatchlistNFTs.allNFTs}
+                    itemsPerPage={allNFTsPerPage}
+                    currentPage={allNFTsPage}
+                    onPageChange={setAllNFTsPage}
+                    onSelectNFT={(contract, tokenId, imageUrl) => {
+                      const nftWithWallet =
+                        allWatchlistNFTs.allNFTsWithWallets.find(
+                          (item) =>
+                            item.nft.contract === contract &&
+                            item.nft.identifier === tokenId,
+                        );
                       handleNFTSelect(
                         contract,
                         tokenId,
                         imageUrl,
-                        primaryWallet?.address,
-                      )
-                    }
+                        nftWithWallet?.walletAddress,
+                        nftWithWallet?.walletLabel,
+                      );
+                    }}
                     supportedCollections={supportedCollections}
-                    nfts={nfts}
-                    loading={nftLoading}
-                    error={nftError}
-                    hasMore={hasMore}
-                    providerName={providerName}
-                    onLoadMore={() => {}}
-                    title="Your NFTs"
-                    subtitle={
-                      nfts.length > 0
-                        ? `${nfts.length} NFTs found in your connected wallet`
-                        : undefined
-                    }
-                    showLoadingState={true}
+                    sources={allWatchlistNFTs.sources}
                   />
-                ) : (
-                  <div className="text-center text-muted-foreground p-4 border rounded-md">
-                    Loading your NFTs...
+                )}
+              </div>
+            )}
+            {activeTab === "loadwallet" && (
+              <div className="flex flex-col gap-4">
+                {/* Connect Wallet Section */}
+                {!isLoggedIn ? (
+                  <div className="flex flex-col gap-3 p-4 border rounded-md">
+                    <h3 className="text-lg font-medium">Connect Your Wallet</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Connect your wallet to load your NFTs automatically
+                    </p>
+                    <DynamicConnectButton>
+                      <Button className="w-full">Connect Wallet</Button>
+                    </DynamicConnectButton>
                   </div>
-                )
-              ) : (
-                <div className="text-center text-muted-foreground p-4 border rounded-md">
-                  Connect your wallet to see your NFTs
+                ) : (
+                  <div className="flex flex-col gap-3 p-4 border rounded-md">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium">Connected Wallet</h3>
+                      <span className="text-sm text-green-600 font-medium">
+                        Connected
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Your wallet is connected. NFTs will load automatically.
+                    </p>
+                    {primaryWallet?.address && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono text-muted-foreground">
+                          {middleEllipsis(primaryWallet.address, 20)}
+                        </span>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={
+                            isResolvingENS ||
+                            watchlist.isInWatchlist(primaryWallet.address)
+                          }
+                          onClick={handleAddToWatchlist(primaryWallet.address)}
+                          title={
+                            watchlist.isInWatchlist(primaryWallet.address)
+                              ? "Already in watchlist"
+                              : "Add to Watchlist"
+                          }
+                        >
+                          {watchlist.isInWatchlist(primaryWallet.address)
+                            ? "In Watchlist"
+                            : "+ Add to Watchlist"}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Manual Wallet Input Section */}
+                <div className="flex flex-col gap-3 p-4 border rounded-md">
+                  <h3 className="text-lg font-medium">Load Any Wallet</h3>
+                  <Label htmlFor="walletInput">
+                    Enter wallet address or ENS name
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="walletInput"
+                      placeholder="0x... or vitalik.eth"
+                      value={walletInput}
+                      onChange={(e) => setWalletInput(e.target.value)}
+                      className="flex-1 min-w-0 font-mono text-sm"
+                      onKeyDown={handleWalletInputKeyDown}
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handlePasteFromClipboard}
+                      title="Paste from clipboard"
+                    >
+                      📋
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={loadWallet}
+                      disabled={
+                        nftLoading || isResolvingENS || !walletInput.trim()
+                      }
+                    >
+                      {nftLoading || isResolvingENS
+                        ? "Loading..."
+                        : "Load NFTs"}
+                    </Button>
+                  </div>
+                  <Button
+                    className="mt-2"
+                    variant="secondary"
+                    size="sm"
+                    disabled={
+                      !walletInput.trim() ||
+                      isResolvingENS ||
+                      watchlist.isInWatchlist(walletInput.trim()) ||
+                      (!isValidEthereumAddress(walletInput.trim()) &&
+                        !looksLikeENS(walletInput.trim()))
+                    }
+                    onClick={handleAddToWatchlist()}
+                    title={
+                      watchlist.isInWatchlist(walletInput.trim())
+                        ? "Already in watchlist"
+                        : !isValidEthereumAddress(walletInput.trim()) &&
+                            !looksLikeENS(walletInput.trim())
+                          ? "Enter a valid address or ENS"
+                          : "Add to Watchlist"
+                    }
+                  >
+                    + Add to Watchlist
+                  </Button>
                 </div>
-              ))}
+
+                {/* Display Connected Wallet NFTs */}
+                {isLoggedIn &&
+                  (nfts.length > 0 || nftLoading || nftError) &&
+                  activeWallet === primaryWallet?.address && (
+                    <UnifiedNFTGallery
+                      onSelectNFT={(contract, tokenId, imageUrl) =>
+                        handleNFTSelect(
+                          contract,
+                          tokenId,
+                          imageUrl,
+                          primaryWallet?.address,
+                        )
+                      }
+                      supportedCollections={supportedCollections}
+                      nfts={nfts}
+                      loading={nftLoading}
+                      error={nftError}
+                      hasMore={hasMore}
+                      providerName={providerName}
+                      onLoadMore={() => {}}
+                      title="Your NFTs"
+                      subtitle={
+                        nfts.length > 0
+                          ? `${nfts.length} NFTs found in your connected wallet`
+                          : undefined
+                      }
+                      showLoadingState={true}
+                    />
+                  )}
+
+                {/* Display Manual Wallet NFTs */}
+                {activeWallet &&
+                  activeWallet !== primaryWallet?.address &&
+                  (nfts.length > 0 || nftLoading || nftError) && (
+                    <UnifiedNFTGallery
+                      onSelectNFT={handleNFTSelect}
+                      supportedCollections={supportedCollections}
+                      nfts={nfts}
+                      loading={nftLoading}
+                      error={nftError}
+                      hasMore={hasMore}
+                      providerName={providerName}
+                      onLoadMore={() => {
+                        if (nextCursor && !nftLoading) {
+                          fetchWalletNFTs(walletInput.trim(), nextCursor);
+                        }
+                      }}
+                      onLoadAll={loadAllFromExternalWallet}
+                      title={getGalleryInfo.title}
+                      subtitle={getGalleryInfo.subtitle}
+                      showLoadingState={true}
+                    />
+                  )}
+              </div>
+            )}
             {activeTab === "upload" && (
               <div className="flex flex-col gap-2">
                 <ImagePicker
@@ -2623,120 +2793,6 @@ function EditorPage() {
                 <small className="text-muted-foreground">
                   Tip: Use 1:1 aspect ratio for best results.
                 </small>
-              </div>
-            )}
-            {activeTab === "input" && (
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="walletInput">
-                  Enter wallet address or ENS name
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="walletInput"
-                    placeholder="0x... or vitalik.eth"
-                    value={walletInput}
-                    onChange={(e) => setWalletInput(e.target.value)}
-                    className="flex-1 min-w-0 font-mono text-sm"
-                    onKeyDown={handleWalletInputKeyDown}
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handlePasteFromClipboard}
-                    title="Paste from clipboard"
-                  >
-                    📋
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={loadWallet}
-                    disabled={
-                      nftLoading || isResolvingENS || !walletInput.trim()
-                    }
-                  >
-                    {nftLoading || isResolvingENS ? "Loading..." : "Load NFTs"}
-                  </Button>
-                </div>
-                <Button
-                  className="mt-2"
-                  variant="secondary"
-                  size="sm"
-                  disabled={
-                    !walletInput.trim() ||
-                    isResolvingENS ||
-                    watchlist.isInWatchlist(walletInput.trim()) ||
-                    (!isValidEthereumAddress(walletInput.trim()) &&
-                      !looksLikeENS(walletInput.trim()))
-                  }
-                  onClick={handleAddToWatchlist()}
-                  title={
-                    watchlist.isInWatchlist(walletInput.trim())
-                      ? "Already in watchlist"
-                      : !isValidEthereumAddress(walletInput.trim()) &&
-                          !looksLikeENS(walletInput.trim())
-                        ? "Enter a valid address or ENS"
-                        : "Add to Watchlist"
-                  }
-                >
-                  + Add to Watchlist
-                </Button>
-                {activeWallet &&
-                  activeWallet !== primaryWallet?.address &&
-                  (nfts.length > 0 || nftLoading || nftError) && (
-                    <UnifiedNFTGallery
-                      onSelectNFT={handleNFTSelect}
-                      supportedCollections={supportedCollections}
-                      nfts={nfts}
-                      loading={nftLoading}
-                      error={nftError}
-                      hasMore={hasMore}
-                      providerName={providerName}
-                      onLoadMore={() => {
-                        if (nextCursor && !nftLoading) {
-                          fetchWalletNFTs(walletInput.trim(), nextCursor);
-                        }
-                      }}
-                      onLoadAll={loadAllFromExternalWallet}
-                      title={getGalleryInfo.title}
-                      subtitle={getGalleryInfo.subtitle}
-                      showLoadingState={true}
-                    />
-                  )}
-              </div>
-            )}
-            {activeTab === "watchlist" && (
-              <div className="space-y-6">
-                <WatchlistManager
-                  watchlist={watchlist}
-                  supportedCollections={supportedCollections}
-                  onSelectNFT={handleNFTSelect}
-                  isResolvingENS={isResolvingENS}
-                />
-                {allWatchlistNFTs.allNFTs.length > 0 && (
-                  <NFTPagination
-                    nfts={allWatchlistNFTs.allNFTs}
-                    itemsPerPage={allNFTsPerPage}
-                    currentPage={allNFTsPage}
-                    onPageChange={setAllNFTsPage}
-                    onSelectNFT={(contract, tokenId, imageUrl) => {
-                      const nftWithWallet =
-                        allWatchlistNFTs.allNFTsWithWallets.find(
-                          (item) =>
-                            item.nft.contract === contract &&
-                            item.nft.identifier === tokenId,
-                        );
-                      handleNFTSelect(
-                        contract,
-                        tokenId,
-                        imageUrl,
-                        nftWithWallet?.walletAddress,
-                        nftWithWallet?.walletLabel,
-                      );
-                    }}
-                    supportedCollections={supportedCollections}
-                    sources={allWatchlistNFTs.sources}
-                  />
-                )}
               </div>
             )}
           </div>
