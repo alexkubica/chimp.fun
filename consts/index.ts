@@ -466,11 +466,11 @@ export const reactionsMap: ReactionMetadata[] = [
     filename: "Happy 4th of July!.png",
   },
   {
-    title: "Chimpers SZN is coming 🐒",
+    title: "CHIMPERS SZN\nis coming\n🐒",
     scale: 0.6,
     x: 500,
     y: 60,
-    filename: "Chimpers SZN is coming.png",
+    filename: "CHIMPERS SZN is coming.png",
   },
   {
     title: "Custom Speech Bubble",
