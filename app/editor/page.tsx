@@ -40,6 +40,9 @@ import path from "path";
 import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useWatchlist } from "./hooks/useNFTFetcher";
+import { WatchlistManager } from "./components/WatchlistManager";
+import { NFTPagination } from "./components/NFTPagination";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -892,10 +895,17 @@ function EditorPage() {
   const [providerName, setProviderName] = useState<string | null>(null);
   const [isResolvingENS, setIsResolvingENS] = useState(false);
 
-  // Tab state for switching between connected and inputted wallet
-  const [activeTab, setActiveTab] = useState<"connected" | "input">(
-    "connected",
-  );
+  // Tab state for switching between connected, inputted, and watchlist wallets
+  const [activeTab, setActiveTab] = useState<
+    "connected" | "input" | "watchlist"
+  >("connected");
+
+  // Pagination state for all NFTs view
+  const [allNFTsPage, setAllNFTsPage] = useState(1);
+  const [allNFTsPerPage] = useState(24);
+
+  // Initialize watchlist hook
+  const watchlist = useWatchlist(supportedCollections);
 
   let collectionMetadata = collectionsMetadata[collectionIndex];
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
@@ -1276,16 +1286,41 @@ function EditorPage() {
     }
   }, [isLoggedIn, primaryWallet?.address, fetchAllUserNFTs]);
 
+  // Load NFTs for all watchlist wallets on page load
+  useEffect(() => {
+    if (watchlist.watchedWallets.length > 0) {
+      watchlist.watchedWallets.forEach((wallet) => {
+        const data = watchlist.walletData.get(wallet.address);
+        if (data && !data.lastFetched && !data.loading) {
+          watchlist.loadWalletNFTs(wallet.address);
+        }
+      });
+    }
+  }, [
+    watchlist.watchedWallets,
+    watchlist.walletData,
+    watchlist.loadWalletNFTs,
+  ]);
+
   // Switch tab logic
   useEffect(() => {
-    if (!isLoggedIn && activeTab === "connected") {
-      setActiveTab("input"); // Switch to input tab if not logged in
+    if (
+      !isLoggedIn &&
+      (activeTab === "connected" || activeTab === "watchlist")
+    ) {
+      setActiveTab("input"); // Switch to input tab if not logged in and on connected/watchlist tab
     }
   }, [isLoggedIn, activeTab]);
 
   // Unified NFT selection handler
   const handleNFTSelect = useCallback(
-    (contract: string, tokenId: string, imageUrl: string) => {
+    (
+      contract: string,
+      tokenId: string,
+      imageUrl: string,
+      walletAddress?: string,
+      walletLabel?: string,
+    ) => {
       // Find the collection index for this contract
       const collectionIdx = collectionsMetadata.findIndex(
         (c) => c.contract?.toLowerCase() === contract.toLowerCase(),
@@ -1300,17 +1335,25 @@ function EditorPage() {
         setUploadedImageUri(null);
 
         // Determine source and wallet address
-        const isYourWallet = activeWallet === primaryWallet?.address;
+        let source: "your-wallet" | "external-wallet" | "watchlist" =
+          "external-wallet";
+        if (walletAddress && watchlist.isInWatchlist(walletAddress)) {
+          source = "watchlist";
+        } else if (activeWallet === primaryWallet?.address) {
+          source = "your-wallet";
+        }
+
         setSelectedFromWallet({
           contract,
           tokenId,
           imageUrl,
-          source: isYourWallet ? "your-wallet" : "external-wallet",
-          walletAddress: activeWallet || "",
+          source,
+          walletAddress: walletAddress || activeWallet || "",
+          walletLabel,
         });
       }
     },
-    [activeWallet, primaryWallet?.address],
+    [activeWallet, primaryWallet?.address, watchlist],
   );
 
   // Paste from clipboard function
@@ -1402,6 +1445,64 @@ function EditorPage() {
     nftLoading,
     hasMore,
   ]);
+
+  // Get all NFTs from watchlist for pagination
+  const allWatchlistNFTs = useMemo(() => {
+    const allNFTs: Array<{
+      nft: any;
+      walletAddress: string;
+      walletLabel: string;
+    }> = [];
+    const sources: {
+      [walletAddress: string]: { count: number; label: string };
+    } = {};
+
+    watchlist.watchedWallets.forEach((wallet) => {
+      const data = watchlist.walletData.get(wallet.address);
+      if (data?.nfts) {
+        const walletNFTs = data.nfts.map((nft) => ({
+          nft,
+          walletAddress: wallet.address,
+          walletLabel: wallet.label || "",
+        }));
+        allNFTs.push(...walletNFTs);
+        sources[wallet.address] = {
+          count: data.nfts.length,
+          label:
+            wallet.label ||
+            `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`,
+        };
+      }
+    });
+
+    // Sort by collection name, then token ID
+    allNFTs.sort((a, b) => {
+      const collectionA =
+        collectionsMetadata.find(
+          (c) => c.contract?.toLowerCase() === a.nft.contract.toLowerCase(),
+        )?.name ||
+        a.nft.collection ||
+        "Unknown";
+      const collectionB =
+        collectionsMetadata.find(
+          (c) => c.contract?.toLowerCase() === b.nft.contract.toLowerCase(),
+        )?.name ||
+        b.nft.collection ||
+        "Unknown";
+
+      if (collectionA !== collectionB) {
+        return collectionA.localeCompare(collectionB);
+      }
+
+      return parseInt(a.nft.identifier) - parseInt(b.nft.identifier);
+    });
+
+    return {
+      allNFTs: allNFTs.map((item) => item.nft),
+      sources,
+      allNFTsWithWallets: allNFTs,
+    };
+  }, [watchlist.watchedWallets, watchlist.walletData]);
 
   useEffect(() => {
     if (isFirstRender) {
@@ -1999,6 +2100,18 @@ function EditorPage() {
                 >
                   Browse Wallet
                 </button>
+                <button
+                  onClick={() => setActiveTab("watchlist")}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === "watchlist"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Watchlist{" "}
+                  {watchlist.watchedWallets.length > 0 &&
+                    `(${watchlist.watchedWallets.length})`}
+                </button>
               </div>
 
               {/* Tab Content - Mobile */}
@@ -2007,7 +2120,14 @@ function EditorPage() {
                   (nfts.length > 0 || nftLoading || nftError) &&
                   activeWallet === primaryWallet?.address ? (
                     <UnifiedNFTGallery
-                      onSelectNFT={handleNFTSelect}
+                      onSelectNFT={(contract, tokenId, imageUrl) =>
+                        handleNFTSelect(
+                          contract,
+                          tokenId,
+                          imageUrl,
+                          primaryWallet?.address,
+                        )
+                      }
                       supportedCollections={supportedCollections}
                       nfts={nfts}
                       loading={nftLoading}
@@ -2036,6 +2156,40 @@ function EditorPage() {
                     Connect your wallet to see your NFTs
                   </div>
                 )
+              ) : activeTab === "watchlist" ? (
+                <div className="space-y-6">
+                  <WatchlistManager
+                    watchlist={watchlist}
+                    supportedCollections={supportedCollections}
+                    onSelectNFT={handleNFTSelect}
+                    isResolvingENS={isResolvingENS}
+                  />
+                  {allWatchlistNFTs.allNFTs.length > 0 && (
+                    <NFTPagination
+                      nfts={allWatchlistNFTs.allNFTs}
+                      itemsPerPage={allNFTsPerPage}
+                      currentPage={allNFTsPage}
+                      onPageChange={setAllNFTsPage}
+                      onSelectNFT={(contract, tokenId, imageUrl) => {
+                        const nftWithWallet =
+                          allWatchlistNFTs.allNFTsWithWallets.find(
+                            (item) =>
+                              item.nft.contract === contract &&
+                              item.nft.identifier === tokenId,
+                          );
+                        handleNFTSelect(
+                          contract,
+                          tokenId,
+                          imageUrl,
+                          nftWithWallet?.walletAddress,
+                          nftWithWallet?.walletLabel,
+                        );
+                      }}
+                      supportedCollections={supportedCollections}
+                      sources={allWatchlistNFTs.sources}
+                    />
+                  )}
+                </div>
               ) : (
                 <div className="flex flex-col gap-4">
                   {/* Wallet Input */}
@@ -2127,6 +2281,18 @@ function EditorPage() {
                     >
                       Browse Wallet
                     </button>
+                    <button
+                      onClick={() => setActiveTab("watchlist")}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === "watchlist"
+                          ? "border-primary text-primary"
+                          : "border-transparent text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Watchlist{" "}
+                      {watchlist.watchedWallets.length > 0 &&
+                        `(${watchlist.watchedWallets.length})`}
+                    </button>
                   </div>
 
                   {/* Tab Content - Desktop */}
@@ -2136,7 +2302,14 @@ function EditorPage() {
                         (nfts.length > 0 || nftLoading || nftError) &&
                         activeWallet === primaryWallet?.address ? (
                           <UnifiedNFTGallery
-                            onSelectNFT={handleNFTSelect}
+                            onSelectNFT={(contract, tokenId, imageUrl) =>
+                              handleNFTSelect(
+                                contract,
+                                tokenId,
+                                imageUrl,
+                                primaryWallet?.address,
+                              )
+                            }
                             supportedCollections={supportedCollections}
                             nfts={nfts}
                             loading={nftLoading}
@@ -2165,6 +2338,40 @@ function EditorPage() {
                           Connect your wallet to see your NFTs
                         </div>
                       )
+                    ) : activeTab === "watchlist" ? (
+                      <div className="space-y-6">
+                        <WatchlistManager
+                          watchlist={watchlist}
+                          supportedCollections={supportedCollections}
+                          onSelectNFT={handleNFTSelect}
+                          isResolvingENS={isResolvingENS}
+                        />
+                        {allWatchlistNFTs.allNFTs.length > 0 && (
+                          <NFTPagination
+                            nfts={allWatchlistNFTs.allNFTs}
+                            itemsPerPage={allNFTsPerPage}
+                            currentPage={allNFTsPage}
+                            onPageChange={setAllNFTsPage}
+                            onSelectNFT={(contract, tokenId, imageUrl) => {
+                              const nftWithWallet =
+                                allWatchlistNFTs.allNFTsWithWallets.find(
+                                  (item) =>
+                                    item.nft.contract === contract &&
+                                    item.nft.identifier === tokenId,
+                                );
+                              handleNFTSelect(
+                                contract,
+                                tokenId,
+                                imageUrl,
+                                nftWithWallet?.walletAddress,
+                                nftWithWallet?.walletLabel,
+                              );
+                            }}
+                            supportedCollections={supportedCollections}
+                            sources={allWatchlistNFTs.sources}
+                          />
+                        )}
+                      </div>
                     ) : (
                       <div className="flex flex-col gap-4">
                         {/* Wallet Input */}
@@ -2210,7 +2417,14 @@ function EditorPage() {
                           activeWallet !== primaryWallet?.address &&
                           (nfts.length > 0 || nftLoading || nftError) && (
                             <UnifiedNFTGallery
-                              onSelectNFT={handleNFTSelect}
+                              onSelectNFT={(contract, tokenId, imageUrl) =>
+                                handleNFTSelect(
+                                  contract,
+                                  tokenId,
+                                  imageUrl,
+                                  activeWallet || undefined,
+                                )
+                              }
                               supportedCollections={supportedCollections}
                               nfts={nfts}
                               loading={nftLoading}
@@ -2309,6 +2523,12 @@ function EditorPage() {
                     <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded border-l-2 border-blue-500">
                       {selectedFromWallet.source === "your-wallet" ? (
                         <span>💳 Selected from your wallet</span>
+                      ) : selectedFromWallet.source === "watchlist" ? (
+                        <span>
+                          ⭐ Selected from watchlist:{" "}
+                          {selectedFromWallet.walletLabel ||
+                            `${selectedFromWallet.walletAddress.slice(0, 6)}...${selectedFromWallet.walletAddress.slice(-4)}`}
+                        </span>
                       ) : (
                         <span>
                           🔍 Selected from{" "}
