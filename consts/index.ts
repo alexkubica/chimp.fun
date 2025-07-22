@@ -466,7 +466,7 @@ export const reactionsMap: ReactionMetadata[] = [
     filename: "Happy 4th of July!.png",
   },
   {
-    title: "CHIMPERS SZN\nis coming\n🐒",
+    title: "CHIMPERS SZN\nis coming",
     scale: 0.6,
     x: 500,
     y: 60,
