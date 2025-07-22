@@ -37,7 +37,7 @@ import {
 import { ImagePicker } from "@/components/ui/ImagePicker";
 import { SpeechBubble } from "@/components/ui/SpeechBubble";
 import path from "path";
-import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useIsLoggedIn, DynamicConnectButton } from "@dynamic-labs/sdk-react-core";
 import { middleEllipsis } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useWatchlist } from "./hooks/useNFTFetcher";
@@ -898,9 +898,9 @@ function EditorPage() {
   const [providerName, setProviderName] = useState<string | null>(null);
   const [isResolvingENS, setIsResolvingENS] = useState(false);
 
-  // Tab state for switching between connected, inputted, and watchlist wallets
+  // Tab state for switching between load wallet (merged connected+input), watchlist, and upload image
   const [activeTab, setActiveTab] = useState<
-    "connected" | "input" | "watchlist" | "upload"
+    "loadwallet" | "watchlist" | "upload"
   >("watchlist");
 
   // Pagination state for all NFTs view
@@ -2525,31 +2525,24 @@ function EditorPage() {
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             <button
-              onClick={() => setActiveTab("connected")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "connected" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-              disabled={!isLoggedIn}
-            >
-              Connected Wallet
-            </button>
-            <button
-              onClick={() => setActiveTab("upload")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "upload" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-            >
-              Upload Image
-            </button>
-            <button
-              onClick={() => setActiveTab("input")}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "input" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-            >
-              Load Wallet
-            </button>
-            <button
               onClick={() => setActiveTab("watchlist")}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "watchlist" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
             >
               Watchlist{" "}
               {watchlist.watchedWallets.length > 0 &&
                 `(${watchlist.watchedWallets.length})`}
+            </button>
+            <button
+              onClick={() => setActiveTab("loadwallet")}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "loadwallet" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              Load Wallet
+            </button>
+            <button
+              onClick={() => setActiveTab("upload")}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "upload" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              Upload Image
             </button>
           </div>
 
