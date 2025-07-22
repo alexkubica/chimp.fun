@@ -64,7 +64,9 @@ function WalletCard({
 }: WalletCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(wallet.label || "");
-  const [showAllNFTs, setShowAllNFTs] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showPaginated, setShowPaginated] = useState(false);
+  const itemsPerPage = 12;
 
   const handleSaveLabel = () => {
     if (editLabel.trim() !== wallet.label) {
@@ -78,8 +80,32 @@ function WalletCard({
     setIsEditing(false);
   };
 
-  const displayedNFTs = showAllNFTs ? data.nfts : data.nfts.slice(0, 6);
-  const hasMoreNFTs = data.nfts.length > 6;
+  // Pagination logic for large collections
+  const paginationData = useMemo(() => {
+    if (!showPaginated) {
+      return {
+        displayedNFTs: data.nfts.slice(0, 6),
+        totalPages: 1,
+        hasMore: data.nfts.length > 6,
+      };
+    }
+
+    const totalPages = Math.ceil(data.nfts.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, data.nfts.length);
+    const displayedNFTs = data.nfts.slice(startIndex, endIndex);
+
+    return {
+      displayedNFTs,
+      totalPages,
+      hasMore: false,
+      hasNext: currentPage < totalPages,
+      hasPrev: currentPage > 1,
+    };
+  }, [data.nfts, showPaginated, currentPage, itemsPerPage]);
+
+  const displayedNFTs = paginationData.displayedNFTs;
+  const hasMoreNFTs = paginationData.hasMore;
 
   return (
     <div className="border rounded-lg p-4 bg-card">
@@ -239,12 +265,48 @@ function WalletCard({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowAllNFTs(!showAllNFTs)}
+                onClick={() => {
+                  setShowPaginated(true);
+                  setCurrentPage(1);
+                }}
               >
-                {showAllNFTs
-                  ? "Show Less"
-                  : `Show All ${data.nfts.length} NFTs`}
+                Show All {data.nfts.length} NFTs
               </Button>
+            </div>
+          )}
+          {showPaginated && paginationData.totalPages > 1 && (
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                Page {currentPage} of {paginationData.totalPages}
+              </span>
+              <div className="flex gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={!paginationData.hasPrev}
+                >
+                  ←
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(Math.min(paginationData.totalPages, currentPage + 1))}
+                  disabled={!paginationData.hasNext}
+                >
+                  →
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowPaginated(false);
+                    setCurrentPage(1);
+                  }}
+                >
+                  Show Less
+                </Button>
+              </div>
             </div>
           )}
         </>

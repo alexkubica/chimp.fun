@@ -549,13 +549,43 @@ function UnifiedNFTGallery({
   subtitle?: string;
   showLoadingState?: boolean;
 }) {
-  // Lazy load state
-  const [visibleCount, setVisibleCount] = useState(100);
+  // Pagination state for wallet previews
+  const [walletPreviewPage, setWalletPreviewPage] = useState(1);
+  const [showWalletPagination, setShowWalletPagination] = useState(false);
+  const walletPreviewItemsPerPage = 24;
+  
   useEffect(() => {
-    setVisibleCount(100); // Reset when nfts change
+    setWalletPreviewPage(1); // Reset when nfts change
+    setShowWalletPagination(false); // Reset pagination view
   }, [nfts]);
-  const visibleNFTs = nfts.slice(0, visibleCount);
-  const canLoadMore = nfts.length > visibleCount;
+
+  // Decide whether to show horizontal scroll or pagination
+  const shouldPaginate = nfts.length > 100;
+  
+  const paginatedNFTs = useMemo(() => {
+    if (!shouldPaginate || !showWalletPagination) {
+      // Show first 100 in horizontal scroll
+      return nfts.slice(0, 100);
+    }
+    
+    // Show paginated view
+    const startIndex = (walletPreviewPage - 1) * walletPreviewItemsPerPage;
+    const endIndex = Math.min(startIndex + walletPreviewItemsPerPage, nfts.length);
+    return nfts.slice(startIndex, endIndex);
+  }, [nfts, shouldPaginate, showWalletPagination, walletPreviewPage, walletPreviewItemsPerPage]);
+
+  const paginationInfo = useMemo(() => {
+    if (!shouldPaginate) return null;
+    
+    const totalPages = Math.ceil(nfts.length / walletPreviewItemsPerPage);
+    return {
+      totalPages,
+      hasNext: walletPreviewPage < totalPages,
+      hasPrev: walletPreviewPage > 1,
+      startIndex: (walletPreviewPage - 1) * walletPreviewItemsPerPage + 1,
+      endIndex: Math.min(walletPreviewPage * walletPreviewItemsPerPage, nfts.length),
+    };
+  }, [nfts.length, walletPreviewPage, walletPreviewItemsPerPage, shouldPaginate]);
 
   if (loading && nfts.length === 0 && showLoadingState) {
     return (
@@ -620,47 +650,97 @@ function UnifiedNFTGallery({
           </div>
         )}
       </div>
-      {/* NFT horizontal scroll gallery */}
-      <div className="relative">
-        {/* Left arrow */}
-        {visibleNFTs.length > 2 && (
-          <button
-            type="button"
-            aria-label="Scroll left"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white border rounded-full shadow p-1 flex items-center justify-center"
-            style={{ display: "flex" }}
-            onClick={() => {
-              const el = document.getElementById("nft-scroll-gallery");
-              if (el) el.scrollBy({ left: -160, behavior: "smooth" });
+      {/* NFT display - horizontal scroll or paginated grid */}
+      {showWalletPagination && shouldPaginate ? (
+        /* Paginated grid view for large collections */
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {paginatedNFTs.map((nft) => {
+            // Find collection name for this NFT
+            const collectionObj = collectionsMetadata.find(
+              (c) => c.contract?.toLowerCase() === nft.contract.toLowerCase(),
+            );
+            const collectionName =
+              collectionObj?.name || nft.collection || "Unknown";
+            const truncatedCollection = middleEllipsis(collectionName, 32);
+            return (
+              <button
+                key={`${nft.contract}-${nft.identifier}`}
+                onClick={() =>
+                  onSelectNFT(nft.contract, nft.identifier, nft.image_url || "")
+                }
+                className="group relative rounded-lg overflow-hidden border hover:border-primary transition-colors bg-muted/50 aspect-square"
+              >
+                {/* Collection name at top */}
+                <div className="absolute top-1 left-1 right-1">
+                  <div className="text-xs text-white bg-black/70 rounded px-1 py-0.5 leading-tight font-semibold text-center truncate">
+                    {middleEllipsis(collectionName, 14)}
+                  </div>
+                </div>
+                {nft.image_url ? (
+                  <img
+                    src={nft.image_url}
+                    alt={nft.name || `NFT ${nft.identifier}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                    No Image
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                {/* NFT ID at bottom */}
+                <div className="absolute bottom-1 left-1 right-1">
+                  <div className="text-xs text-white bg-black/70 rounded px-1 py-0.5 leading-tight font-mono text-center">
+                    ID: {nft.identifier}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        /* Horizontal scroll view */
+        <div className="relative">
+          {/* Left arrow */}
+          {paginatedNFTs.length > 2 && (
+            <button
+              type="button"
+              aria-label="Scroll left"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white border rounded-full shadow p-1 flex items-center justify-center"
+              style={{ display: "flex" }}
+              onClick={() => {
+                const el = document.getElementById("nft-scroll-gallery");
+                if (el) el.scrollBy({ left: -160, behavior: "smooth" });
+              }}
+            >
+              <span style={{ fontSize: 24, fontWeight: "bold" }}>{"<"}</span>
+            </button>
+          )}
+          {/* Right arrow */}
+          {paginatedNFTs.length > 2 && (
+            <button
+              type="button"
+              aria-label="Scroll right"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white border rounded-full shadow p-1 flex items-center justify-center"
+              style={{ display: "flex" }}
+              onClick={() => {
+                const el = document.getElementById("nft-scroll-gallery");
+                if (el) el.scrollBy({ left: 160, behavior: "smooth" });
+              }}
+            >
+              <span style={{ fontSize: 24, fontWeight: "bold" }}>{">"}</span>
+            </button>
+          )}
+          <div
+            id="nft-scroll-gallery"
+            className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 py-2 px-1"
+            style={{
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
             }}
           >
-            <span style={{ fontSize: 24, fontWeight: "bold" }}>{"<"}</span>
-          </button>
-        )}
-        {/* Right arrow */}
-        {visibleNFTs.length > 2 && (
-          <button
-            type="button"
-            aria-label="Scroll right"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white border rounded-full shadow p-1 flex items-center justify-center"
-            style={{ display: "flex" }}
-            onClick={() => {
-              const el = document.getElementById("nft-scroll-gallery");
-              if (el) el.scrollBy({ left: 160, behavior: "smooth" });
-            }}
-          >
-            <span style={{ fontSize: 24, fontWeight: "bold" }}>{">"}</span>
-          </button>
-        )}
-        <div
-          id="nft-scroll-gallery"
-          className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 py-2 px-1"
-          style={{
-            scrollSnapType: "x mandatory",
-            WebkitOverflowScrolling: "touch",
-          }}
-        >
-          {visibleNFTs.map((nft) => {
+            {paginatedNFTs.map((nft) => {
             // Find collection name for this NFT
             const collectionObj = collectionsMetadata.find(
               (c) => c.contract?.toLowerCase() === nft.contract.toLowerCase(),
@@ -722,25 +802,89 @@ function UnifiedNFTGallery({
                   </div>
                 </div>
               </button>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
-      {(hasMore || canLoadMore) && (
-        <div className="flex gap-2">
-          {canLoadMore && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setVisibleCount((c) => c + 100)}
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading
-                ? "Loading..."
-                : `Load More (${visibleCount + 1}-${Math.min(visibleCount + 100, nfts.length)} of ${nfts.length})`}
-            </Button>
+      )}
+      
+      {/* Pagination or Load More Controls */}
+      {shouldPaginate && (
+        <div className="flex flex-col gap-2">
+          {!showWalletPagination ? (
+            /* Switch to pagination view for large collections */
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowWalletPagination(true)}
+                className="flex-1"
+              >
+                View All {nfts.length} NFTs (Paginated)
+              </Button>
+              {onLoadAll && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={onLoadAll}
+                  disabled={loading}
+                  className="flex-1"
+                >
+                  {loading ? "Loading..." : "Load All"}
+                </Button>
+              )}
+            </div>
+          ) : paginationInfo && (
+            /* Pagination controls */
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Showing {paginationInfo.startIndex}-{paginationInfo.endIndex} of {nfts.length} NFTs
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWalletPreviewPage(Math.max(1, walletPreviewPage - 1))}
+                  disabled={!paginationInfo.hasPrev}
+                >
+                  ← Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {walletPreviewPage} of {paginationInfo.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setWalletPreviewPage(Math.min(paginationInfo.totalPages, walletPreviewPage + 1))}
+                  disabled={!paginationInfo.hasNext}
+                >
+                  Next →
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowWalletPagination(false)}
+                >
+                  Show Less
+                </Button>
+              </div>
+            </div>
           )}
+        </div>
+      )}
+      
+      {/* Regular load more for smaller collections */}
+      {!shouldPaginate && hasMore && (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onLoadMore}
+            disabled={loading}
+            className="flex-1"
+          >
+            {loading ? "Loading..." : "Load More"}
+          </Button>
           {onLoadAll && (
             <Button
               variant="secondary"
@@ -1363,6 +1507,14 @@ function EditorPage() {
           walletAddress: walletAddress || activeWallet || "",
           walletLabel,
         });
+
+        // Scroll up to the preview when an NFT is selected
+        setTimeout(() => {
+          const preview = document.querySelector('.aspect-square');
+          if (preview) {
+            preview.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 100);
       }
     },
     [activeWallet, primaryWallet?.address, watchlist],
@@ -2420,6 +2572,27 @@ function EditorPage() {
                   {errorMessage}
                 </div>
               )}
+              {/* Load Wallet button above OpenSea link */}
+              {!uploadedImageUri && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setActiveTab("loadwallet");
+                    // Scroll to wallet input after a brief delay
+                    setTimeout(() => {
+                      const walletInput = document.getElementById("walletInput");
+                      if (walletInput) {
+                        walletInput.scrollIntoView({ behavior: "smooth", block: "center" });
+                        walletInput.focus();
+                      }
+                    }, 100);
+                  }}
+                  className="w-full mt-1"
+                >
+                  🔍 Load Wallet to Browse NFTs
+                </Button>
+              )}
               {/* OpenSea link below Token ID input */}
               {uploadedImageUri
                 ? null
@@ -2556,12 +2729,7 @@ function EditorPage() {
           <div className="mt-4">
             {activeTab === "watchlist" && (
               <div className="space-y-6">
-                <WatchlistManager
-                  watchlist={watchlist}
-                  supportedCollections={supportedCollections}
-                  onSelectNFT={handleNFTSelect}
-                  isResolvingENS={isResolvingENS}
-                />
+                {/* Show all NFTs first */}
                 {allWatchlistNFTs.allNFTs.length > 0 && (
                   <NFTPagination
                     nfts={allWatchlistNFTs.allNFTs}
@@ -2587,6 +2755,13 @@ function EditorPage() {
                     sources={allWatchlistNFTs.sources}
                   />
                 )}
+                {/* Watchlist manager below the NFTs */}
+                <WatchlistManager
+                  watchlist={watchlist}
+                  supportedCollections={supportedCollections}
+                  onSelectNFT={handleNFTSelect}
+                  isResolvingENS={isResolvingENS}
+                />
               </div>
             )}
             {activeTab === "loadwallet" && (
