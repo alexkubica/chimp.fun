@@ -721,6 +721,38 @@ function UnifiedNFTGallery({
                     ID: {nft.identifier}
                   </div>
                 </div>
+                {/* OpenSea link */}
+                <div className="absolute top-6 right-1 z-10">
+                  {(() => {
+                    const collectionObj = collectionsMetadata.find(
+                      (c) =>
+                        c.contract?.toLowerCase() ===
+                        nft.contract.toLowerCase(),
+                    );
+                    const chain = collectionObj?.chain || "ethereum";
+                    let openseaChainSegment = "";
+                    if (chain === "ape") {
+                      openseaChainSegment = "ape_chain";
+                    } else if (chain === "polygon") {
+                      openseaChainSegment = "polygon";
+                    } else {
+                      openseaChainSegment = "ethereum";
+                    }
+                    const url = `https://opensea.io/assets/${openseaChainSegment}/${nft.contract}/${nft.identifier}`;
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-black/70 hover:bg-black/90 text-white text-xs px-1.5 py-0.5 rounded pointer-events-auto transition-colors"
+                        title="View NFT on OpenSea"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        🌊
+                      </a>
+                    );
+                  })()}
+                </div>
               </button>
             );
           })}
@@ -2352,6 +2384,34 @@ function EditorPage() {
                   🎲
                 </Button>
               </div>
+              {/* OpenSea link for collection */}
+              {(() => {
+                const contract = collectionMetadata.contract;
+                const chain = collectionMetadata.chain;
+                let openseaChainSegment = "";
+                if (chain === "ape") {
+                  openseaChainSegment = "ape_chain";
+                } else if (chain === "polygon") {
+                  openseaChainSegment = "polygon";
+                } else {
+                  openseaChainSegment = "ethereum";
+                }
+                if (contract && openseaChainSegment) {
+                  const url = `https://opensea.io/collection/${contract}`;
+                  return (
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm mt-1"
+                      style={{ wordBreak: "break-all" }}
+                    >
+                      View Collection on OpenSea
+                    </a>
+                  );
+                }
+                return null;
+              })()}
               {selectedFromWallet && (
                 <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded border-l-2 border-blue-500">
                   {selectedFromWallet.source === "your-wallet" ? (
@@ -2449,7 +2509,7 @@ function EditorPage() {
                           className="text-blue-600 hover:underline text-sm mt-1"
                           style={{ wordBreak: "break-all" }}
                         >
-                          View on OpenSea
+                          View NFT on OpenSea
                         </a>
                       );
                     }
