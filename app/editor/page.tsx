@@ -761,10 +761,10 @@ function EditorPage() {
   const ffmpegRef = useRef(new FFmpeg());
   const [imageExtension, setImageExtension] = useState("gif");
   const [loading, setLoading] = useState(true);
-  const [tokenID, setTokenID] = useState<string | number>(2956);
-  const [tempTokenID, setTempTokenID] = useState<string | number>(2956);
+  const [tokenID, setTokenID] = useState<string | number>(1507);
+  const [tempTokenID, setTempTokenID] = useState<string | number>(1507);
   const [isFirstRender, setIsFirstRender] = useState(true);
-  const [collectionIndex, setCollectionIndex] = useState(0);
+  const [collectionIndex, setCollectionIndex] = useState(2);
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
   const [scale, setScale] = useState(0.8);
@@ -885,7 +885,9 @@ function EditorPage() {
   } | null>(null);
 
   // Unified wallet browsing state
-  const [walletInput, setWalletInput] = useState<string>("");
+  const [walletInput, setWalletInput] = useState<string>(
+    "0x9624e6235a358fafadb50714ddd039d75d46687d",
+  );
   const [activeWallet, setActiveWallet] = useState<string | null>(null); // Currently loaded wallet
   const [nfts, setNfts] = useState<UserNFT[]>([]);
   const [nftLoading, setNftLoading] = useState(false);
