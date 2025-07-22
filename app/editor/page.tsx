@@ -758,7 +758,7 @@ function EditorPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const ffmpegRef = useRef(new FFmpeg());
+  const ffmpegRef = useRef<FFmpeg | null>(null);
   const [imageExtension, setImageExtension] = useState("gif");
   const [loading, setLoading] = useState(true);
   const [tokenID, setTokenID] = useState<string | number>(1507);
@@ -1307,11 +1307,8 @@ function EditorPage() {
 
   // Switch tab logic
   useEffect(() => {
-    if (
-      !isLoggedIn &&
-      (activeTab === "connected" || activeTab === "watchlist")
-    ) {
-      setActiveTab("input"); // Switch to input tab if not logged in and on connected/watchlist tab
+    if (!isLoggedIn && activeTab === "connected") {
+      setActiveTab("input");
     }
   }, [isLoggedIn, activeTab]);
 
@@ -1324,6 +1321,13 @@ function EditorPage() {
       walletAddress?: string,
       walletLabel?: string,
     ) => {
+      console.log("NFT selected:", {
+        contract,
+        tokenId,
+        imageUrl,
+        walletAddress,
+        walletLabel,
+      });
       // Find the collection index for this contract
       const collectionIdx = collectionsMetadata.findIndex(
         (c) => c.contract?.toLowerCase() === contract.toLowerCase(),
@@ -1530,6 +1534,7 @@ function EditorPage() {
 
   useEffect(() => {
     (async () => {
+      console.log("Fetching image for", { collectionIndex, tokenID });
       if (
         isNaN(Number(tokenID)) ||
         Number(tokenID) < minTokenID ||
@@ -1544,6 +1549,7 @@ function EditorPage() {
         // return encodeURIComponent( `/proxy?url=${https://r3bel-gifs-prod.s3.us-east-2.amazonaws.com/chimpers-main-portrait/${gifNumber}.gif}`,);
 
         setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
+        console.log("Set imageUrl:", imageUrl);
         return;
       }
 
@@ -1561,22 +1567,30 @@ function EditorPage() {
       } else {
         setImageUrl(`/proxy?url=${imageUrl}`);
       }
+      console.log("Set imageUrl:", imageUrl);
     })();
   }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
 
   const encodedImageUrl = useMemo(() => {
+    console.log("encodedImageUrl useMemo:", imageUrl);
     if (!imageUrl) {
       return null;
     }
-
     return encodeURIComponent(imageUrl);
   }, [imageUrl]);
 
   const debouncedRenderImageUrl = useCallback(
     debounce(async () => {
+      console.log("debouncedRenderImageUrl called", {
+        imageUrl,
+        encodedImageUrl,
+        ffmpegReady,
+        uploadedImageUri,
+      });
       if (!imageUrl || !encodedImageUrl) {
         return;
       }
+      if (!ffmpegRef.current) return;
       if (!ffmpegReady) {
         console.warn("FFmpeg not ready yet.");
         return;
@@ -1683,7 +1697,7 @@ function EditorPage() {
         );
 
         setFinalResult(url);
-        console.log("Image URL generated:", url);
+        console.log("Set finalResult:", url);
       } catch (error) {
         console.error("Error during FFmpeg execution:", error);
       } finally {
@@ -1708,29 +1722,31 @@ function EditorPage() {
   );
 
   useEffect(() => {
+    console.log("FFmpeg load effect running");
     const loadFfmpeg = async () => {
-      try {
-        const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
-        const ffmpeg = ffmpegRef.current;
-        ffmpeg.on("log", ({ message }) => {
-          console.log(message);
-        });
-        await ffmpeg.load({
-          coreURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.js`,
-            "text/javascript",
-          ),
-          wasmURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.wasm`,
-            "application/wasm",
-          ),
-        });
-        setFfmpegReady(true);
-      } catch (e) {
-        console.error(e);
+      if (typeof window === "undefined") return;
+      if (!ffmpegRef.current) {
+        ffmpegRef.current = new FFmpeg();
+        console.log("FFmpeg instance created");
       }
+      const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+      const ffmpeg = ffmpegRef.current;
+      ffmpeg.on("log", ({ message }) => {
+        console.log(message);
+      });
+      await ffmpeg.load({
+        coreURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.js`,
+          "text/javascript",
+        ),
+        wasmURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          "application/wasm",
+        ),
+      });
+      setFfmpegReady(true);
+      console.log("FFmpeg loaded and ffmpegReady set to true");
     };
-
     loadFfmpeg();
   }, []);
 
@@ -1745,6 +1761,13 @@ function EditorPage() {
   }, [file]);
 
   useEffect(() => {
+    console.log("Preview effect:", {
+      ffmpegReady,
+      encodedImageUrl,
+      uploadedImageUri,
+      dragging,
+      resizing,
+    });
     if (
       ffmpegReady &&
       (encodedImageUrl || uploadedImageUri) &&
@@ -2060,6 +2083,19 @@ function EditorPage() {
     }
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && ffmpegRef.current === null) {
+      ffmpegRef.current = new FFmpeg();
+      console.log("FFmpeg instance created");
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("imageUrl changed:", imageUrl);
+  }, [imageUrl]);
+
+  console.log("Top-level render:", { ffmpegReady, imageUrl });
+
   return (
     <>
       <main className="min-h-screen flex items-center justify-center px-2 py-4">
@@ -2161,6 +2197,7 @@ function EditorPage() {
                 )
               ) : activeTab === "watchlist" ? (
                 <div className="space-y-6">
+                  {console.log("Watchlist NFTs:", allWatchlistNFTs)}
                   <WatchlistManager
                     watchlist={watchlist}
                     supportedCollections={supportedCollections}
@@ -2343,6 +2380,7 @@ function EditorPage() {
                       )
                     ) : activeTab === "watchlist" ? (
                       <div className="space-y-6">
+                        {console.log("Watchlist NFTs:", allWatchlistNFTs)}
                         <WatchlistManager
                           watchlist={watchlist}
                           supportedCollections={supportedCollections}

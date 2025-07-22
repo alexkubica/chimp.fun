@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ import {
   AiOutlineClose,
   AiOutlineEdit,
   AiOutlineCheck,
-  AiOutlineRefresh,
+  AiOutlineReload,
   AiOutlineDelete,
 } from "react-icons/ai";
 
@@ -136,7 +136,7 @@ function WalletCard({
             disabled={data.loading}
             title="Refresh NFTs"
           >
-            <AiOutlineRefresh
+            <AiOutlineReload
               className={`h-4 w-4 ${data.loading ? "animate-spin" : ""}`}
             />
           </Button>
