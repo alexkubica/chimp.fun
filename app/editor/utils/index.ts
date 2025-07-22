@@ -102,9 +102,10 @@ export const looksLikeENS = (input: string): boolean => {
 /**
  * Gets client X and Y coordinates from mouse or touch events
  */
-export function getClientXY(
-  e: globalThis.MouseEvent | globalThis.TouchEvent,
-): { clientX: number; clientY: number } {
+export function getClientXY(e: globalThis.MouseEvent | globalThis.TouchEvent): {
+  clientX: number;
+  clientY: number;
+} {
   if ("touches" in e && e.touches.length > 0) {
     return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
   } else if ("changedTouches" in e && e.changedTouches.length > 0) {
@@ -173,7 +174,7 @@ export async function extractFirstFrame(gifUrl: string): Promise<string> {
   const response = await fetch(gifUrl);
   const blob = await response.blob();
   const url = URL.createObjectURL(blob);
-  
+
   return new Promise<string>((resolve, reject) => {
     const img = new window.Image();
     img.onload = function () {
@@ -211,4 +212,153 @@ export function middleEllipsis(text: string, maxLength: number): string {
   const start = Math.ceil(maxLength / 2) - 1;
   const end = Math.floor(maxLength / 2) - 2;
   return text.slice(0, start) + "..." + text.slice(-end);
+}
+
+// Watchlist Management Functions
+
+/**
+ * Storage key for wallet watchlist
+ */
+const WATCHLIST_STORAGE_KEY = "nft-editor-watchlist";
+
+/**
+ * Watched wallet interface
+ */
+export interface WatchedWallet {
+  address: string;
+  label?: string;
+  addedAt: number;
+  isEns?: boolean;
+  ensName?: string;
+}
+
+/**
+ * Gets all watched wallets from localStorage
+ */
+export function getWatchedWallets(): WatchedWallet[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+    if (!raw) return [];
+    const wallets = JSON.parse(raw);
+    return Array.isArray(wallets) ? wallets : [];
+  } catch (error) {
+    console.warn("Failed to load watched wallets:", error);
+    return [];
+  }
+}
+
+/**
+ * Saves watched wallets to localStorage
+ */
+export function saveWatchedWallets(wallets: WatchedWallet[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(wallets));
+  } catch (error) {
+    console.warn("Failed to save watched wallets:", error);
+  }
+}
+
+/**
+ * Adds a wallet to the watchlist
+ */
+export function addToWatchlist(
+  address: string,
+  label?: string,
+  ensName?: string,
+): boolean {
+  try {
+    const wallets = getWatchedWallets();
+    const normalizedAddress = address.toLowerCase();
+
+    // Check if already exists
+    if (wallets.some((w) => w.address.toLowerCase() === normalizedAddress)) {
+      return false;
+    }
+
+    const newWallet: WatchedWallet = {
+      address: normalizedAddress,
+      label:
+        label || ensName || `${address.slice(0, 6)}...${address.slice(-4)}`,
+      addedAt: Date.now(),
+      isEns: !!ensName,
+      ensName,
+    };
+
+    wallets.unshift(newWallet); // Add to beginning
+    saveWatchedWallets(wallets);
+    return true;
+  } catch (error) {
+    console.warn("Failed to add wallet to watchlist:", error);
+    return false;
+  }
+}
+
+/**
+ * Removes a wallet from the watchlist
+ */
+export function removeFromWatchlist(address: string): boolean {
+  try {
+    const wallets = getWatchedWallets();
+    const normalizedAddress = address.toLowerCase();
+    const filteredWallets = wallets.filter(
+      (w) => w.address.toLowerCase() !== normalizedAddress,
+    );
+
+    if (filteredWallets.length === wallets.length) {
+      return false; // Wallet not found
+    }
+
+    saveWatchedWallets(filteredWallets);
+    return true;
+  } catch (error) {
+    console.warn("Failed to remove wallet from watchlist:", error);
+    return false;
+  }
+}
+
+/**
+ * Checks if a wallet is in the watchlist
+ */
+export function isInWatchlist(address: string): boolean {
+  const wallets = getWatchedWallets();
+  const normalizedAddress = address.toLowerCase();
+  return wallets.some((w) => w.address.toLowerCase() === normalizedAddress);
+}
+
+/**
+ * Updates the label of a watched wallet
+ */
+export function updateWatchlistLabel(address: string, label: string): boolean {
+  try {
+    const wallets = getWatchedWallets();
+    const normalizedAddress = address.toLowerCase();
+    const walletIndex = wallets.findIndex(
+      (w) => w.address.toLowerCase() === normalizedAddress,
+    );
+
+    if (walletIndex === -1) {
+      return false;
+    }
+
+    wallets[walletIndex].label = label;
+    saveWatchedWallets(wallets);
+    return true;
+  } catch (error) {
+    console.warn("Failed to update watchlist label:", error);
+    return false;
+  }
+}
+
+/**
+ * Clears all watched wallets
+ */
+export function clearWatchlist(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(WATCHLIST_STORAGE_KEY);
+  } catch (error) {
+    console.warn("Failed to clear watchlist:", error);
+  }
 }
