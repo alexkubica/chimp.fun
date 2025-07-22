@@ -467,10 +467,10 @@ export const reactionsMap: ReactionMetadata[] = [
   },
   {
     title: "Chimpers SZN is coming 🐒",
-    scale: 0.8,
+    scale: 0.6,
     x: 500,
     y: 60,
-    filename: "Chimpers SZN is coming 🐒.png",
+    filename: "Chimpers SZN is coming.png",
   },
   {
     title: "Custom Speech Bubble",
