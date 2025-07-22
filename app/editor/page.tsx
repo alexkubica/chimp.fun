@@ -879,8 +879,9 @@ function EditorPage() {
     contract: string;
     tokenId: string;
     imageUrl: string;
-    source?: "your-wallet" | "external-wallet";
+    source?: "your-wallet" | "external-wallet" | "watchlist";
     walletAddress?: string;
+    walletLabel?: string;
   } | null>(null);
 
   // Unified wallet browsing state
@@ -898,11 +899,18 @@ function EditorPage() {
   // Tab state for switching between connected, inputted, and watchlist wallets
   const [activeTab, setActiveTab] = useState<
     "connected" | "input" | "watchlist"
-  >("connected");
+  >("watchlist");
 
   // Pagination state for all NFTs view
   const [allNFTsPage, setAllNFTsPage] = useState(1);
   const [allNFTsPerPage] = useState(24);
+
+  // Create supported collections set for filtering
+  const supportedCollections = useMemo(() => {
+    return new Set(
+      collectionsMetadata.map((c) => c.contract?.toLowerCase()).filter(Boolean),
+    );
+  }, []);
 
   // Initialize watchlist hook
   const watchlist = useWatchlist(supportedCollections);
@@ -911,13 +919,6 @@ function EditorPage() {
   let minTokenID = 1 + (collectionMetadata.tokenIdOffset ?? 0);
   let maxTokenID =
     collectionMetadata.total + (collectionMetadata.tokenIdOffset ?? 0);
-
-  // Create supported collections set for filtering
-  const supportedCollections = useMemo(() => {
-    return new Set(
-      collectionsMetadata.map((c) => c.contract?.toLowerCase()).filter(Boolean),
-    );
-  }, []);
 
   // URL parameter handling functions
   const parseUrlParams = useCallback(() => {
