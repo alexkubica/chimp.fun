@@ -873,7 +873,12 @@ function EditorPage() {
   );
   const watermarkPaddingX = -170;
   const watermarkPaddingY = -30;
-  const watermarkScale = 1;
+
+  // Separate watermark scales for single NFT preview vs collage preview
+  const watermarkScalePreview = 3; // original size for single NFT preview
+  const watermarkScaleCollage = 0.5; // smaller watermark for collage preview
+  // Backward compatibility alias used in existing effect dependency arrays
+  const watermarkScale = watermarkScalePreview;
 
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
@@ -1676,7 +1681,7 @@ function EditorPage() {
             "-i",
             watermarkFile,
             "-filter_complex",
-            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScalePreview}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1722,7 +1727,7 @@ function EditorPage() {
       watermarkStyle,
       watermarkPaddingX,
       watermarkPaddingY,
-      watermarkScale,
+      watermarkScalePreview,
       customSpeechBubbleDataUrl,
     ],
   );
@@ -2806,7 +2811,7 @@ function EditorPage() {
               <CollageTab
                 watermarkEnabled={overlayEnabled}
                 watermarkStyle={watermarkStyle}
-                watermarkScale={watermarkScale}
+                watermarkScale={watermarkScaleCollage}
                 watermarkPaddingX={watermarkPaddingX}
                 watermarkPaddingY={watermarkPaddingY}
                 currentCollectionContract={collectionMetadata.contract}
