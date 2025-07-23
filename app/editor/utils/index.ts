@@ -362,3 +362,86 @@ export function clearWatchlist(): void {
     console.warn("Failed to clear watchlist:", error);
   }
 }
+
+/**
+ * Generates a speech bubble data URL with custom text
+ */
+export function generateSpeechBubbleDataUrl(text: string): string | null {
+  if (typeof window === "undefined") return null;
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const fontSize = 16;
+  const padding = 20;
+  const spikeHeight = 20;
+
+  ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+
+  // Support multi-line text
+  const lines = text.split("\n");
+  const textWidths = lines.map((line) => ctx.measureText(line).width);
+  const textWidth = Math.max(...textWidths);
+  const textHeight = lines.length * fontSize + (lines.length - 1) * 4; // 4px line spacing
+
+  // Calculate bubble dimensions
+  const bubbleWidth = textWidth + padding * 2;
+  const bubbleHeight = textHeight + padding * 2;
+
+  // Set canvas size
+  canvas.width = bubbleWidth;
+  canvas.height = bubbleHeight + spikeHeight;
+
+  // Set font again after canvas resize
+  ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  // Draw bubble background
+  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 2;
+
+  // Draw rounded rectangle
+  const radius = 10;
+  ctx.beginPath();
+  ctx.moveTo(radius, 0);
+  ctx.lineTo(bubbleWidth - radius, 0);
+  ctx.quadraticCurveTo(bubbleWidth, 0, bubbleWidth, radius);
+  ctx.lineTo(bubbleWidth, bubbleHeight - radius);
+  ctx.quadraticCurveTo(
+    bubbleWidth,
+    bubbleHeight,
+    bubbleWidth - radius,
+    bubbleHeight,
+  );
+
+  // Add speech spike
+  ctx.lineTo(bubbleWidth * 0.7, bubbleHeight);
+  ctx.lineTo(bubbleWidth * 0.6, bubbleHeight + spikeHeight);
+  ctx.lineTo(bubbleWidth * 0.5, bubbleHeight);
+
+  ctx.lineTo(radius, bubbleHeight);
+  ctx.quadraticCurveTo(0, bubbleHeight, 0, bubbleHeight - radius);
+  ctx.lineTo(0, radius);
+  ctx.quadraticCurveTo(0, 0, radius, 0);
+  ctx.closePath();
+
+  ctx.fill();
+  ctx.stroke();
+
+  // Draw text
+  ctx.fillStyle = "#000000";
+  const centerX = bubbleWidth / 2;
+  const centerY = bubbleHeight / 2;
+  const lineSpacing = fontSize + 4;
+  const startY = centerY - ((lines.length - 1) * lineSpacing) / 2;
+
+  lines.forEach((line, index) => {
+    const y = startY + index * lineSpacing;
+    ctx.fillText(line, centerX, y);
+  });
+
+  return canvas.toDataURL("image/png");
+}
