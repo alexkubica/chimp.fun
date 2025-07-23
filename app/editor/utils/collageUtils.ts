@@ -151,8 +151,8 @@ export async function validateImageUrl(url: string): Promise<boolean> {
  */
 export function getDefaultCollageSettings() {
   const settings = {
-    rows: 3,
-    columns: 3,
+    rows: 2,
+    columns: 2,
     spacing: 2,
     backgroundColor: "#ffffff",
     borderRadius: 4,

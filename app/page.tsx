@@ -77,6 +77,12 @@ export default function Home() {
             asChild
             className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
           >
+            <Link href="/collage">Collage Generator</Link>
+          </Button>
+          <Button
+            asChild
+            className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
+          >
             <Link href="/game">Game</Link>
           </Button>
         </div>

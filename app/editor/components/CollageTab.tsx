@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { collectionsMetadata } from "@/consts";
 import { CollagePreview } from "./CollagePreview";
 import {
   fetchRandomNFTs,
@@ -223,84 +224,65 @@ export function CollageTab({
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Collage Settings</h3>
 
-        {/* Grid Size Controls */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="rows">Rows: {settings.rows}</Label>
-            <Slider
-              id="rows"
-              min={1}
-              max={20}
-              step={1}
-              value={[settings.rows]}
-              onValueChange={([value]) => updateSettings({ rows: value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="columns">Columns: {settings.columns}</Label>
-            <Slider
-              id="columns"
-              min={1}
-              max={20}
-              step={1}
-              value={[settings.columns]}
-              onValueChange={([value]) => updateSettings({ columns: value })}
-            />
-          </div>
-        </div>
-
-        {/* Additional Settings */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="spacing">Spacing: {settings.spacing}px</Label>
-            <Slider
-              id="spacing"
-              min={0}
-              max={20}
-              step={1}
-              value={[settings.spacing]}
-              onValueChange={([value]) => updateSettings({ spacing: value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="borderRadius">
-              Border Radius: {settings.borderRadius}px
-            </Label>
-            <Slider
-              id="borderRadius"
-              min={0}
-              max={20}
-              step={1}
-              value={[settings.borderRadius]}
-              onValueChange={([value]) =>
-                updateSettings({ borderRadius: value })
-              }
-            />
-          </div>
-        </div>
-
-        {/* Background Color */}
+        {/* Combined Dimensions Slider (square) */}
         <div className="space-y-2">
-          <Label htmlFor="backgroundColor">Background Color</Label>
+          <Label htmlFor="dimensions">
+            Dimensions: {settings.rows}x{settings.rows}
+          </Label>
+          <Slider
+            id="dimensions"
+            min={1}
+            max={10}
+            step={1}
+            value={[settings.rows]}
+            onValueChange={([value]) =>
+              updateSettings({ rows: value, columns: value })
+            }
+          />
+        </div>
+
+        {/* Collection Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="collection">Collection</Label>
           <div className="flex gap-2">
-            <Input
-              id="backgroundColor"
-              type="color"
-              value={settings.backgroundColor}
-              onChange={(e) =>
-                updateSettings({ backgroundColor: e.target.value })
-              }
-              className="w-16 h-10"
-            />
-            <Input
-              type="text"
-              value={settings.backgroundColor}
-              onChange={(e) =>
-                updateSettings({ backgroundColor: e.target.value })
-              }
-              placeholder="#ffffff"
-              className="flex-1"
-            />
+            <Select
+              value={currentCollectionContract || "all"}
+              onValueChange={(value) => {
+                // This would trigger a re-generation with the new collection
+                console.log("Collection changed to:", value);
+              }}
+            >
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select collection" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Collections</SelectItem>
+                {collectionsMetadata.map((collection) => (
+                  <SelectItem
+                    key={collection.contract || collection.name}
+                    value={collection.contract || ""}
+                  >
+                    {collection.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                // Random collection selection
+                const randomCollection =
+                  collectionsMetadata[
+                    Math.floor(Math.random() * collectionsMetadata.length)
+                  ];
+                console.log(
+                  "Random collection selected:",
+                  randomCollection.name,
+                );
+              }}
+            >
+              🎲
+            </Button>
           </div>
         </div>
 
