@@ -230,6 +230,39 @@ function WalletCard({
                       #{nft.identifier}
                     </div>
                   </div>
+
+                  {/* OpenSea link */}
+                  <div className="absolute top-1 right-1 z-10">
+                    {(() => {
+                      const collectionObj = collectionsMetadata.find(
+                        (c) =>
+                          c.contract?.toLowerCase() ===
+                          nft.contract.toLowerCase(),
+                      );
+                      const chain = collectionObj?.chain || "ethereum";
+                      let openseaChainSegment = "";
+                      if (chain === "ape") {
+                        openseaChainSegment = "ape_chain";
+                      } else if (chain === "polygon") {
+                        openseaChainSegment = "polygon";
+                      } else {
+                        openseaChainSegment = "ethereum";
+                      }
+                      const url = `https://opensea.io/assets/${openseaChainSegment}/${nft.contract}/${nft.identifier}`;
+                      return (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-black/70 hover:bg-black/90 text-white text-xs px-1.5 py-0.5 rounded pointer-events-auto transition-colors"
+                          title="View NFT on OpenSea"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          🌊
+                        </a>
+                      );
+                    })()}
+                  </div>
                 </button>
               );
             })}
