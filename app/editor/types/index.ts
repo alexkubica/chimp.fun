@@ -265,3 +265,31 @@ export interface NFTPaginationProps {
     };
   };
 }
+
+// Collage Types
+export interface CollageNFT {
+  id: string;
+  imageUrl: string;
+  contract: string;
+  tokenId: string;
+  collectionName: string;
+}
+
+export interface CollageSettings {
+  rows: number;
+  columns: number;
+  spacing: number;
+  backgroundColor: string;
+  borderRadius: number;
+}
+
+export interface CollagePreviewProps {
+  nfts: CollageNFT[];
+  settings: CollageSettings;
+  watermarkEnabled: boolean;
+  watermarkStyle: string;
+  watermarkScale: number;
+  watermarkPaddingX: number;
+  watermarkPaddingY: number;
+  loading?: boolean;
+}

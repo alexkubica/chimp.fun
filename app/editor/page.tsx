@@ -47,6 +47,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useWatchlist } from "./hooks/useNFTFetcher";
 import { WatchlistManager } from "./components/WatchlistManager";
 import { NFTPagination } from "./components/NFTPagination";
+import { CollageTab } from "./components/CollageTab";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -902,9 +903,9 @@ function EditorPage() {
   const [providerName, setProviderName] = useState<string | null>(null);
   const [isResolvingENS, setIsResolvingENS] = useState(false);
 
-  // Tab state for switching between load wallet (merged connected+input), watchlist, and upload image
+  // Tab state for switching between load wallet (merged connected+input), watchlist, upload image, and collage
   const [activeTab, setActiveTab] = useState<
-    "loadwallet" | "watchlist" | "upload"
+    "loadwallet" | "watchlist" | "upload" | "collage"
   >("watchlist");
 
   // Pagination state for all NFTs view
@@ -2550,6 +2551,12 @@ function EditorPage() {
             >
               Upload Image
             </button>
+            <button
+              onClick={() => setActiveTab("collage")}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "collage" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              Collage
+            </button>
           </div>
 
           {/* 7. Tab Content */}
@@ -2794,6 +2801,15 @@ function EditorPage() {
                   Tip: Use 1:1 aspect ratio for best results.
                 </small>
               </div>
+            )}
+            {activeTab === "collage" && (
+              <CollageTab
+                watermarkEnabled={overlayEnabled}
+                watermarkStyle={watermarkStyle}
+                watermarkScale={watermarkScale}
+                watermarkPaddingX={watermarkPaddingX}
+                watermarkPaddingY={watermarkPaddingY}
+              />
             )}
           </div>
         </div>
