@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logAPIUsage } from "@/lib/api-logger";
 
 // NFT Provider configurations
 const NFT_PROVIDERS = {
@@ -199,135 +200,152 @@ async function fetchFromMoralis(
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const walletAddress = searchParams.get("wallet");
-  const chain = searchParams.get("chain") || "ethereum";
-  const limit = searchParams.get("limit") || "50";
-  const provider = searchParams.get("provider") || "auto"; // Allow manual provider selection
-
-  if (!walletAddress) {
-    return NextResponse.json(
-      { error: "Wallet address is required" },
-      { status: 400 },
-    );
-  }
-
-  // Determine which provider to use
-  let selectedProvider = null;
-
-  if (provider !== "auto" && provider in NFT_PROVIDERS) {
-    selectedProvider = provider;
-  } else {
-    // Auto-select first available provider with API key
-    for (const providerName of PROVIDER_PRIORITY) {
-      const providerConfig =
-        NFT_PROVIDERS[providerName as keyof typeof NFT_PROVIDERS];
-      if (
-        !providerConfig.requiresApiKey ||
-        process.env[providerConfig.envKey!]
-      ) {
-        selectedProvider = providerName;
-        break;
-      }
-    }
-  }
-
-  if (!selectedProvider) {
-    return NextResponse.json(
-      {
-        error:
-          "No NFT provider available. Please configure at least one API key: ALCHEMY_API_KEY, MORALIS_API_KEY, or OPENSEA_API_KEY",
-        availableProviders: Object.keys(NFT_PROVIDERS),
-      },
-      { status: 500 },
-    );
-  }
-
-  const providerConfig =
-    NFT_PROVIDERS[selectedProvider as keyof typeof NFT_PROVIDERS];
-  const apiKey: string | undefined = providerConfig.envKey
-    ? process.env[providerConfig.envKey]
-    : undefined;
+  const startTime = Date.now();
+  const endpoint = "/fetchUserNFTs";
+  const method = "GET";
+  let status = 200;
 
   try {
-    let allNFTs: any[] = [];
-    let nextCursor: string | undefined = undefined;
-    let firstResponse: any = null;
-    let pageCount = 0;
-    do {
-      let data;
-      switch (selectedProvider) {
-        case "alchemy":
-          data = await fetchFromAlchemy(
-            walletAddress,
-            chain,
-            limit,
-            nextCursor,
-            apiKey,
-          );
-          break;
-        case "opensea":
-          data = await fetchFromOpenSea(
-            walletAddress,
-            chain,
-            limit,
-            nextCursor,
-            apiKey,
-          );
-          // OpenSea's response shape is different
-          data = {
-            nfts:
-              data.nfts?.map((nft: any) => ({
-                identifier: nft.identifier,
-                collection: nft.collection,
-                contract: nft.contract,
-                token_standard: nft.token_standard,
-                name: nft.name,
-                description: nft.description,
-                image_url: nft.image_url,
-                metadata_url: nft.metadata_url,
-                opensea_url: nft.opensea_url,
-                updated_at: nft.updated_at,
-                is_disabled: nft.is_disabled,
-                is_nsfw: nft.is_nsfw,
-              })) || [],
-            next: data.next || null,
-          };
-          break;
-        case "moralis":
-          data = await fetchFromMoralis(
-            walletAddress,
-            chain,
-            limit,
-            nextCursor,
-            apiKey,
-          );
-          break;
-        default:
-          throw new Error(`Unsupported provider: ${selectedProvider}`);
-      }
-      if (!firstResponse) firstResponse = data;
-      allNFTs = allNFTs.concat(data.nfts || []);
-      nextCursor = data.next || null;
-      pageCount++;
-      // Defensive: break after 50 pages to avoid infinite loop
-      if (pageCount > 50) break;
-    } while (nextCursor);
+    const { searchParams } = new URL(req.url);
+    const walletAddress = searchParams.get("wallet");
+    const chain = searchParams.get("chain") || "ethereum";
+    const limit = searchParams.get("limit") || "50";
+    const provider = searchParams.get("provider") || "auto"; // Allow manual provider selection
 
-    return NextResponse.json({
-      nfts: allNFTs,
-      next: null,
-      provider: selectedProvider,
-      providerName: providerConfig.name,
-    });
-  } catch (error) {
-    console.error(`Error fetching NFTs from ${selectedProvider}:`, error);
-    return NextResponse.json(
-      {
-        error: `${providerConfig.name} API error: ${error instanceof Error ? error.message : "Unknown error"}`,
+    if (!walletAddress) {
+      status = 400;
+      return NextResponse.json(
+        { error: "Wallet address is required" },
+        { status: 400 },
+      );
+    }
+
+    // Determine which provider to use
+    let selectedProvider = null;
+
+    if (provider !== "auto" && provider in NFT_PROVIDERS) {
+      selectedProvider = provider;
+    } else {
+      // Auto-select first available provider with API key
+      for (const providerName of PROVIDER_PRIORITY) {
+        const providerConfig =
+          NFT_PROVIDERS[providerName as keyof typeof NFT_PROVIDERS];
+        if (
+          !providerConfig.requiresApiKey ||
+          process.env[providerConfig.envKey!]
+        ) {
+          selectedProvider = providerName;
+          break;
+        }
+      }
+    }
+
+    if (!selectedProvider) {
+      return NextResponse.json(
+        {
+          error:
+            "No NFT provider available. Please configure at least one API key: ALCHEMY_API_KEY, MORALIS_API_KEY, or OPENSEA_API_KEY",
+          availableProviders: Object.keys(NFT_PROVIDERS),
+        },
+        { status: 500 },
+      );
+    }
+
+    const providerConfig =
+      NFT_PROVIDERS[selectedProvider as keyof typeof NFT_PROVIDERS];
+    const apiKey: string | undefined = providerConfig.envKey
+      ? process.env[providerConfig.envKey]
+      : undefined;
+
+    try {
+      let allNFTs: any[] = [];
+      let nextCursor: string | undefined = undefined;
+      let firstResponse: any = null;
+      let pageCount = 0;
+      do {
+        let data;
+        switch (selectedProvider) {
+          case "alchemy":
+            data = await fetchFromAlchemy(
+              walletAddress,
+              chain,
+              limit,
+              nextCursor,
+              apiKey,
+            );
+            break;
+          case "opensea":
+            data = await fetchFromOpenSea(
+              walletAddress,
+              chain,
+              limit,
+              nextCursor,
+              apiKey,
+            );
+            // OpenSea's response shape is different
+            data = {
+              nfts:
+                data.nfts?.map((nft: any) => ({
+                  identifier: nft.identifier,
+                  collection: nft.collection,
+                  contract: nft.contract,
+                  token_standard: nft.token_standard,
+                  name: nft.name,
+                  description: nft.description,
+                  image_url: nft.image_url,
+                  metadata_url: nft.metadata_url,
+                  opensea_url: nft.opensea_url,
+                  updated_at: nft.updated_at,
+                  is_disabled: nft.is_disabled,
+                  is_nsfw: nft.is_nsfw,
+                })) || [],
+              next: data.next || null,
+            };
+            break;
+          case "moralis":
+            data = await fetchFromMoralis(
+              walletAddress,
+              chain,
+              limit,
+              nextCursor,
+              apiKey,
+            );
+            break;
+          default:
+            throw new Error(`Unsupported provider: ${selectedProvider}`);
+        }
+        if (!firstResponse) firstResponse = data;
+        allNFTs = allNFTs.concat(data.nfts || []);
+        nextCursor = data.next || null;
+        pageCount++;
+        // Defensive: break after 50 pages to avoid infinite loop
+        if (pageCount > 50) break;
+      } while (nextCursor);
+
+      return NextResponse.json({
+        nfts: allNFTs,
+        next: null,
         provider: selectedProvider,
-      },
-      { status: 500 },
-    );
+        providerName: providerConfig.name,
+      });
+    } catch (error) {
+      status = 500;
+      console.error(`Error fetching NFTs from ${selectedProvider}:`, error);
+      return NextResponse.json(
+        {
+          error: `${providerConfig.name} API error: ${error instanceof Error ? error.message : "Unknown error"}`,
+          provider: selectedProvider,
+        },
+        { status: 500 },
+      );
+    }
+  } finally {
+    const responseTime = Date.now() - startTime;
+    const ip =
+      req.headers.get("x-forwarded-for") ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+    const userAgent = req.headers.get("user-agent") || "unknown";
+    await logAPIUsage(endpoint, method, status, responseTime, ip, userAgent);
   }
 }

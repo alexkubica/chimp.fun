@@ -79,6 +79,12 @@ export default function Home() {
           >
             <Link href="/game">Game</Link>
           </Button>
+          <Button
+            asChild
+            className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
+          >
+            <Link href="/analytics">Analytics</Link>
+          </Button>
         </div>
       </div>
     </main>

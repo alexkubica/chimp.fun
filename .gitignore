@@ -38,3 +38,6 @@ output.gif
 
 .env*
 .env
+
+# API logging
+/tmp/
