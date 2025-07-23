@@ -42,6 +42,7 @@ export function CollageTab({
   );
   const [nfts, setNfts] = useState<CollageNFT[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState<boolean[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Debug logging
@@ -67,11 +68,38 @@ export function CollageTab({
       const requiredNFTCount = settings.rows * settings.columns;
       console.log(`Fetching ${requiredNFTCount} random NFTs...`);
 
+      // Initialize loading slots array - all slots are loading initially
+      const initialLoadingSlots = new Array(requiredNFTCount).fill(true);
+      setLoadingSlots(initialLoadingSlots);
+
+      // Initialize empty NFTs array with placeholders
+      const initialNfts = new Array(requiredNFTCount).fill(null);
+      setNfts(initialNfts);
+
+      // Callback function to handle each NFT as it's fetched
+      const onNFTFetched = (nft: CollageNFT, index: number) => {
+        console.log(`NFT fetched for slot ${index}:`, nft);
+
+        // Update the NFTs array with the new NFT
+        setNfts((prevNfts) => {
+          const newNfts = [...prevNfts];
+          newNfts[index] = nft;
+          return newNfts;
+        });
+
+        // Mark this slot as no longer loading
+        setLoadingSlots((prevLoadingSlots) => {
+          const newLoadingSlots = [...prevLoadingSlots];
+          newLoadingSlots[index] = false;
+          return newLoadingSlots;
+        });
+      };
+
       const randomNFTs = await fetchRandomNFTs(
         requiredNFTCount,
         currentCollectionContract,
+        onNFTFetched,
       );
-      setNfts(randomNFTs);
 
       console.log(`Successfully fetched ${randomNFTs.length} NFTs`);
     } catch (err) {
@@ -79,6 +107,8 @@ export function CollageTab({
       setError(
         err instanceof Error ? err.message : "Failed to generate collage",
       );
+      // Reset loading states on error
+      setLoadingSlots([]);
     } finally {
       setLoading(false);
     }
@@ -108,6 +138,11 @@ export function CollageTab({
     Promise.all(
       nfts.slice(0, rows * columns).map((nft, index) => {
         return new Promise<void>((resolve) => {
+          if (!nft) {
+            resolve();
+            return;
+          }
+
           const img = new Image();
           img.crossOrigin = "anonymous";
           img.onload = () => {
@@ -325,7 +360,7 @@ export function CollageTab({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Preview</h3>
-          {nfts.length > 0 && (
+          {nfts.filter((nft) => nft !== null).length > 0 && (
             <Button
               onClick={handleDownload}
               variant="outline"
@@ -341,6 +376,7 @@ export function CollageTab({
         <div className="flex justify-center">
           <CollagePreview
             nfts={nfts}
+            loadingSlots={loadingSlots}
             settings={settings}
             watermarkEnabled={watermarkEnabled}
             watermarkStyle={watermarkStyle}
@@ -351,13 +387,21 @@ export function CollageTab({
           />
         </div>
 
-        {nfts.length > 0 && (
+        {nfts.filter((nft) => nft !== null).length > 0 && (
           <div className="text-center text-sm text-muted-foreground">
             <p>
-              Grid: {settings.rows} × {settings.columns} ({nfts.length} NFTs)
+              Grid: {settings.rows} × {settings.columns} (
+              {nfts.filter((nft) => nft !== null).length} NFTs loaded)
             </p>
             <p>
-              Collections: {new Set(nfts.map((nft) => nft.collectionName)).size}{" "}
+              Collections:{" "}
+              {
+                new Set(
+                  nfts
+                    .filter((nft) => nft !== null)
+                    .map((nft) => nft.collectionName),
+                ).size
+              }{" "}
               different collections
             </p>
           </div>

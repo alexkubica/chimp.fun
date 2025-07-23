@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function CollagePreview({
   nfts,
+  loadingSlots = [],
   settings,
   watermarkEnabled,
   watermarkStyle,
@@ -17,6 +18,9 @@ export function CollagePreview({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<
+    Map<number, HTMLImageElement>
+  >(new Map());
 
   // Debug logging
   useEffect(() => {
@@ -25,11 +29,46 @@ export function CollagePreview({
       watermarkEnabled,
       watermarkScale,
       nftsCount: nfts.length,
+      loadingSlotsCount: loadingSlots.length,
     });
-  }, [settings, watermarkEnabled, watermarkScale, nfts.length]);
+  }, [
+    settings,
+    watermarkEnabled,
+    watermarkScale,
+    nfts.length,
+    loadingSlots.length,
+  ]);
+
+  // Preload images as NFTs become available
+  useEffect(() => {
+    const loadImage = async (nft: any, index: number) => {
+      if (!nft || loadedImages.has(index)) return;
+
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject();
+          img.src = nft.imageUrl;
+        });
+
+        setLoadedImages((prev) => new Map(prev).set(index, img));
+      } catch (error) {
+        console.error(`Failed to load image for slot ${index}:`, error);
+      }
+    };
+
+    nfts.forEach((nft, index) => {
+      if (nft && !loadedImages.has(index)) {
+        loadImage(nft, index);
+      }
+    });
+  }, [nfts, loadedImages]);
 
   const generateCollage = useCallback(async () => {
-    if (!canvasRef.current || nfts.length === 0) return;
+    if (!canvasRef.current) return;
 
     setIsGenerating(true);
     const canvas = canvasRef.current;
@@ -52,31 +91,16 @@ export function CollagePreview({
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     try {
-      // Load all NFT images
-      const imagePromises = nfts.slice(0, rows * columns).map((nft) => {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => resolve(img);
-          img.onerror = () => {
-            // Create a placeholder if image fails to load
-            const placeholder = new Image();
-            placeholder.width = cellWidth;
-            placeholder.height = cellHeight;
-            resolve(placeholder);
-          };
-          img.src = nft.imageUrl;
-        });
-      });
-
-      const images = await Promise.all(imagePromises);
-
       // Draw NFT images in grid
-      images.forEach((img, index) => {
+      for (let index = 0; index < rows * columns; index++) {
         const row = Math.floor(index / columns);
         const col = index % columns;
         const x = col * (cellWidth + spacing);
         const y = row * (cellHeight + spacing);
+
+        const nft = nfts[index];
+        const img = loadedImages.get(index);
+        const isLoading = loadingSlots[index];
 
         if (borderRadius > 0) {
           // Draw rounded rectangle
@@ -92,26 +116,49 @@ export function CollagePreview({
           ctx.clip();
         }
 
-        // Draw the image
-        if (img.src) {
+        if (img && nft && !isLoading) {
+          // Draw the loaded image
           ctx.drawImage(img, x, y, cellWidth, cellHeight);
-        } else {
-          // Draw placeholder
-          ctx.fillStyle = "#f0f0f0";
+        } else if (isLoading || (!nft && loading)) {
+          // Draw loading placeholder
+          ctx.fillStyle = "#f3f4f6";
           ctx.fillRect(x, y, cellWidth, cellHeight);
-          ctx.fillStyle = "#999";
+
+          // Add loading animation effect
+          const gradient = ctx.createLinearGradient(x, y, x + cellWidth, y);
+          gradient.addColorStop(0, "#f3f4f6");
+          gradient.addColorStop(0.5, "#e5e7eb");
+          gradient.addColorStop(1, "#f3f4f6");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, cellWidth, cellHeight);
+
+          // Add loading text
+          ctx.fillStyle = "#9ca3af";
           ctx.font = "14px Arial";
           ctx.textAlign = "center";
-          ctx.fillText("No Image", x + cellWidth / 2, y + cellHeight / 2);
+          ctx.fillText("Loading...", x + cellWidth / 2, y + cellHeight / 2);
+        } else {
+          // Draw empty placeholder
+          ctx.fillStyle = "#f9fafb";
+          ctx.fillRect(x, y, cellWidth, cellHeight);
+          ctx.strokeStyle = "#e5e7eb";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x, y, cellWidth, cellHeight);
+
+          // Add placeholder text
+          ctx.fillStyle = "#6b7280";
+          ctx.font = "12px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Empty", x + cellWidth / 2, y + cellHeight / 2);
         }
 
         if (borderRadius > 0) {
           ctx.restore();
         }
-      });
+      }
 
-      // Add watermark if enabled
-      if (watermarkEnabled) {
+      // Add watermark if enabled and we have some NFTs loaded
+      if (watermarkEnabled && nfts.some((nft) => nft !== null)) {
         const watermarkPath =
           watermarkStyle === "oneline" ? "/credit-oneline.png" : "/credit.png";
         const watermarkImg = new Image();
@@ -152,6 +199,10 @@ export function CollagePreview({
       canvas.toBlob((blob) => {
         if (blob) {
           const url = URL.createObjectURL(blob);
+          // Clean up previous URL
+          if (finalImageUrl) {
+            URL.revokeObjectURL(finalImageUrl);
+          }
           setFinalImageUrl(url);
         }
       }, "image/png");
@@ -162,17 +213,22 @@ export function CollagePreview({
     }
   }, [
     nfts,
+    loadingSlots,
+    loadedImages,
     settings,
     watermarkEnabled,
     watermarkStyle,
     watermarkScale,
     watermarkPaddingX,
     watermarkPaddingY,
+    loading,
+    finalImageUrl,
   ]);
 
   // Generate collage when dependencies change
   useEffect(() => {
-    if (nfts.length > 0 && !loading) {
+    // Only regenerate if we have some content to show or are actively loading
+    if (nfts.length > 0 || loading) {
       generateCollage();
     }
   }, [generateCollage, nfts.length, loading]);
@@ -186,7 +242,7 @@ export function CollagePreview({
     };
   }, [finalImageUrl]);
 
-  if (loading || isGenerating) {
+  if (loading && nfts.length === 0) {
     return (
       <div className="relative w-full max-w-md aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
         <Skeleton className="w-full h-full rounded-lg" />

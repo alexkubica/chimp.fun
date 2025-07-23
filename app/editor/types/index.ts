@@ -285,6 +285,7 @@ export interface CollageSettings {
 
 export interface CollagePreviewProps {
   nfts: CollageNFT[];
+  loadingSlots?: boolean[];
   settings: CollageSettings;
   watermarkEnabled: boolean;
   watermarkStyle: string;

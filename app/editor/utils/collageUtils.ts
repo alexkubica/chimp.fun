@@ -14,10 +14,14 @@ function getRandomTokenId(collection: any): string {
 
 /**
  * Fetches a random selection of NFTs from various collections or a specific collection
+ * @param count - Number of NFTs to fetch
+ * @param collectionContract - Optional specific collection contract
+ * @param onNFTFetched - Optional callback called when each NFT is successfully fetched
  */
 export async function fetchRandomNFTs(
   count: number,
   collectionContract?: string,
+  onNFTFetched?: (nft: CollageNFT, index: number) => void,
 ): Promise<CollageNFT[]> {
   const nfts: CollageNFT[] = [];
   const usedNFTs = new Set<string>(); // Track used NFTs to avoid duplicates
@@ -50,7 +54,8 @@ export async function fetchRandomNFTs(
     throw new Error("No available collections found");
   }
 
-  for (let i = 0; i < count; i++) {
+  // Create an array of promises to fetch NFTs in parallel
+  const fetchPromises = Array.from({ length: count }, async (_, i) => {
     let attempts = 0;
     const maxAttempts = 50; // Prevent infinite loops
 
@@ -104,32 +109,43 @@ export async function fetchRandomNFTs(
           collectionName: randomCollection.name,
         };
 
-        nfts.push(collageNFT);
         usedNFTs.add(nftKey);
-        break; // Successfully added an NFT, move to next
+
+        // Call the callback if provided to enable incremental loading
+        if (onNFTFetched) {
+          onNFTFetched(collageNFT, i);
+        }
+
+        return collageNFT;
       } catch (error) {
         console.error(`Error fetching NFT ${nftKey}:`, error);
         attempts++;
       }
     }
 
-    // If we couldn't find a unique NFT after max attempts, just add a placeholder
-    if (attempts >= maxAttempts) {
-      console.warn(
-        `Could not find unique NFT for slot ${i}, adding placeholder`,
-      );
-      const placeholderCollection = availableCollections[0];
-      const placeholderTokenId = getRandomTokenId(placeholderCollection);
+    // If we couldn't find a unique NFT after max attempts, add a placeholder
+    console.warn(`Could not find unique NFT for slot ${i}, adding placeholder`);
+    const placeholderCollection = availableCollections[0];
+    const placeholderTokenId = getRandomTokenId(placeholderCollection);
 
-      nfts.push({
-        id: `placeholder-${i}`,
-        imageUrl: `/api/placeholder?text=NFT+${i + 1}`, // This could be a placeholder image endpoint
-        contract: placeholderCollection.contract,
-        tokenId: placeholderTokenId,
-        collectionName: placeholderCollection.name,
-      });
+    const placeholderNFT: CollageNFT = {
+      id: `placeholder-${i}`,
+      imageUrl: `/api/placeholder?text=NFT+${i + 1}`, // This could be a placeholder image endpoint
+      contract: placeholderCollection.contract,
+      tokenId: placeholderTokenId,
+      collectionName: placeholderCollection.name,
+    };
+
+    if (onNFTFetched) {
+      onNFTFetched(placeholderNFT, i);
     }
-  }
+
+    return placeholderNFT;
+  });
+
+  // Wait for all NFTs to be fetched
+  const results = await Promise.all(fetchPromises);
+  nfts.push(...results);
 
   return nfts;
 }
