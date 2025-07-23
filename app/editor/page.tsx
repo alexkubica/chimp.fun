@@ -47,6 +47,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useWatchlist } from "./hooks/useNFTFetcher";
 import { WatchlistManager } from "./components/WatchlistManager";
 import { NFTPagination } from "./components/NFTPagination";
+import { CollageTab } from "./components/CollageTab";
 
 function dataURLtoBlob(dataurl: string) {
   const arr = dataurl.split(",");
@@ -904,7 +905,12 @@ function EditorPage() {
   );
   const watermarkPaddingX = -170;
   const watermarkPaddingY = -30;
-  const watermarkScale = 3;
+
+  // Separate watermark scales for single NFT preview vs collage preview
+  const watermarkScalePreview = 3; // original size for single NFT preview
+  const watermarkScaleCollage = 0.5; // smaller watermark for collage preview
+  // Backward compatibility alias used in existing effect dependency arrays
+  const watermarkScale = watermarkScalePreview;
 
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
@@ -934,9 +940,9 @@ function EditorPage() {
   const [providerName, setProviderName] = useState<string | null>(null);
   const [isResolvingENS, setIsResolvingENS] = useState(false);
 
-  // Tab state for switching between load wallet (merged connected+input), watchlist, and upload image
+  // Tab state for switching between load wallet (merged connected+input), watchlist, upload image, and collage
   const [activeTab, setActiveTab] = useState<
-    "loadwallet" | "watchlist" | "upload"
+    "loadwallet" | "watchlist" | "upload" | "collage"
   >("watchlist");
 
   // Pagination state for all NFTs view
@@ -1707,7 +1713,7 @@ function EditorPage() {
             "-i",
             watermarkFile,
             "-filter_complex",
-            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScale}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
+            `[0:v]scale=1080:1080[scaled_input]; [1:v]scale=iw/${scale}:ih/${scale}[scaled1]; [scaled_input][scaled1]overlay=${x}:${y}[video1]; [2:v]scale=iw*${watermarkScalePreview}:-1[scaled2]; [video1][scaled2]overlay=x=W-w-${watermarkPaddingX}:y=H-h-${watermarkPaddingY}`,
             ...(isGIF ? ["-f", "gif"] : []),
             `output.${imageExtension}`,
           ];
@@ -1753,7 +1759,7 @@ function EditorPage() {
       watermarkStyle,
       watermarkPaddingX,
       watermarkPaddingY,
-      watermarkScale,
+      watermarkScalePreview,
       customSpeechBubbleDataUrl,
     ],
   );
@@ -2610,6 +2616,12 @@ function EditorPage() {
             >
               Upload Image
             </button>
+            <button
+              onClick={() => setActiveTab("collage")}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === "collage" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              Collage
+            </button>
           </div>
 
           {/* 7. Tab Content */}
@@ -2854,6 +2866,16 @@ function EditorPage() {
                   Tip: Use 1:1 aspect ratio for best results.
                 </small>
               </div>
+            )}
+            {activeTab === "collage" && (
+              <CollageTab
+                watermarkEnabled={overlayEnabled}
+                watermarkStyle={watermarkStyle}
+                watermarkScale={watermarkScaleCollage}
+                watermarkPaddingX={watermarkPaddingX}
+                watermarkPaddingY={watermarkPaddingY}
+                currentCollectionContract={collectionMetadata.contract}
+              />
             )}
           </div>
         </div>
