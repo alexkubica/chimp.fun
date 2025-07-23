@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logAPIUsage } from "@/lib/api-logger";
+import {
+  alchemyLogger,
+  openseaLogger,
+  moralisLogger,
+} from "@/lib/external-api-logger";
 
 // NFT Provider configurations
 const NFT_PROVIDERS = {
@@ -74,7 +79,7 @@ async function fetchFromAlchemy(
 
   url += `?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await alchemyLogger.fetch(url, {
     headers: {
       Accept: "application/json",
     },
@@ -138,7 +143,7 @@ async function fetchFromOpenSea(
     headers["X-API-KEY"] = apiKey;
   }
 
-  const response = await fetch(url, { headers });
+  const response = await openseaLogger.fetch(url, { headers });
 
   if (!response.ok) {
     throw new Error(`OpenSea API error: ${response.status}`);
@@ -165,7 +170,7 @@ async function fetchFromMoralis(
     url += `&cursor=${cursor}`;
   }
 
-  const response = await fetch(url, {
+  const response = await moralisLogger.fetch(url, {
     headers: {
       Accept: "application/json",
       "X-API-Key": apiKey || "",

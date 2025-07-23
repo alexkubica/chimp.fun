@@ -12,34 +12,44 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Activity, Clock, TrendingUp, Server } from "lucide-react";
 
-interface APIUsageData {
-  endpoint: string;
-  method: string;
-  count: number;
+interface ServiceUsageData {
+  service: string;
+  totalCalls: number;
+  successfulCalls: number;
+  failedCalls: number;
   averageResponseTime: number;
-  lastCalled: string;
-  errorCount: number;
   successRate: number;
+  lastCalled: string;
+  rateLimitStatus?: number;
+  totalCost?: number;
 }
 
-interface UsageStats {
-  totalRequests: number;
+interface ExternalAPIStats {
+  totalCalls: number;
   totalErrors: number;
   averageResponseTime: number;
-  uniqueEndpoints: number;
-  requestsToday: number;
-  topEndpoints: APIUsageData[];
+  uniqueServices: number;
+  callsToday: number;
+  serviceStats: ServiceUsageData[];
   recentActivity: Array<{
+    service: string;
     endpoint: string;
     method: string;
     timestamp: string;
     status: number;
     responseTime: number;
+    success: boolean;
+    errorMessage?: string;
+  }>;
+  dailyUsage: Array<{
+    date: string;
+    calls: number;
+    errors: number;
   }>;
 }
 
 export default function AnalyticsPage() {
-  const [stats, setStats] = useState<UsageStats | null>(null);
+  const [stats, setStats] = useState<ExternalAPIStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -123,10 +133,11 @@ export default function AnalyticsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#222] mb-2">
-              API Analytics
+              External API Analytics
             </h1>
             <p className="text-gray-600">
-              Monitor API usage and performance metrics
+              Monitor external API usage including Etherscan, Alchemy, OpenSea,
+              and Moralis
             </p>
           </div>
           <Button
@@ -153,10 +164,10 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#222]">
-                {stats?.totalRequests?.toLocaleString() || 0}
+                {stats?.totalCalls?.toLocaleString() || 0}
               </div>
               <p className="text-xs text-gray-600 mt-1">
-                {stats?.requestsToday || 0} today
+                {stats?.callsToday || 0} today
               </p>
             </CardContent>
           </Card>
@@ -187,7 +198,7 @@ export default function AnalyticsPage() {
             <CardContent>
               <div className="text-2xl font-bold text-[#222]">
                 {stats
-                  ? `${(((stats.totalRequests - stats.totalErrors) / stats.totalRequests) * 100).toFixed(1)}%`
+                  ? `${(((stats.totalCalls - stats.totalErrors) / stats.totalCalls) * 100).toFixed(1)}%`
                   : "N/A"}
               </div>
               <p className="text-xs text-gray-600 mt-1">
@@ -205,7 +216,7 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#222]">
-                {stats?.uniqueEndpoints || 0}
+                {stats?.uniqueServices || 0}
               </div>
             </CardContent>
           </Card>
@@ -215,49 +226,61 @@ export default function AnalyticsPage() {
           {/* Top Endpoints */}
           <Card>
             <CardHeader>
-              <CardTitle>Top API Endpoints</CardTitle>
-              <CardDescription>Most frequently used endpoints</CardDescription>
+              <CardTitle>External API Services</CardTitle>
+              <CardDescription>
+                Usage statistics for external services
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {stats?.topEndpoints?.length ? (
-                  stats.topEndpoints.map((endpoint, index) => (
+                {stats?.serviceStats?.length ? (
+                  stats.serviceStats.map((service, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className="text-xs">
-                            {endpoint.method}
+                          <Badge
+                            variant="outline"
+                            className="text-xs font-bold"
+                          >
+                            {service.service}
                           </Badge>
-                          <span className="font-medium text-sm truncate">
-                            {endpoint.endpoint}
-                          </span>
+                          {service.rateLimitStatus !== undefined && (
+                            <Badge variant="secondary" className="text-xs">
+                              Rate limit: {service.rateLimitStatus}
+                            </Badge>
+                          )}
                         </div>
                         <div className="flex items-center gap-4 text-xs text-gray-600">
-                          <span>{endpoint.count} calls</span>
+                          <span>{service.totalCalls} calls</span>
                           <span>
-                            {formatResponseTime(endpoint.averageResponseTime)}
+                            {formatResponseTime(service.averageResponseTime)}
                           </span>
                           <span
                             className={
-                              endpoint.successRate >= 95
+                              service.successRate >= 95
                                 ? "text-green-600"
-                                : endpoint.successRate >= 90
+                                : service.successRate >= 90
                                   ? "text-yellow-600"
                                   : "text-red-600"
                             }
                           >
-                            {endpoint.successRate.toFixed(1)}% success
+                            {service.successRate.toFixed(1)}% success
                           </span>
+                          {service.totalCost && (
+                            <span className="text-blue-600">
+                              Cost: ${service.totalCost.toFixed(4)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
                   <p className="text-gray-500 text-center py-4">
-                    No API usage data available
+                    No external API usage data available
                   </p>
                 )}
               </div>

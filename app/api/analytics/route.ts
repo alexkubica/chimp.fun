@@ -2,55 +2,63 @@ import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 
-interface LogEntry {
+interface ExternalAPICall {
+  service: string;
   endpoint: string;
   method: string;
   timestamp: string;
-  status: number;
   responseTime: number;
-  ip?: string;
-  userAgent?: string;
+  status: number;
+  success: boolean;
+  errorMessage?: string;
+  rateLimitRemaining?: number;
+  cost?: number;
 }
 
-interface APIUsageData {
-  endpoint: string;
-  method: string;
-  count: number;
+interface ServiceUsageData {
+  service: string;
+  totalCalls: number;
+  successfulCalls: number;
+  failedCalls: number;
   averageResponseTime: number;
-  lastCalled: string;
-  errorCount: number;
   successRate: number;
+  lastCalled: string;
+  rateLimitStatus?: number;
+  totalCost?: number;
 }
 
-interface UsageStats {
-  totalRequests: number;
+interface ExternalAPIStats {
+  totalCalls: number;
   totalErrors: number;
   averageResponseTime: number;
-  uniqueEndpoints: number;
-  requestsToday: number;
-  topEndpoints: APIUsageData[];
-  recentActivity: LogEntry[];
+  uniqueServices: number;
+  callsToday: number;
+  serviceStats: ServiceUsageData[];
+  recentActivity: ExternalAPICall[];
+  dailyUsage: Array<{
+    date: string;
+    calls: number;
+    errors: number;
+  }>;
 }
 
-const LOG_FILE_PATH = path.join(process.cwd(), "tmp", "api-usage.log");
+const LOG_FILE_PATH = path.join(process.cwd(), "tmp", "external-api-usage.log");
 
 async function ensureLogFileExists(): Promise<void> {
   try {
     await fs.access(LOG_FILE_PATH);
   } catch {
-    // Create tmp directory if it doesn't exist
     const tmpDir = path.dirname(LOG_FILE_PATH);
     try {
       await fs.access(tmpDir);
     } catch {
       await fs.mkdir(tmpDir, { recursive: true });
     }
-    // Create empty log file
     await fs.writeFile(LOG_FILE_PATH, "");
   }
 }
 
-async function readLogEntries(): Promise<LogEntry[]> {
+async function readExternalAPILogs(): Promise<ExternalAPICall[]> {
   await ensureLogFileExists();
 
   try {
@@ -63,27 +71,28 @@ async function readLogEntries(): Promise<LogEntry[]> {
       .filter((line) => line.trim())
       .map((line) => {
         try {
-          return JSON.parse(line) as LogEntry;
+          return JSON.parse(line) as ExternalAPICall;
         } catch {
           return null;
         }
       })
-      .filter((entry): entry is LogEntry => entry !== null);
+      .filter((entry): entry is ExternalAPICall => entry !== null);
   } catch {
     return [];
   }
 }
 
-function analyzeLogEntries(entries: LogEntry[]): UsageStats {
-  if (entries.length === 0) {
+function analyzeExternalAPIUsage(calls: ExternalAPICall[]): ExternalAPIStats {
+  if (calls.length === 0) {
     return {
-      totalRequests: 0,
+      totalCalls: 0,
       totalErrors: 0,
       averageResponseTime: 0,
-      uniqueEndpoints: 0,
-      requestsToday: 0,
-      topEndpoints: [],
+      uniqueServices: 0,
+      callsToday: 0,
+      serviceStats: [],
       recentActivity: [],
+      dailyUsage: [],
     };
   }
 
@@ -91,65 +100,94 @@ function analyzeLogEntries(entries: LogEntry[]): UsageStats {
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   // Calculate basic stats
-  const totalRequests = entries.length;
-  const totalErrors = entries.filter((e) => e.status >= 400).length;
+  const totalCalls = calls.length;
+  const totalErrors = calls.filter((call) => !call.success).length;
   const averageResponseTime =
-    entries.reduce((sum, e) => sum + e.responseTime, 0) / totalRequests;
-  const requestsToday = entries.filter(
-    (e) => new Date(e.timestamp) >= todayStart,
+    calls.reduce((sum, call) => sum + call.responseTime, 0) / totalCalls;
+  const callsToday = calls.filter(
+    (call) => new Date(call.timestamp) >= todayStart,
   ).length;
 
-  // Group by endpoint and method
-  const endpointStats = new Map<
-    string,
-    {
-      count: number;
-      responseTimes: number[];
-      errors: number;
-      lastCalled: string;
+  // Group by service
+  const serviceGroups = new Map<string, ExternalAPICall[]>();
+  calls.forEach((call) => {
+    if (!serviceGroups.has(call.service)) {
+      serviceGroups.set(call.service, []);
     }
-  >();
-
-  entries.forEach((entry) => {
-    const key = `${entry.method} ${entry.endpoint}`;
-    const existing = endpointStats.get(key) || {
-      count: 0,
-      responseTimes: [],
-      errors: 0,
-      lastCalled: entry.timestamp,
-    };
-
-    existing.count++;
-    existing.responseTimes.push(entry.responseTime);
-    if (entry.status >= 400) existing.errors++;
-    if (new Date(entry.timestamp) > new Date(existing.lastCalled)) {
-      existing.lastCalled = entry.timestamp;
-    }
-
-    endpointStats.set(key, existing);
+    serviceGroups.get(call.service)!.push(call);
   });
 
-  // Convert to APIUsageData and sort by count
-  const topEndpoints: APIUsageData[] = Array.from(endpointStats.entries())
-    .map(([key, stats]) => {
-      const [method, endpoint] = key.split(" ", 2);
+  // Calculate service stats
+  const serviceStats: ServiceUsageData[] = Array.from(serviceGroups.entries())
+    .map(([service, serviceCalls]) => {
+      const totalCalls = serviceCalls.length;
+      const successfulCalls = serviceCalls.filter(
+        (call) => call.success,
+      ).length;
+      const failedCalls = totalCalls - successfulCalls;
+      const averageResponseTime =
+        serviceCalls.reduce((sum, call) => sum + call.responseTime, 0) /
+        totalCalls;
+      const successRate = (successfulCalls / totalCalls) * 100;
+      const lastCalled = serviceCalls.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+      )[0].timestamp;
+
+      // Get latest rate limit info
+      const latestCallWithRateLimit = serviceCalls
+        .filter((call) => call.rateLimitRemaining !== undefined)
+        .sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+        )[0];
+
+      const totalCost = serviceCalls.reduce(
+        (sum, call) => sum + (call.cost || 0),
+        0,
+      );
+
       return {
-        endpoint,
-        method,
-        count: stats.count,
-        averageResponseTime:
-          stats.responseTimes.reduce((a, b) => a + b, 0) /
-          stats.responseTimes.length,
-        lastCalled: stats.lastCalled,
-        errorCount: stats.errors,
-        successRate: ((stats.count - stats.errors) / stats.count) * 100,
+        service,
+        totalCalls,
+        successfulCalls,
+        failedCalls,
+        averageResponseTime,
+        successRate,
+        lastCalled,
+        rateLimitStatus: latestCallWithRateLimit?.rateLimitRemaining,
+        totalCost: totalCost > 0 ? totalCost : undefined,
       };
     })
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
+    .sort((a, b) => b.totalCalls - a.totalCalls);
 
-  // Get recent activity (last 20 entries)
-  const recentActivity = entries
+  // Calculate daily usage for the last 7 days
+  const dailyUsage = [];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const dayStart = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+
+    const dayCalls = calls.filter((call) => {
+      const callDate = new Date(call.timestamp);
+      return callDate >= dayStart && callDate < dayEnd;
+    });
+
+    dailyUsage.push({
+      date: dayStart.toISOString().split("T")[0],
+      calls: dayCalls.length,
+      errors: dayCalls.filter((call) => !call.success).length,
+    });
+  }
+
+  // Get recent activity (last 20 calls)
+  const recentActivity = calls
     .sort(
       (a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
@@ -157,26 +195,27 @@ function analyzeLogEntries(entries: LogEntry[]): UsageStats {
     .slice(0, 20);
 
   return {
-    totalRequests,
+    totalCalls,
     totalErrors,
     averageResponseTime,
-    uniqueEndpoints: endpointStats.size,
-    requestsToday,
-    topEndpoints,
+    uniqueServices: serviceGroups.size,
+    callsToday,
+    serviceStats,
     recentActivity,
+    dailyUsage,
   };
 }
 
 export async function GET() {
   try {
-    const entries = await readLogEntries();
-    const stats = analyzeLogEntries(entries);
+    const calls = await readExternalAPILogs();
+    const stats = analyzeExternalAPIUsage(calls);
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error("Error fetching analytics:", error);
+    console.error("Error fetching external API analytics:", error);
     return NextResponse.json(
-      { error: "Failed to fetch analytics data" },
+      { error: "Failed to fetch external API analytics data" },
       { status: 500 },
     );
   }
