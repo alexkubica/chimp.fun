@@ -266,7 +266,8 @@ async function updateReactionsMap(newReactions: any[]) {
     // Format the new reactions
     const formattedReactions = newReactions
       .map((reaction) => {
-        return `  {
+        return `
+{
     title: "${reaction.title}",
     scale: ${reaction.scale},
     x: ${reaction.x},
@@ -277,8 +278,7 @@ async function updateReactionsMap(newReactions: any[]) {
       .join(",\n");
 
     // Insert the new reactions before the closing ];
-    const replacement = `,
-${formattedReactions},
+    const replacement = `${formattedReactions},
 ${match[1]}];${match[2]}`;
 
     fileContent = fileContent.replace(reactionsMapEndRegex, replacement);
