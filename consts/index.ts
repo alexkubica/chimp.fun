@@ -41,6 +41,12 @@ const originalCollections: CollectionMetadata[] = [
     contract: "0x896BE40d15d1dbFA4F4Ff25A110F3CE770e07897",
     chain: "ape",
   },
+  {
+    name: "Less Than Three (L3T)",
+    total: 5555,
+    contract: "0x6ff0c1e1b674138de7f5dd4131bf76665c0ff54a",
+    chain: "ethereum",
+  },
   // check why ipfs times out
   //   {
   //     name: "Pixel Chibis",
