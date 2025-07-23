@@ -801,6 +801,7 @@ function EditorPage() {
   const [tokenID, setTokenID] = useState<string | number>(1507);
   const [tempTokenID, setTempTokenID] = useState<string | number>(1507);
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const [urlParamsParsed, setUrlParamsParsed] = useState(false);
   const [collectionIndex, setCollectionIndex] = useState(2);
   const [x, setX] = useState(650);
   const [y, setY] = useState(71);
@@ -1041,6 +1042,9 @@ function EditorPage() {
       setWalletInput(walletIdParam);
       setActiveTab("loadwallet");
     }
+
+    // Mark URL params as parsed
+    setUrlParamsParsed(true);
   }, []);
 
   const updateUrlParams = useCallback(() => {
@@ -1576,6 +1580,11 @@ function EditorPage() {
   }, [updateUrlParams, isFirstRender]);
 
   useEffect(() => {
+    // Don't fetch image until URL params have been parsed to avoid loading default NFT first
+    if (!urlParamsParsed) {
+      return;
+    }
+
     (async () => {
       console.log("Fetching image for", { collectionIndex, tokenID });
       if (
@@ -1612,7 +1621,14 @@ function EditorPage() {
       }
       console.log("Set imageUrl:", imageUrl);
     })();
-  }, [collectionIndex, collectionMetadata, maxTokenID, minTokenID, tokenID]);
+  }, [
+    collectionIndex,
+    collectionMetadata,
+    maxTokenID,
+    minTokenID,
+    tokenID,
+    urlParamsParsed,
+  ]);
 
   const encodedImageUrl = useMemo(() => {
     console.log("encodedImageUrl useMemo:", imageUrl);
