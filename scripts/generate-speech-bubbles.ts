@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 // List of strings to convert to speech bubbles
-const speechTexts = ["Happy 4th\nof July!"];
+const speechTexts = ["CHIMPERS JUST REACHED\n1M FOLLOWERS IN TIKTOK!"];
 
 // Helper function to create safe filename from text
 function createFilename(text: string): string {
@@ -18,21 +18,9 @@ function createFilename(text: string): string {
 
 // Helper function to calculate position and scale based on text length
 function calculateMetadata(text: string) {
-  const textLength = text.replace(/\n/g, "").length;
-  let scale = 0.8;
-  let x = 600;
-  let y = 80;
-
-  // Adjust scale based on text length
-  if (textLength > 15) {
-    scale = 0.6;
-    x = 500;
-    y = 60;
-  } else if (textLength > 10) {
-    scale = 0.7;
-    x = 550;
-    y = 70;
-  }
+  let scale = 1;
+  let x = 500;
+  let y = 60;
 
   return { scale, x, y };
 }

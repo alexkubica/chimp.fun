@@ -480,6 +480,21 @@ export const reactionsMap: ReactionMetadata[] = [
     filename: "custom-speech-bubble",
     isCustom: true,
   },
+  {
+    title: "Congrats on\n1M followers\nin TikTok!",
+    scale: 1,
+    x: 500,
+    y: 60,
+    filename: "Congrats on 1M followers in TikTok!.png",
+  },
+  ,
+  {
+    title: "CHIMPERS JUST REACHED\n1M FOLLOWERS IN TIKTOK!",
+    scale: 1,
+    x: 400,
+    y: 60,
+    filename: "CHIMPERS JUST REACHED 1M FOLLOWERS IN TIKTOK!.png",
+  },
 ];
 
 export const tokenURIABI = [
