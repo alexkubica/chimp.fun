@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ interface CollageTabProps {
   watermarkScale: number;
   watermarkPaddingX: number;
   watermarkPaddingY: number;
+  currentCollectionContract?: string;
 }
 
 export function CollageTab({
@@ -34,6 +35,7 @@ export function CollageTab({
   watermarkScale,
   watermarkPaddingX,
   watermarkPaddingY,
+  currentCollectionContract,
 }: CollageTabProps) {
   const [settings, setSettings] = useState<CollageSettings>(
     getDefaultCollageSettings(),
@@ -41,6 +43,21 @@ export function CollageTab({
   const [nfts, setNfts] = useState<CollageNFT[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("CollageTab initialized with settings:", settings);
+    console.log("Current collection contract:", currentCollectionContract);
+    console.log("Watermark scale:", watermarkScale);
+  }, [settings, currentCollectionContract, watermarkScale]);
+
+  // Reset settings when collection changes
+  useEffect(() => {
+    if (currentCollectionContract) {
+      console.log("Collection changed, resetting settings to default");
+      setSettings(getDefaultCollageSettings());
+    }
+  }, [currentCollectionContract]);
 
   const handleGenerateCollage = useCallback(async () => {
     setLoading(true);
@@ -50,7 +67,10 @@ export function CollageTab({
       const requiredNFTCount = settings.rows * settings.columns;
       console.log(`Fetching ${requiredNFTCount} random NFTs...`);
 
-      const randomNFTs = await fetchRandomNFTs(requiredNFTCount);
+      const randomNFTs = await fetchRandomNFTs(
+        requiredNFTCount,
+        currentCollectionContract,
+      );
       setNfts(randomNFTs);
 
       console.log(`Successfully fetched ${randomNFTs.length} NFTs`);
@@ -62,7 +82,7 @@ export function CollageTab({
     } finally {
       setLoading(false);
     }
-  }, [settings.rows, settings.columns]);
+  }, [settings.rows, settings.columns, currentCollectionContract]);
 
   const handleDownload = useCallback(() => {
     // Create a temporary canvas to generate the final image

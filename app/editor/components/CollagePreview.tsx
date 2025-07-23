@@ -18,6 +18,16 @@ export function CollagePreview({
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Debug logging
+  useEffect(() => {
+    console.log("CollagePreview props:", {
+      settings,
+      watermarkEnabled,
+      watermarkScale,
+      nftsCount: nfts.length,
+    });
+  }, [settings, watermarkEnabled, watermarkScale, nfts.length]);
+
   const generateCollage = useCallback(async () => {
     if (!canvasRef.current || nfts.length === 0) return;
 
@@ -111,6 +121,13 @@ export function CollagePreview({
           watermarkImg.onload = () => {
             const watermarkWidth = watermarkImg.width * watermarkScale;
             const watermarkHeight = watermarkImg.height * watermarkScale;
+            console.log("CollagePreview watermark scaling:", {
+              originalWidth: watermarkImg.width,
+              originalHeight: watermarkImg.height,
+              watermarkScale,
+              finalWidth: watermarkWidth,
+              finalHeight: watermarkHeight,
+            });
             const watermarkX = canvasWidth - watermarkWidth - watermarkPaddingX;
             const watermarkY =
               canvasHeight - watermarkHeight - watermarkPaddingY;
