@@ -487,7 +487,6 @@ export const reactionsMap: ReactionMetadata[] = [
     y: 60,
     filename: "Congrats on 1M followers in TikTok!.png",
   },
-  ,
   {
     title: "CHIMPERS JUST REACHED\n1M FOLLOWERS IN TIKTOK!",
     scale: 1,
