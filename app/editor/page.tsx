@@ -873,7 +873,7 @@ function EditorPage() {
   );
   const watermarkPaddingX = -170;
   const watermarkPaddingY = -30;
-  const watermarkScale = 3;
+  const watermarkScale = 1;
 
   // Dynamic SDK hooks for wallet context
   const { primaryWallet } = useDynamicContext();
@@ -2809,6 +2809,7 @@ function EditorPage() {
                 watermarkScale={watermarkScale}
                 watermarkPaddingX={watermarkPaddingX}
                 watermarkPaddingY={watermarkPaddingY}
+                currentCollectionContract={collectionMetadata.contract}
               />
             )}
           </div>

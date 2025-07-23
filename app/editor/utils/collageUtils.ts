@@ -13,16 +13,38 @@ function getRandomTokenId(collection: any): string {
 }
 
 /**
- * Fetches a random selection of NFTs from various collections
+ * Fetches a random selection of NFTs from various collections or a specific collection
  */
-export async function fetchRandomNFTs(count: number): Promise<CollageNFT[]> {
+export async function fetchRandomNFTs(
+  count: number,
+  collectionContract?: string,
+): Promise<CollageNFT[]> {
   const nfts: CollageNFT[] = [];
   const usedNFTs = new Set<string>(); // Track used NFTs to avoid duplicates
 
+  console.log("fetchRandomNFTs called with:", { count, collectionContract });
+
   // Filter collections that have image URLs or can generate them
-  const availableCollections = collectionsMetadata.filter(
+  let availableCollections = collectionsMetadata.filter(
     (collection) => collection.contract && collection.total,
   );
+
+  // If a specific collection is requested, filter to only that collection
+  if (collectionContract) {
+    availableCollections = availableCollections.filter(
+      (collection) =>
+        collection.contract?.toLowerCase() === collectionContract.toLowerCase(),
+    );
+    console.log("Filtered to specific collection:", collectionContract);
+    console.log(
+      "Available collections after filtering:",
+      availableCollections.length,
+    );
+  } else {
+    console.log(
+      "No specific collection requested, using all available collections",
+    );
+  }
 
   if (availableCollections.length === 0) {
     throw new Error("No available collections found");
@@ -33,7 +55,7 @@ export async function fetchRandomNFTs(count: number): Promise<CollageNFT[]> {
     const maxAttempts = 50; // Prevent infinite loops
 
     while (attempts < maxAttempts) {
-      // Pick a random collection
+      // Pick a random collection from available collections
       const randomCollection =
         availableCollections[
           Math.floor(Math.random() * availableCollections.length)
@@ -128,11 +150,13 @@ export async function validateImageUrl(url: string): Promise<boolean> {
  * Generates default collage settings
  */
 export function getDefaultCollageSettings() {
-  return {
-    rows: 10,
-    columns: 10,
+  const settings = {
+    rows: 3,
+    columns: 3,
     spacing: 2,
     backgroundColor: "#ffffff",
     borderRadius: 4,
   };
+  console.log("getDefaultCollageSettings called, returning:", settings);
+  return settings;
 }
