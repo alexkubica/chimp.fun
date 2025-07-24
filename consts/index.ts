@@ -47,7 +47,7 @@ const originalCollections: CollectionMetadata[] = [
     contract: "0x6ff0c1e1b674138de7f5dd4131bf76665c0ff54a",
     chain: "ethereum",
   },
-{
+  {
     name: "Secret Society of Whales (SSOW)",
     total: 9997,
     contract: "0x88091012eedf8dba59d08e27ed7b22008f5d6fe5",
@@ -505,6 +505,27 @@ export const reactionsMap: ReactionMetadata[] = [
     x: 400,
     y: 60,
     filename: "CHIMPERS JUST REACHED 1M FOLLOWERS IN TIKTOK!.png",
+  },
+  {
+    title: "!IKZ",
+    scale: 1,
+    x: 500,
+    y: 60,
+    filename: "!IKZ.png",
+  },
+  {
+    title: "Welcome to\nthe garden!",
+    scale: 0.8,
+    x: 450,
+    y: 40,
+    filename: "Welcome to the garden!.png",
+  },
+  {
+    title: "Please!",
+    scale: 1,
+    x: 500,
+    y: 60,
+    filename: "Please!.png",
   },
 ];
 
