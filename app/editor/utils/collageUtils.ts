@@ -17,32 +17,40 @@ function getRandomTokenId(collection: any): string {
  */
 export async function fetchRandomNFTs(
   count: number,
-  collectionContract?: string,
+  collectionContracts?: string[],
 ): Promise<CollageNFT[]> {
   const nfts: CollageNFT[] = [];
   const usedNFTs = new Set<string>(); // Track used NFTs to avoid duplicates
 
-  console.log("fetchRandomNFTs called with:", { count, collectionContract });
+  console.log("fetchRandomNFTs called with:", { count, collectionContracts });
 
   // Filter collections that have image URLs or can generate them
   let availableCollections = collectionsMetadata.filter(
     (collection) => collection.contract && collection.total,
   );
 
-  // If a specific collection is requested, filter to only that collection
-  if (collectionContract) {
+  // If specific collections are requested, filter to only those collections
+  if (
+    collectionContracts &&
+    collectionContracts.length > 0 &&
+    !collectionContracts.includes("all")
+  ) {
     availableCollections = availableCollections.filter(
       (collection) =>
-        collection.contract?.toLowerCase() === collectionContract.toLowerCase(),
+        collection.contract &&
+        collectionContracts.some(
+          (contract) =>
+            collection.contract?.toLowerCase() === contract.toLowerCase(),
+        ),
     );
-    console.log("Filtered to specific collection:", collectionContract);
+    console.log("Filtered to specific collections:", collectionContracts);
     console.log(
       "Available collections after filtering:",
       availableCollections.length,
     );
   } else {
     console.log(
-      "No specific collection requested, using all available collections",
+      "No specific collections requested or 'all' selected, using all available collections",
     );
   }
 

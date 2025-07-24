@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SearchableSelect } from "@/components/ui/SearchableSelect";
+import { MultiSearchableSelect } from "@/components/ui/MultiSearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { collectionsMetadata, reactionsMap } from "@/consts";
@@ -25,7 +25,7 @@ import { CollageNFT } from "../editor/types";
 
 interface CollageSettings {
   dimensions: number; // Combined rows and columns (square)
-  collection: string;
+  collections: string[];
 }
 
 function CollagePageContent() {
@@ -35,7 +35,7 @@ function CollagePageContent() {
   // Settings
   const [settings, setSettings] = useState<CollageSettings>({
     dimensions: 2, // Default to 2x2
-    collection: "all", // Default to all collections
+    collections: ["all"], // Default to all collections
   });
 
   // State
@@ -55,9 +55,10 @@ function CollagePageContent() {
       setSettings((prev) => ({ ...prev, dimensions: Number(dimensionsParam) }));
     }
 
-    const collectionParam = params.get("collection");
-    if (collectionParam) {
-      setSettings((prev) => ({ ...prev, collection: collectionParam }));
+    const collectionsParam = params.get("collections");
+    if (collectionsParam) {
+      const collections = collectionsParam.split(",").filter(Boolean);
+      setSettings((prev) => ({ ...prev, collections }));
     }
   }, []);
 
@@ -65,7 +66,7 @@ function CollagePageContent() {
   const updateUrlParams = useCallback(() => {
     const params = new URLSearchParams();
     params.set("dimensions", settings.dimensions.toString());
-    params.set("collection", settings.collection);
+    params.set("collections", settings.collections.join(","));
 
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, "", newUrl);
@@ -95,11 +96,12 @@ function CollagePageContent() {
       const requiredNFTCount = settings.dimensions * settings.dimensions;
       console.log(`Fetching ${requiredNFTCount} random NFTs...`);
 
-      const collectionContract =
-        settings.collection === "all" ? undefined : settings.collection;
+      const collectionContracts = settings.collections.includes("all")
+        ? undefined
+        : settings.collections;
       const randomNFTs = await fetchRandomNFTs(
         requiredNFTCount,
-        collectionContract,
+        collectionContracts,
       );
       setNfts(randomNFTs);
 
@@ -156,16 +158,6 @@ function CollagePageContent() {
                 nftImg.src = nft.imageUrl;
               });
 
-              // Load watermark
-              const watermarkImg = new Image();
-              watermarkImg.crossOrigin = "anonymous";
-
-              await new Promise<void>((resolveWatermark) => {
-                watermarkImg.onload = () => resolveWatermark();
-                watermarkImg.onerror = () => resolveWatermark(); // Continue without watermark
-                watermarkImg.src = "/credit.png";
-              });
-
               // Calculate position
               const row = Math.floor(index / dimensions);
               const col = index % dimensions;
@@ -185,25 +177,6 @@ function CollagePageContent() {
                 ctx.fillText("No Image", x + cellSize / 2, y + cellSize / 2);
               }
 
-              // Add watermark (smaller scale for collage)
-              if (watermarkImg.complete && watermarkImg.naturalWidth > 0) {
-                const watermarkScale = 0.5; // Smaller watermark for collage
-                const watermarkWidth = watermarkImg.width * watermarkScale;
-                const watermarkHeight = watermarkImg.height * watermarkScale;
-                const watermarkX = x + cellSize - watermarkWidth - 10;
-                const watermarkY = y + cellSize - watermarkHeight - 10;
-
-                ctx.globalAlpha = 0.8;
-                ctx.drawImage(
-                  watermarkImg,
-                  watermarkX,
-                  watermarkY,
-                  watermarkWidth,
-                  watermarkHeight,
-                );
-                ctx.globalAlpha = 1.0;
-              }
-
               resolve();
             } catch (error) {
               console.error(`Error processing NFT ${index}:`, error);
@@ -213,6 +186,39 @@ function CollagePageContent() {
         });
 
       await Promise.all(imagePromises);
+
+      // Add single watermark to the whole collage (same size as in editor)
+      const watermarkImg = new Image();
+      watermarkImg.crossOrigin = "anonymous";
+
+      await new Promise<void>((resolveWatermark) => {
+        watermarkImg.onload = () => {
+          // Apply watermark with same scale as editor (3)
+          const watermarkScale = 3;
+          const watermarkWidth = watermarkImg.width * watermarkScale;
+          const watermarkHeight = watermarkImg.height * watermarkScale;
+
+          // Position watermark at bottom-right of entire collage
+          const watermarkX = canvasWidth - watermarkWidth - 20;
+          const watermarkY = canvasHeight - watermarkHeight - 20;
+
+          ctx.globalAlpha = 0.8;
+          ctx.drawImage(
+            watermarkImg,
+            watermarkX,
+            watermarkY,
+            watermarkWidth,
+            watermarkHeight,
+          );
+          ctx.globalAlpha = 1.0;
+          resolveWatermark();
+        };
+        watermarkImg.onerror = () => {
+          console.warn("Failed to load watermark, continuing without it");
+          resolveWatermark();
+        };
+        watermarkImg.src = "/credit.png";
+      });
 
       // Convert canvas to blob URL
       canvas.toBlob((blob) => {
@@ -276,13 +282,22 @@ function CollagePageContent() {
     ];
   }, []);
 
-  const selectedCollectionName = useMemo(() => {
-    if (settings.collection === "all") return "All Collections";
-    const collection = collectionsMetadata.find(
-      (c) => c.contract === settings.collection,
-    );
-    return collection?.name || "Unknown Collection";
-  }, [settings.collection]);
+  const selectedCollectionNames = useMemo(() => {
+    if (settings.collections.includes("all")) return ["All Collections"];
+    return settings.collections.map((contract) => {
+      const collection = collectionsMetadata.find(
+        (c) => c.contract === contract,
+      );
+      return collection?.name || "Unknown Collection";
+    });
+  }, [settings.collections]);
+
+  const selectedCollectionDisplayName = useMemo(() => {
+    if (selectedCollectionNames.length === 1) return selectedCollectionNames[0];
+    if (selectedCollectionNames.length <= 3)
+      return selectedCollectionNames.join(", ");
+    return `${selectedCollectionNames.slice(0, 2).join(", ")} +${selectedCollectionNames.length - 2} more`;
+  }, [selectedCollectionNames]);
 
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
@@ -385,25 +400,26 @@ function CollagePageContent() {
 
           {/* Collection Selection */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="collection">Collection</Label>
+            <Label htmlFor="collections">Collections</Label>
             <div className="flex gap-2">
-              <Select
-                value={settings.collection}
+              <MultiSearchableSelect
+                items={collectionOptions}
+                value={settings.collections}
                 onValueChange={(value) =>
-                  setSettings((prev) => ({ ...prev, collection: value }))
+                  setSettings((prev) => ({ ...prev, collections: value }))
                 }
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Select collection" />
-                </SelectTrigger>
-                <SelectContent>
-                  {collectionOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Select collections..."
+                searchPlaceholder="Search collections..."
+                getItemValue={(item) => item.value}
+                getItemLabel={(item) => item.label}
+                getItemKey={(item) => item.value}
+                className="flex-1"
+                fuseOptions={{
+                  keys: ["label"],
+                  threshold: 0.3,
+                  includeScore: true,
+                }}
+              />
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -413,7 +429,7 @@ function CollagePageContent() {
                     ];
                   setSettings((prev) => ({
                     ...prev,
-                    collection: randomCollection.value,
+                    collections: [randomCollection.value],
                   }));
                 }}
               >
@@ -446,8 +462,7 @@ function CollagePageContent() {
               Generated: {settings.dimensions}×{settings.dimensions} grid with{" "}
               {nfts.length} NFTs
             </p>
-            <p>Collection: {selectedCollectionName}</p>
-            <p>Each NFT includes watermark from preview</p>
+            <p>Collections: {selectedCollectionDisplayName}</p>
           </div>
         )}
       </div>
