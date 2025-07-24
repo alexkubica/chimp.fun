@@ -13,7 +13,14 @@ import { MultiSearchableSelect } from "@/components/ui/MultiSearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { collectionsMetadata, reactionsMap } from "@/consts";
-import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  Suspense,
+  useRef,
+} from "react";
 import {
   AiOutlineCopy,
   AiOutlineDownload,
@@ -28,6 +35,12 @@ interface CollageSettings {
   collections: string[];
 }
 
+// Individual NFT with loading state for progressive loading
+interface LoadableNFT extends CollageNFT {
+  isLoaded: boolean;
+  hasError: boolean;
+}
+
 function CollagePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,12 +52,16 @@ function CollagePageContent() {
   });
 
   // State
-  const [nfts, setNfts] = useState<CollageNFT[]>([]);
+  const [nfts, setNfts] = useState<LoadableNFT[]>([]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [loadedImagesCount, setLoadedImagesCount] = useState(0);
+
+  // Debounce ref for settings changes
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Parse URL parameters
   const parseUrlParams = useCallback(() => {
@@ -52,7 +69,10 @@ function CollagePageContent() {
 
     const dimensionsParam = params.get("dimensions");
     if (dimensionsParam && !isNaN(Number(dimensionsParam))) {
-      setSettings((prev) => ({ ...prev, dimensions: Number(dimensionsParam) }));
+      const dimensions = Number(dimensionsParam);
+      // Enforce 2-10 range
+      const clampedDimensions = Math.max(2, Math.min(10, dimensions));
+      setSettings((prev) => ({ ...prev, dimensions: clampedDimensions }));
     }
 
     const collectionsParam = params.get("collections");
@@ -86,11 +106,25 @@ function CollagePageContent() {
     }
   }, []);
 
-  // Generate collage
+  // Progressive image loading handler
+  const handleImageLoad = useCallback((index: number, success: boolean) => {
+    setNfts((prevNfts) =>
+      prevNfts.map((nft, i) =>
+        i === index ? { ...nft, isLoaded: true, hasError: !success } : nft,
+      ),
+    );
+
+    if (success) {
+      setLoadedImagesCount((prev) => prev + 1);
+    }
+  }, []);
+
+  // Generate collage - fetch NFT data
   const generateCollage = useCallback(async () => {
     setLoading(true);
     setGenerating(true);
     setError(null);
+    setLoadedImagesCount(0);
 
     try {
       const requiredNFTCount = settings.dimensions * settings.dimensions;
@@ -103,8 +137,15 @@ function CollagePageContent() {
         requiredNFTCount,
         collectionContracts,
       );
-      setNfts(randomNFTs);
 
+      // Initialize NFTs with loading state
+      const loadableNFTs: LoadableNFT[] = randomNFTs.map((nft) => ({
+        ...nft,
+        isLoaded: false,
+        hasError: false,
+      }));
+
+      setNfts(loadableNFTs);
       console.log(`Successfully fetched ${randomNFTs.length} NFTs`);
     } catch (err) {
       console.error("Error generating collage:", err);
@@ -113,9 +154,19 @@ function CollagePageContent() {
       );
     } finally {
       setLoading(false);
-      setGenerating(false);
     }
   }, [settings]);
+
+  // Debounced generate collage
+  const debouncedGenerateCollage = useCallback(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      generateCollage();
+    }, 500); // 500ms debounce
+  }, [generateCollage]);
 
   // Generate collage with watermarks
   const generateCollageWithWatermarks = useCallback(async () => {
@@ -257,17 +308,31 @@ function CollagePageContent() {
     updateUrlParams();
   }, [updateUrlParams]);
 
-  // Generate collage on page load and when settings change
+  // Generate collage on page load and when settings change (debounced)
   useEffect(() => {
-    generateCollage();
-  }, [generateCollage]);
+    debouncedGenerateCollage();
 
-  // Generate watermarked collage when NFTs are loaded
+    // Cleanup timeout on unmount
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [debouncedGenerateCollage]);
+
+  // Generate watermarked collage when all NFTs are loaded
   useEffect(() => {
-    if (nfts.length > 0 && !loading) {
+    const totalNfts = settings.dimensions * settings.dimensions;
+    if (nfts.length > 0 && !loading && loadedImagesCount >= totalNfts) {
       generateCollageWithWatermarks();
     }
-  }, [nfts, loading, generateCollageWithWatermarks]);
+  }, [
+    nfts,
+    loading,
+    loadedImagesCount,
+    settings.dimensions,
+    generateCollageWithWatermarks,
+  ]);
 
   // Collection options
   const collectionOptions = useMemo(() => {
@@ -315,7 +380,7 @@ function CollagePageContent() {
         {/* Preview */}
         <div className="flex flex-col items-center w-full p-4 border rounded-lg bg-muted/50 mt-2">
           <div className="relative w-full max-w-md aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
-            {generating || loading ? (
+            {loading ? (
               <div className="relative w-full h-full">
                 {/* Skeleton grid matching the dimensions */}
                 <div
@@ -335,13 +400,60 @@ function CollagePageContent() {
                   <Spinner />
                 </div>
               </div>
-            ) : finalImageUrl ? (
-              <img
-                src={finalImageUrl}
-                alt="NFT Collage"
-                className="object-contain w-full h-full rounded-lg"
-                style={{ background: "transparent" }}
-              />
+            ) : nfts.length > 0 ? (
+              <div className="relative w-full h-full">
+                {/* Progressive loading grid */}
+                <div
+                  className="grid gap-1 w-full h-full p-2"
+                  style={{
+                    gridTemplateColumns: `repeat(${settings.dimensions}, 1fr)`,
+                    gridTemplateRows: `repeat(${settings.dimensions}, 1fr)`,
+                  }}
+                >
+                  {nfts
+                    .slice(0, settings.dimensions * settings.dimensions)
+                    .map((nft, index) => (
+                      <div
+                        key={nft.id}
+                        className="relative w-full h-full rounded overflow-hidden"
+                      >
+                        {!nft.isLoaded && !nft.hasError && (
+                          <Skeleton className="absolute inset-0 w-full h-full" />
+                        )}
+                        {nft.hasError ? (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-xs text-gray-500">
+                            Failed to load
+                          </div>
+                        ) : (
+                          <img
+                            src={nft.imageUrl}
+                            alt={`NFT ${index + 1}`}
+                            className={`w-full h-full object-cover transition-opacity duration-300 ${
+                              nft.isLoaded ? "opacity-100" : "opacity-0"
+                            }`}
+                            onLoad={() => handleImageLoad(index, true)}
+                            onError={() => handleImageLoad(index, false)}
+                          />
+                        )}
+                      </div>
+                    ))}
+                </div>
+                {/* Final collage overlay when all images are loaded and processing */}
+                {finalImageUrl && (
+                  <img
+                    src={finalImageUrl}
+                    alt="NFT Collage"
+                    className="absolute inset-0 w-full h-full object-contain rounded-lg"
+                    style={{ background: "transparent" }}
+                  />
+                )}
+                {/* Loading spinner when generating final collage */}
+                {generating && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+                    <Spinner />
+                  </div>
+                )}
+              </div>
             ) : error ? (
               <div className="text-center p-4">
                 <p className="text-destructive font-medium mb-2">Error</p>
@@ -388,7 +500,7 @@ function CollagePageContent() {
             </Label>
             <Slider
               id="dimensions"
-              min={1}
+              min={2}
               max={10}
               step={1}
               value={[settings.dimensions]}
@@ -463,6 +575,12 @@ function CollagePageContent() {
               {nfts.length} NFTs
             </p>
             <p>Collections: {selectedCollectionDisplayName}</p>
+            {loadedImagesCount < settings.dimensions * settings.dimensions && (
+              <p>
+                Loading images: {loadedImagesCount}/
+                {settings.dimensions * settings.dimensions}
+              </p>
+            )}
           </div>
         )}
       </div>
