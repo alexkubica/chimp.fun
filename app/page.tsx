@@ -91,6 +91,12 @@ export default function Home() {
           >
             <Link href="/chimper-simulation">!CHIMP SIMULATION</Link>
           </Button>
+          <Button
+            asChild
+            className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
+          >
+            <Link href="/rafa-stats">🐧 Rafa Stats</Link>
+          </Button>
         </div>
       </div>
     </main>
