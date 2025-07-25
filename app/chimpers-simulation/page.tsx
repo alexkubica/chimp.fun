@@ -39,6 +39,8 @@ interface BananaSprite extends Phaser.GameObjects.Text {
   id: number;
   timeWithChimper: number;
   chimperOnBanana: ChimperSprite | null;
+  x: number;
+  y: number;
 }
 
 export default function ChimpersSimulationPage() {
@@ -472,7 +474,7 @@ export default function ChimpersSimulationPage() {
             let closestBanana: BananaSprite | null = null;
             let closestDistance = Infinity;
 
-            this.bananas.forEach((banana) => {
+            this.bananas.forEach((banana: BananaSprite) => {
               const distance = Phaser.Math.Distance.Between(
                 chimper.x,
                 chimper.y,
@@ -487,8 +489,8 @@ export default function ChimpersSimulationPage() {
 
             if (closestBanana) {
               chimper.targetBanana = closestBanana;
-              chimper.targetX = closestBanana.x;
-              chimper.targetY = closestBanana.y;
+              chimper.targetX = (closestBanana as BananaSprite).x;
+              chimper.targetY = (closestBanana as BananaSprite).y;
               return;
             }
           }
