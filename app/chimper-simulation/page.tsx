@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 interface ChimperSimulationScene extends Phaser.Scene {
   chimpers: ChimperSprite[];
-  spawnChimper: (x?: number, y?: number) => void;
+  spawnChimper: (x?: number, y?: number, chimperIdOverride?: number) => void;
   clearAllChimpers: () => void;
 }
 
@@ -36,6 +34,8 @@ export default function ChimperSimulationPage() {
   const [chimperCount, setChimperCount] = useState(1);
   const [actualChimperCount, setActualChimperCount] = useState(0);
   const [showMessage, setShowMessage] = useState(true);
+  const [specificChimperId, setSpecificChimperId] = useState("");
+  const [inputError, setInputError] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -164,7 +164,29 @@ export default function ChimperSimulationPage() {
             .setDepth(0);
         }
 
-        spawnChimper(x?: number, y?: number) {
+        spawnChimper(x?: number, y?: number, chimperIdOverride?: number) {
+          let chimperId: number;
+          if (typeof chimperIdOverride === "number") {
+            chimperId = chimperIdOverride;
+            // If not loaded, load it
+            const key = `chimp_${chimperId}`;
+            if (!this.textures.exists(key)) {
+              const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${chimperId}.png?v6`;
+              this.load.spritesheet(key, url, {
+                frameWidth: 96,
+                frameHeight: 96,
+              });
+              this.load.once("complete", () => {
+                this.createChimperSprite(key, chimperId, x, y);
+                this.refillChimperQueue();
+              });
+              this.load.start();
+            } else {
+              this.createChimperSprite(key, chimperId, x, y);
+              this.refillChimperQueue();
+            }
+            return;
+          }
           // Use a random chimper from the queue
           if (this.chimperQueue.length === 0) {
             this.refillChimperQueue();
@@ -172,7 +194,7 @@ export default function ChimperSimulationPage() {
           const randomIndex = Math.floor(
             Math.random() * this.chimperQueue.length,
           );
-          const chimperId = this.chimperQueue.splice(randomIndex, 1)[0];
+          chimperId = this.chimperQueue.splice(randomIndex, 1)[0];
           const key = `chimp_${chimperId}`;
 
           if (!this.textures.exists(key)) {
@@ -515,6 +537,20 @@ export default function ChimperSimulationPage() {
     }
   };
 
+  // Add a function to spawn a specific chimper by ID
+  const spawnSpecificChimper = () => {
+    const id = parseInt(specificChimperId, 10);
+    if (isNaN(id) || id < 1 || id > 5555) {
+      setInputError("Enter a valid ID (1-5555)");
+      return;
+    }
+    setInputError("");
+    if (sceneRef.current) {
+      sceneRef.current.spawnChimper(undefined, undefined, id);
+    }
+    // Do not clear the input
+  };
+
   if (!mounted) return null;
 
   return (
@@ -526,6 +562,49 @@ export default function ChimperSimulationPage() {
       >
         !CHIMP Simulation
       </h1>
+
+      {/* Spawn Specific Chimps UI */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 bg-white/80 rounded-lg px-4 py-2 shadow-lg flex flex-col sm:flex-row items-center sm:space-x-2 space-y-2 sm:space-y-0">
+        <div className="flex flex-row items-center space-x-2 w-full justify-center">
+          <input
+            type="number"
+            min={1}
+            max={5555}
+            value={specificChimperId}
+            onChange={(e) => setSpecificChimperId(e.target.value)}
+            placeholder="Chimper ID"
+            className="w-36 px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base"
+          />
+          <Button
+            onClick={spawnSpecificChimper}
+            size="sm"
+            className="font-bold"
+          >
+            Spawn
+          </Button>
+          <Button
+            onClick={spawnChimper}
+            size="sm"
+            className="font-bold"
+            title="Spawn Random"
+          >
+            🎲
+          </Button>
+        </div>
+        <Button
+          onClick={clearAll}
+          size="sm"
+          className="font-bold mt-2 sm:mt-0"
+          variant="destructive"
+        >
+          Clear All
+        </Button>
+      </div>
+      {inputError && (
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30 text-red-600 bg-white/90 rounded px-3 py-1 shadow">
+          {inputError}
+        </div>
+      )}
 
       {/* Simulation Container - Fullscreen */}
       <div

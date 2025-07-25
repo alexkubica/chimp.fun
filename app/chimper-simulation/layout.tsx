@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "!CHIMP Life Simulation - CHIMP.FUN",
+  title: "!CHIMP Simulation - CHIMP.FUN",
   description:
     "Watch random chimpers walk around and live their own little lives! Click to spawn more chimpers and observe their unique personalities and behaviors.",
   keywords: [
