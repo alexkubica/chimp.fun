@@ -89,7 +89,7 @@ export default function Home() {
             asChild
             className="text-lg py-6 bg-[#8DC7FF] hover:bg-[#5bb0f7] font-bold rounded-xl shadow-md box-border"
           >
-            <Link href="/chimper-simulation">!CHIMP Life Simulation</Link>
+            <Link href="/chimpers-simulation">!CHIMP Simulation</Link>
           </Button>
         </div>
       </div>
