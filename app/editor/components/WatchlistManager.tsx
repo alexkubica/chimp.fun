@@ -21,6 +21,7 @@ import {
   AiOutlineReload,
   AiOutlineDelete,
 } from "react-icons/ai";
+import { debounce } from "lodash";
 
 interface WatchlistManagerProps {
   watchlist: UseWatchlistResult;
@@ -296,6 +297,25 @@ export function WatchlistManager({
   const [labelInput, setLabelInput] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
+  // Debounced wallet input validation
+  const debouncedWalletValidation = useMemo(
+    () =>
+      debounce((input: string) => {
+        // Here you could add validation logic, ENS resolution, etc.
+        console.log("Validating wallet input:", input);
+      }, 300),
+    [],
+  );
+
+  // Handle wallet input changes with debouncing
+  const handleWalletInputChange = useCallback(
+    (value: string) => {
+      setWalletInput(value);
+      debouncedWalletValidation(value);
+    },
+    [debouncedWalletValidation],
+  );
+
   const handleAddWallet = useCallback(async () => {
     if (!walletInput.trim()) return;
 
@@ -317,6 +337,13 @@ export function WatchlistManager({
       setIsAdding(false);
     }
   }, [walletInput, labelInput, watchlist]);
+
+  // Cleanup debounced function on unmount
+  useEffect(() => {
+    return () => {
+      debouncedWalletValidation.cancel();
+    };
+  }, [debouncedWalletValidation]);
 
   const handlePasteFromClipboard = useCallback(async () => {
     try {
@@ -355,7 +382,7 @@ export function WatchlistManager({
                   id="walletAddress"
                   placeholder="0x... or vitalik.eth"
                   value={walletInput}
-                  onChange={(e) => setWalletInput(e.target.value)}
+                  onChange={(e) => handleWalletInputChange(e.target.value)}
                   className="flex-1 font-mono text-sm"
                   onKeyDown={handleKeyDown}
                 />
@@ -432,7 +459,7 @@ export function WatchlistManager({
           <Input
             placeholder="0x... or vitalik.eth"
             value={walletInput}
-            onChange={(e) => setWalletInput(e.target.value)}
+            onChange={(e) => handleWalletInputChange(e.target.value)}
             className="flex-1 font-mono text-sm"
             onKeyDown={handleKeyDown}
           />
