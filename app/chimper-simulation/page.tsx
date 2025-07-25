@@ -3,6 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 
+// Helper to get image URL for Chimpers or Chimpers Genesis
+function getChimperImageUrl(id: number, collection: string) {
+  if (collection === "Chimpers Genesis") {
+    return `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpersgenesis/full/${id}.png?v6`;
+  }
+  return `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${id}.png?v6`;
+}
+
 interface ChimperSimulationScene extends Phaser.Scene {
   chimpers: ChimperSprite[];
   spawnChimper: (x?: number, y?: number, chimperIdOverride?: number) => void;
@@ -36,6 +44,15 @@ export default function ChimperSimulationPage() {
   const [showMessage, setShowMessage] = useState(true);
   const [specificChimperId, setSpecificChimperId] = useState("");
   const [inputError, setInputError] = useState("");
+  const [collection, setCollection] = useState<"Chimpers" | "Chimpers Genesis">(
+    "Chimpers",
+  );
+
+  // Track collection in a ref for Phaser scene
+  const collectionRef = useRef(collection);
+  useEffect(() => {
+    collectionRef.current = collection;
+  }, [collection]);
 
   useEffect(() => {
     setMounted(true);
@@ -54,7 +71,10 @@ export default function ChimperSimulationPage() {
         nextChimperId = 1;
         loadedChimpers = new Set<number>();
         chimperQueue: number[] = [];
-        maxChimperId = 5555;
+        // Use correct max ID for collection
+        get maxChimperId() {
+          return collectionRef.current === "Chimpers Genesis" ? 98 : 5555;
+        }
         queueSize = 20;
         bg: Phaser.GameObjects.TileSprite | null = null;
 
@@ -84,7 +104,7 @@ export default function ChimperSimulationPage() {
             ) {
               this.chimperQueue.push(id);
               const key = `chimp_${id}`;
-              const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${id}.png?v6`;
+              const url = getChimperImageUrl(id, collectionRef.current);
               this.load.spritesheet(key, url, {
                 frameWidth: 96,
                 frameHeight: 96,
@@ -171,7 +191,7 @@ export default function ChimperSimulationPage() {
             // If not loaded, load it
             const key = `chimp_${chimperId}`;
             if (!this.textures.exists(key)) {
-              const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${chimperId}.png?v6`;
+              const url = getChimperImageUrl(chimperId, collectionRef.current);
               this.load.spritesheet(key, url, {
                 frameWidth: 96,
                 frameHeight: 96,
@@ -199,7 +219,7 @@ export default function ChimperSimulationPage() {
 
           if (!this.textures.exists(key)) {
             // If texture doesn't exist, load it
-            const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${chimperId}.png?v6`;
+            const url = getChimperImageUrl(chimperId, collectionRef.current);
             this.load.spritesheet(key, url, {
               frameWidth: 96,
               frameHeight: 96,
@@ -497,6 +517,19 @@ export default function ChimperSimulationPage() {
     });
   }, [mounted, chimperCount, showMessage]);
 
+  // Reset Phaser state when collection changes
+  useEffect(() => {
+    if (sceneRef.current) {
+      sceneRef.current.clearAllChimpers();
+      (sceneRef.current as any).loadedChimpers = new Set();
+      (sceneRef.current as any).chimperQueue = [];
+      (sceneRef.current as any).nextChimperId = 1;
+      (sceneRef.current as any).refillChimperQueue();
+    }
+    setSpecificChimperId("");
+    setInputError("");
+  }, [collection]);
+
   const spawnChimper = () => {
     if (sceneRef.current) {
       sceneRef.current.spawnChimper();
@@ -539,9 +572,10 @@ export default function ChimperSimulationPage() {
 
   // Add a function to spawn a specific chimper by ID
   const spawnSpecificChimper = () => {
+    const maxId = collection === "Chimpers Genesis" ? 98 : 5555;
     const id = parseInt(specificChimperId, 10);
-    if (isNaN(id) || id < 1 || id > 5555) {
-      setInputError("Enter a valid ID (1-5555)");
+    if (isNaN(id) || id < 1 || id > maxId) {
+      setInputError(`Enter a valid ID (1-${maxId})`);
       return;
     }
     setInputError("");
@@ -562,14 +596,25 @@ export default function ChimperSimulationPage() {
       >
         !CHIMP Simulation
       </h1>
-
-      {/* Spawn Specific Chimps UI */}
+      {/* Collection Selector - stays at top */}
+      <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-30 bg-white/80 rounded-lg px-4 py-2 shadow-lg flex flex-row items-center space-x-2">
+        <span className="font-bold">Collection:</span>
+        <select
+          value={collection}
+          onChange={(e) => setCollection(e.target.value as any)}
+          className="px-2 py-1 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base"
+        >
+          <option value="Chimpers">Chimpers</option>
+          <option value="Chimpers Genesis">Chimpers Genesis</option>
+        </select>
+      </div>
+      {/* Spawn Specific Chimps UI - moved to bottom */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 bg-white/80 rounded-lg px-4 py-2 shadow-lg flex flex-col sm:flex-row items-center sm:space-x-2 space-y-2 sm:space-y-0">
         <div className="flex flex-row items-center space-x-2 w-full justify-center">
           <input
             type="number"
             min={1}
-            max={5555}
+            max={collection === "Chimpers Genesis" ? 98 : 5555}
             value={specificChimperId}
             onChange={(e) => setSpecificChimperId(e.target.value)}
             placeholder="Chimper ID"
@@ -605,7 +650,6 @@ export default function ChimperSimulationPage() {
           {inputError}
         </div>
       )}
-
       {/* Simulation Container - Fullscreen */}
       <div
         id="simulation-container"
