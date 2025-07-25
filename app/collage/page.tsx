@@ -140,7 +140,7 @@ function CollagePageContent() {
     };
 
     loadFfmpeg();
-  }, []);
+  }, [ffmpegLoading]);
 
   // Parse URL parameters
   const parseUrlParams = useCallback(() => {
@@ -216,126 +216,72 @@ function CollagePageContent() {
         const totalSize = settings.dimensions * cellSize;
 
         if (settings.format === "gif" && ffmpegReady && ffmpegRef.current) {
-          // Use FFmpeg for GIF generation
+          // Use FFmpeg for GIF generation - create a simpler animated collage
           console.log("Generating GIF using FFmpeg...");
 
-          // Create individual frames using canvas
-          const frameCount = 8;
-          const frameDuration = 0.5; // 500ms per frame
+          // First, create a base collage image
+          const baseCanvas = document.createElement("canvas");
+          const baseCtx = baseCanvas.getContext("2d");
+          if (!baseCtx) throw new Error("Failed to get canvas context");
 
-          for (let frame = 0; frame < frameCount; frame++) {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            if (!ctx) continue;
+          baseCanvas.width = totalSize;
+          baseCanvas.height = totalSize;
 
-            canvas.width = totalSize;
-            canvas.height = totalSize;
+          // Load all images first
+          const loadedImages = await Promise.all(
+            nftList.map(async (nft) => {
+              if (!nft) return null;
+              try {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                await new Promise<void>((resolve, reject) => {
+                  img.onload = () => resolve();
+                  img.onerror = () =>
+                    reject(new Error(`Failed to load: ${nft.imageUrl}`));
+                  img.src = nft.imageUrl;
+                });
+                return img;
+              } catch (error) {
+                console.warn(
+                  `Failed to load NFT image: ${nft.imageUrl}`,
+                  error,
+                );
+                return null;
+              }
+            }),
+          );
 
-            // Draw all NFTs for this frame
-            await Promise.all(
-              nftList.map(async (nft, index) => {
-                if (!nft) return;
+          // Write the base image to FFmpeg
+          nftList.forEach((nft, index) => {
+            if (!nft || !loadedImages[index]) return;
 
-                const row = Math.floor(index / settings.dimensions);
-                const col = index % settings.dimensions;
-                const baseX = col * cellSize;
-                const baseY = row * cellSize;
+            const row = Math.floor(index / settings.dimensions);
+            const col = index % settings.dimensions;
+            const x = col * cellSize;
+            const y = row * cellSize;
 
-                // Animation: slight scale and rotation
-                const animationProgress = (frame / frameCount) * Math.PI * 2;
-                const scale =
-                  1 + Math.sin(animationProgress + index * 0.5) * 0.05;
-                const rotation =
-                  Math.sin(animationProgress + index * 0.3) * 0.02;
+            baseCtx.drawImage(loadedImages[index]!, x, y, cellSize, cellSize);
+          });
 
-                const scaledSize = cellSize * scale;
-                const x = baseX + (cellSize - scaledSize) / 2;
-                const y = baseY + (cellSize - scaledSize) / 2;
+          const baseBlob = await new Promise<Blob>((resolve) => {
+            baseCanvas.toBlob((blob) => resolve(blob!), "image/png");
+          });
 
-                try {
-                  const img = new Image();
-                  img.crossOrigin = "anonymous";
+          const baseData = await fetchFile(URL.createObjectURL(baseBlob));
+          await ffmpegRef.current.writeFile("input.png", baseData);
 
-                  await new Promise<void>((resolve, reject) => {
-                    img.onload = () => {
-                      ctx.save();
-                      ctx.translate(baseX + cellSize / 2, baseY + cellSize / 2);
-                      ctx.rotate(rotation);
-                      ctx.drawImage(
-                        img,
-                        -scaledSize / 2,
-                        -scaledSize / 2,
-                        scaledSize,
-                        scaledSize,
-                      );
-                      ctx.restore();
-                      resolve();
-                    };
-                    img.onerror = () =>
-                      reject(
-                        new Error(`Failed to load image: ${nft.imageUrl}`),
-                      );
-                    img.src = nft.imageUrl;
-                  });
-                } catch (error) {
-                  console.warn(
-                    `Failed to load NFT image: ${nft.imageUrl}`,
-                    error,
-                  );
-                  ctx.fillStyle = "#f5f5f5";
-                  ctx.fillRect(x, y, scaledSize, scaledSize);
-                  ctx.fillStyle = "#999";
-                  ctx.font = "24px Arial";
-                  ctx.textAlign = "center";
-                  ctx.fillText(
-                    "Failed to load",
-                    x + scaledSize / 2,
-                    y + scaledSize / 2,
-                  );
-                }
-              }),
-            );
-
-            // Convert canvas to blob and write to FFmpeg
-            const frameBlob = await new Promise<Blob>((resolve) => {
-              canvas.toBlob((blob) => resolve(blob!), "image/png");
-            });
-
-            const frameData = await fetchFile(URL.createObjectURL(frameBlob));
-            await ffmpegRef.current.writeFile(
-              `frame_${frame.toString().padStart(3, "0")}.png`,
-              frameData,
-            );
-          }
-
-          // Generate GIF using FFmpeg
+          // Convert to GIF format (simple conversion first)
           const ffmpegArgs = [
-            "-r",
-            `${1 / frameDuration}`, // Frame rate
             "-i",
-            "frame_%03d.png",
+            "input.png",
             "-vf",
-            "palettegen=reserve_transparent=0",
-            "palette.png",
-          ];
-
-          await ffmpegRef.current.exec(ffmpegArgs);
-
-          const gifArgs = [
-            "-r",
-            `${1 / frameDuration}`,
-            "-i",
-            "frame_%03d.png",
-            "-i",
-            "palette.png",
-            "-filter_complex",
-            "[0:v][1:v]paletteuse=dither=bayer",
-            "-loop",
-            "0",
+            "scale=trunc(iw/2)*2:trunc(ih/2)*2",
+            "-f",
+            "gif",
             "output.gif",
           ];
 
-          await ffmpegRef.current.exec(gifArgs);
+          await ffmpegRef.current.exec(ffmpegArgs);
 
           const data = await ffmpegRef.current.readFile("output.gif");
           const url = URL.createObjectURL(
