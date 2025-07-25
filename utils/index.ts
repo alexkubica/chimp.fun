@@ -3,7 +3,12 @@ import { Chain, CollectionMetadata } from "@/types";
 import { EtherscanPlugin } from "ethers";
 import { EtherscanProvider } from "ethers";
 import { Network } from "ethers";
-import { AbstractProvider, ethers } from "ethers";
+import {
+  AbstractProvider,
+  getAddress,
+  Contract,
+  JsonRpcProvider,
+} from "ethers";
 
 export const getCachePath = (
   collection: CollectionMetadata,
@@ -22,7 +27,7 @@ export const getEtherscanProvider = (chain: Chain) => {
   console.log("Creating provider for chain:", chain);
 
   if (chain === "polygon") {
-    provider = new ethers.JsonRpcProvider(
+    provider = new JsonRpcProvider(
       process.env.POLYGON_RPC_URL || "https://polygon-rpc.com",
     );
   } else if (chain === "ape") {
@@ -38,7 +43,7 @@ export const getEtherscanProvider = (chain: Chain) => {
   } else if (chain === "ethereum") {
     console.log("Creating Ethereum mainnet provider");
     // Use JsonRpcProvider for Ethereum mainnet
-    provider = new ethers.JsonRpcProvider(
+    provider = new JsonRpcProvider(
       process.env.ETHEREUM_RPC_URL || "https://eth.llamarpc.com",
     );
     console.log("Provider created:", !!provider);
@@ -90,8 +95,10 @@ export const fetchTokenMetadata = async (
 
   console.log("Fetching metadata from contract");
   try {
-    const ethersContract = new ethers.Contract(
-      collection.contract,
+    // Normalize contract address to checksum format
+    const checksummedAddress = getAddress(collection.contract.toLowerCase());
+    const ethersContract = new Contract(
+      checksummedAddress,
       tokenURIABI,
       provider,
     );

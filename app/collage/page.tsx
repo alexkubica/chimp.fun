@@ -68,6 +68,43 @@ function CollagePageContent() {
   const [replacingIndex, setReplacingIndex] = useState<number | null>(null);
   const [usedNFTsSet, setUsedNFTsSet] = useState<Set<string>>(new Set());
 
+  // Handle NFT progress (make this stable and use only functional setProgressiveNfts)
+  const handleNFTProgress = useCallback(
+    (nft: CollageNFT, index: number) => {
+      setProgressiveNfts((prevArray) => {
+        // Always create a new array of the correct length
+        const length = settings.dimensions * settings.dimensions;
+        const newArray = Array.from({ length }, (_, i) => prevArray[i]);
+        newArray[index] = nft;
+        return newArray;
+      });
+      setLoadingProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
+    },
+    [settings.dimensions],
+  );
+
+  // Cancel current generation (restore this)
+  const cancelGeneration = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setGenerating(false);
+    setError("Generation cancelled");
+  }, []);
+
+  const settingsRef = useRef(settings);
+  const handleNFTProgressRef = useRef(handleNFTProgress);
+
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+
+  useEffect(() => {
+    handleNFTProgressRef.current = handleNFTProgress;
+  }, [handleNFTProgress]);
+
   // Available collections for the dropdown
   const collectionOptions = useMemo(() => {
     const options = [{ value: "all", label: "All Collections" }];
@@ -133,190 +170,106 @@ function CollagePageContent() {
     [updateUrlParams],
   );
 
-  // Handle NFT progress
-  const handleNFTProgress = useCallback((nft: CollageNFT, index: number) => {
-    setProgressiveNfts((prevArray) => {
-      const newArray = [...prevArray];
-      newArray[index] = nft;
-      return newArray;
-    });
-    setLoadingProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
-  }, []);
-
-  // Cancel current generation
-  const cancelGeneration = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    setLoading(false);
-    setGenerating(false);
-    setError("Generation cancelled");
-  }, []);
-
-  // Generate collage
-  const generateCollage = useCallback(async () => {
-    // Cancel any existing generation
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new abort controller
-    abortControllerRef.current = new AbortController();
-
-    setLoading(true);
-    setGenerating(false);
-    setError(null);
-    setProgressiveNfts([]);
-    setFinalImageUrl(null); // Clear previous image
-
-    try {
-      const requiredNFTCount = settings.dimensions * settings.dimensions;
-      setLoadingProgress({ loaded: 0, total: requiredNFTCount });
-      console.log(`Fetching ${requiredNFTCount} random NFTs...`);
-
-      const collectionContracts = settings.collections.includes("all")
-        ? undefined
-        : settings.collections;
-
-      const randomNFTs = await fetchRandomNFTs(
-        requiredNFTCount,
-        collectionContracts,
-        handleNFTProgress,
-        abortControllerRef.current.signal,
-      );
-
-      // Check if operation was cancelled
-      if (abortControllerRef.current.signal.aborted) {
-        return;
+  // Generate collage (now takes settings and handleNFTProgress as arguments)
+  const generateCollage = useCallback(
+    async (
+      settingsArg: CollageSettings,
+      handleNFTProgressArg: (nft: CollageNFT, index: number) => void,
+    ) => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
+      abortControllerRef.current = new AbortController();
+      setLoading(true);
+      setGenerating(false);
+      setError(null);
+      // Initialize progressiveNfts to correct length with undefineds
+      setProgressiveNfts(
+        Array(settingsArg.dimensions * settingsArg.dimensions).fill(undefined),
+      );
+      setFinalImageUrl(null);
+      try {
+        const requiredNFTCount =
+          settingsArg.dimensions * settingsArg.dimensions;
+        setLoadingProgress({ loaded: 0, total: requiredNFTCount });
+        const collectionContracts = settingsArg.collections.includes("all")
+          ? undefined
+          : settingsArg.collections;
+        const randomNFTs = await fetchRandomNFTs(
+          requiredNFTCount,
+          collectionContracts,
+          handleNFTProgressArg,
+          abortControllerRef.current.signal,
+        );
+        if (abortControllerRef.current.signal.aborted) {
+          return;
+        }
+        setNfts(randomNFTs);
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        setError(
+          err instanceof Error ? err.message : "Failed to generate collage",
+        );
+      } finally {
+        setLoading(false);
+        setGenerating(false);
+        abortControllerRef.current = null;
+      }
+    },
+    [],
+  );
 
-      setNfts(randomNFTs);
-      console.log(`Successfully fetched ${randomNFTs.length} NFTs`);
+  // Stable debounced generateCollage
+  const debouncedGenerateCollage = useMemo(() => {
+    return debounce(() => {
+      generateCollage(settingsRef.current, handleNFTProgressRef.current);
+    }, 300);
+  }, [generateCollage]);
 
-      // Auto-generate the final image after all NFTs are loaded
-      if (randomNFTs.length === requiredNFTCount) {
-        setGenerating(true);
-        try {
-          if (settings.format === "gif") {
-            // Generate GIF inline
-            const GIF = (await import("gif.js")).default;
-            const gif = new GIF({
-              workers: 2,
-              quality: 10,
-              width: settings.dimensions * 512,
-              height: settings.dimensions * 512,
-              workerScript: "/gif.worker.js",
-            });
-
-            const cellSize = 512;
-            const frameCount = 8;
-            const frameDuration = 500;
-
-            for (let frame = 0; frame < frameCount; frame++) {
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
-              if (!ctx) continue;
-
-              canvas.width = settings.dimensions * cellSize;
-              canvas.height = settings.dimensions * cellSize;
-
-              await Promise.all(
-                randomNFTs.map(async (nft, index) => {
-                  if (!nft) return;
-
-                  const row = Math.floor(index / settings.dimensions);
-                  const col = index % settings.dimensions;
-                  const baseX = col * cellSize;
-                  const baseY = row * cellSize;
-
-                  const animationProgress = (frame / frameCount) * Math.PI * 2;
-                  const scale =
-                    1 + Math.sin(animationProgress + index * 0.5) * 0.05;
-                  const scaledSize = cellSize * scale;
-                  const x = baseX + (cellSize - scaledSize) / 2;
-                  const y = baseY + (cellSize - scaledSize) / 2;
-
-                  try {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous";
-
-                    await new Promise<void>((resolve, reject) => {
-                      img.onload = () => {
-                        ctx.drawImage(img, x, y, scaledSize, scaledSize);
-                        resolve();
-                      };
-                      img.onerror = () =>
-                        reject(
-                          new Error(`Failed to load image: ${nft.imageUrl}`),
-                        );
-                      img.src = nft.imageUrl;
-                    });
-                  } catch (error) {
-                    console.warn(
-                      `Failed to load NFT image: ${nft.imageUrl}`,
-                      error,
-                    );
-                    ctx.fillStyle = "#f5f5f5";
-                    ctx.fillRect(x, y, scaledSize, scaledSize);
-                    ctx.fillStyle = "#999";
-                    ctx.font = "24px Arial";
-                    ctx.textAlign = "center";
-                    ctx.fillText(
-                      "Failed to load",
-                      x + scaledSize / 2,
-                      y + scaledSize / 2,
-                    );
-                  }
-                }),
-              );
-
-              gif.addFrame(ctx, { copy: true, delay: frameDuration });
-            }
-
-            await new Promise<void>((resolve, reject) => {
-              gif.on("finished", (blob: Blob) => {
-                const url = URL.createObjectURL(blob);
-                setFinalImageUrl(url);
-                resolve();
-              });
-
-              try {
-                gif.render();
-              } catch (error) {
-                reject(error);
-              }
-
-              setTimeout(() => {
-                reject(new Error("GIF generation timed out"));
-              }, 30000);
-            });
-          } else {
-            // Generate PNG inline
+  // Extracted function to generate the final image from current NFTs
+  const generateFinalImage = useCallback(
+    async (nftsToRender: CollageNFT[], settingsToUse: CollageSettings) => {
+      setGenerating(true);
+      try {
+        if (settingsToUse.format === "gif") {
+          const GIF = (await import("gif.js")).default;
+          const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            width: settingsToUse.dimensions * 512,
+            height: settingsToUse.dimensions * 512,
+            workerScript: "/gif.worker.js",
+          });
+          const cellSize = 512;
+          const frameCount = 8;
+          const frameDuration = 500;
+          for (let frame = 0; frame < frameCount; frame++) {
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            if (!ctx) throw new Error("Failed to get canvas context");
-
-            const cellSize = 512;
-            canvas.width = settings.dimensions * cellSize;
-            canvas.height = settings.dimensions * cellSize;
-
+            if (!ctx) continue;
+            canvas.width = settingsToUse.dimensions * cellSize;
+            canvas.height = settingsToUse.dimensions * cellSize;
             await Promise.all(
-              randomNFTs.map(async (nft, index) => {
+              nftsToRender.map(async (nft, index) => {
                 if (!nft) return;
-
-                const row = Math.floor(index / settings.dimensions);
-                const col = index % settings.dimensions;
-                const x = col * cellSize;
-                const y = row * cellSize;
-
+                const row = Math.floor(index / settingsToUse.dimensions);
+                const col = index % settingsToUse.dimensions;
+                const baseX = col * cellSize;
+                const baseY = row * cellSize;
+                const animationProgress = (frame / frameCount) * Math.PI * 2;
+                const scale =
+                  1 + Math.sin(animationProgress + index * 0.5) * 0.05;
+                const scaledSize = cellSize * scale;
+                const x = baseX + (cellSize - scaledSize) / 2;
+                const y = baseY + (cellSize - scaledSize) / 2;
                 try {
                   const img = new Image();
                   img.crossOrigin = "anonymous";
-
                   await new Promise<void>((resolve, reject) => {
                     img.onload = () => {
-                      ctx.drawImage(img, x, y, cellSize, cellSize);
+                      ctx.drawImage(img, x, y, scaledSize, scaledSize);
                       resolve();
                     };
                     img.onerror = () =>
@@ -326,80 +279,134 @@ function CollagePageContent() {
                     img.src = nft.imageUrl;
                   });
                 } catch (error) {
-                  console.warn(
-                    `Failed to load NFT image: ${nft.imageUrl}`,
-                    error,
-                  );
                   ctx.fillStyle = "#f5f5f5";
-                  ctx.fillRect(x, y, cellSize, cellSize);
+                  ctx.fillRect(x, y, scaledSize, scaledSize);
                   ctx.fillStyle = "#999";
                   ctx.font = "24px Arial";
                   ctx.textAlign = "center";
                   ctx.fillText(
                     "Failed to load",
-                    x + cellSize / 2,
-                    y + cellSize / 2,
+                    x + scaledSize / 2,
+                    y + scaledSize / 2,
                   );
                 }
               }),
             );
-
-            // Add watermark
-            const watermarkImg = new Image();
-            watermarkImg.crossOrigin = "anonymous";
-
-            await new Promise<void>((resolve) => {
-              watermarkImg.onload = () => {
-                const watermarkScale = 0.3;
-                const watermarkWidth = watermarkImg.width * watermarkScale;
-                const watermarkHeight = watermarkImg.height * watermarkScale;
-                const watermarkX = canvas.width - watermarkWidth - 20;
-                const watermarkY = canvas.height - watermarkHeight - 20;
-
-                ctx.globalAlpha = 0.8;
-                ctx.drawImage(
-                  watermarkImg,
-                  watermarkX,
-                  watermarkY,
-                  watermarkWidth,
-                  watermarkHeight,
-                );
-                ctx.globalAlpha = 1.0;
-                resolve();
-              };
-              watermarkImg.onerror = () => resolve();
-              watermarkImg.src = "/chimp.png";
-            });
-
-            canvas.toBlob((blob) => {
-              if (blob) {
-                const url = URL.createObjectURL(blob);
-                setFinalImageUrl(url);
-              }
-            }, "image/png");
+            gif.addFrame(ctx, { copy: true, delay: frameDuration });
           }
-        } catch (error) {
-          console.error("Error generating final image:", error);
-          setError("Failed to generate final image");
-        } finally {
-          setGenerating(false);
+          await new Promise<void>((resolve, reject) => {
+            gif.on("finished", (blob: Blob) => {
+              const url = URL.createObjectURL(blob);
+              setFinalImageUrl(url);
+              resolve();
+            });
+            try {
+              gif.render();
+            } catch (error) {
+              reject(error);
+            }
+            setTimeout(() => {
+              reject(new Error("GIF generation timed out"));
+            }, 30000);
+          });
+        } else {
+          // PNG
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("Failed to get canvas context");
+          const cellSize = 512;
+          canvas.width = settingsToUse.dimensions * cellSize;
+          canvas.height = settingsToUse.dimensions * cellSize;
+          await Promise.all(
+            nftsToRender.map(async (nft, index) => {
+              if (!nft) return;
+              const row = Math.floor(index / settingsToUse.dimensions);
+              const col = index % settingsToUse.dimensions;
+              const x = col * cellSize;
+              const y = row * cellSize;
+              try {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                await new Promise<void>((resolve, reject) => {
+                  img.onload = () => {
+                    ctx.drawImage(img, x, y, cellSize, cellSize);
+                    resolve();
+                  };
+                  img.onerror = () =>
+                    reject(new Error(`Failed to load image: ${nft.imageUrl}`));
+                  img.src = nft.imageUrl;
+                });
+              } catch (error) {
+                ctx.fillStyle = "#f5f5f5";
+                ctx.fillRect(x, y, cellSize, cellSize);
+                ctx.fillStyle = "#999";
+                ctx.font = "24px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(
+                  "Failed to load",
+                  x + cellSize / 2,
+                  y + cellSize / 2,
+                );
+              }
+            }),
+          );
+          // Add watermark
+          const watermarkImg = new Image();
+          watermarkImg.crossOrigin = "anonymous";
+          await new Promise<void>((resolve) => {
+            watermarkImg.onload = () => {
+              const watermarkScale = 0.3;
+              const watermarkWidth = watermarkImg.width * watermarkScale;
+              const watermarkHeight = watermarkImg.height * watermarkScale;
+              const watermarkX = canvas.width - watermarkWidth - 20;
+              const watermarkY = canvas.height - watermarkHeight - 20;
+              ctx.globalAlpha = 0.8;
+              ctx.drawImage(
+                watermarkImg,
+                watermarkX,
+                watermarkY,
+                watermarkWidth,
+                watermarkHeight,
+              );
+              ctx.globalAlpha = 1.0;
+              resolve();
+            };
+            watermarkImg.onerror = () => resolve();
+            watermarkImg.src = "/chimp.png";
+          });
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              setFinalImageUrl(url);
+            }
+          }, "image/png");
         }
+      } catch (error) {
+        setError("Failed to generate final image");
+      } finally {
+        setGenerating(false);
       }
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") {
-        console.log("Generation was cancelled");
-        return;
-      }
-      console.error("Error generating collage:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to generate collage",
-      );
-    } finally {
-      setLoading(false);
-      setGenerating(false);
-      abortControllerRef.current = null;
+    },
+    [],
+  );
+
+  // Regenerate final image when progressiveNfts changes and is fully populated
+  useEffect(() => {
+    const allFilled =
+      progressiveNfts.length === settings.dimensions * settings.dimensions &&
+      progressiveNfts.every((nft) => nft && nft.imageUrl);
+    // Only generate if not loading, not generating, and finalImageUrl is not set
+    if (!loading && !generating && allFilled && !finalImageUrl) {
+      generateFinalImage(progressiveNfts, settings);
     }
-  }, [settings, handleNFTProgress]);
+  }, [
+    progressiveNfts,
+    settings,
+    loading,
+    generating,
+    generateFinalImage,
+    finalImageUrl,
+  ]);
 
   // Download collage
   const handleDownload = useCallback(() => {
@@ -478,6 +485,23 @@ function CollagePageContent() {
     [replacingIndex, progressiveNfts, settings.collections, usedNFTsSet],
   );
 
+  // Debounced handlers for settings changes
+  const debouncedSetDimensions = useMemo(
+    () =>
+      debounce((value: number) => {
+        setSettings((prev) => ({ ...prev, dimensions: value }));
+      }, 300),
+    [],
+  );
+
+  const debouncedSetCollections = useMemo(
+    () =>
+      debounce((value: string[]) => {
+        setSettings((prev) => ({ ...prev, collections: value }));
+      }, 300),
+    [],
+  );
+
   // Parse URL params on mount
   useEffect(() => {
     parseUrlParams();
@@ -490,7 +514,9 @@ function CollagePageContent() {
 
   // Update used NFTs set when progressive NFTs change
   useEffect(() => {
-    const newUsedSet = new Set(progressiveNfts.map((nft) => nft.id));
+    const newUsedSet = new Set(
+      progressiveNfts.filter(Boolean).map((nft) => nft.id),
+    );
     setUsedNFTsSet(newUsedSet);
   }, [progressiveNfts]);
 
@@ -502,6 +528,19 @@ function CollagePageContent() {
       }
     };
   }, []);
+
+  // Cleanup debounced functions on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSetDimensions.cancel();
+      debouncedSetCollections.cancel();
+      debouncedGenerateCollage.cancel();
+    };
+  }, [
+    debouncedSetDimensions,
+    debouncedSetCollections,
+    debouncedGenerateCollage,
+  ]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4">
@@ -587,6 +626,15 @@ function CollagePageContent() {
                 })}
               </div>
 
+              {/* Tip below the NFT grid */}
+              <div className="text-xs text-muted-foreground mt-1 mb-2 flex items-center gap-1">
+                <span role="img" aria-label="tip">
+                  💡
+                </span>
+                Click on any NFT in the grid above to replace it with a random
+                one
+              </div>
+
               {/* Progress indicator */}
               {loading && loadingProgress && (
                 <div className="flex flex-col items-center gap-2">
@@ -637,12 +685,6 @@ function CollagePageContent() {
                   </Button>
                 </div>
               )}
-
-              {/* Hint text */}
-              <p className="text-sm text-muted-foreground text-center max-w-md">
-                💡 Click on any NFT in the grid above to replace it with a
-                random one
-              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-4">
@@ -710,9 +752,9 @@ function CollagePageContent() {
             <Slider
               id="dimensions"
               value={[settings.dimensions]}
-              onValueChange={(value) =>
-                setSettings((prev) => ({ ...prev, dimensions: value[0] }))
-              }
+              onValueChange={function handleSliderChange(value) {
+                debouncedSetDimensions(value[0]);
+              }}
               min={1}
               max={5}
               step={1}
@@ -747,9 +789,9 @@ function CollagePageContent() {
             <MultiSearchableSelect
               items={collectionOptions}
               value={settings.collections}
-              onValueChange={(value) =>
-                setSettings((prev) => ({ ...prev, collections: value }))
-              }
+              onValueChange={function handleDropdownChange(value) {
+                debouncedSetCollections(value);
+              }}
               placeholder="Select collections..."
               searchPlaceholder="Search collections..."
               getItemValue={(item) => item.value}
@@ -767,7 +809,9 @@ function CollagePageContent() {
           {/* Generate and Cancel Buttons */}
           <div className="flex gap-2">
             <Button
-              onClick={generateCollage}
+              onClick={function handleGenerateClick() {
+                debouncedGenerateCollage();
+              }}
               disabled={loading || generating}
               className="flex-1"
               size="lg"

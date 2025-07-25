@@ -172,71 +172,61 @@ export async function fetchRandomNFTs(
     return [];
   }
 
-  // Fetch NFTs progressively with controlled concurrency
-  const maxConcurrent = 3; // Reduce concurrent requests to avoid overwhelming APIs
-  const batches: Promise<void>[] = [];
+  // Robust retry logic: for each slot, keep retrying until filled or max global attempts reached
+  const maxAttemptsPerSlot = 10;
+  const maxTotalAttempts = count * maxAttemptsPerSlot * 2;
+  let totalAttempts = 0;
 
-  for (let i = 0; i < count; i += maxConcurrent) {
-    const batch = Array.from(
-      { length: Math.min(maxConcurrent, count - i) },
-      async (_, batchIndex) => {
-        const index = i + batchIndex;
-
-        const nft = await fetchSingleNFTWithRetry(
-          availableCollections,
-          usedNFTs,
-          5,
-          abortSignal,
-        );
-
-        if (nft) {
-          nfts[index] = nft;
-          // Call progress callback if provided
-          if (onProgress) {
-            onProgress(nft, index);
-          }
-        } else {
-          // Create placeholder if all retries failed
-          console.warn(
-            `Could not find NFT for slot ${index}, adding placeholder`,
-          );
-          const placeholderCollection = availableCollections[0];
-          const placeholderTokenId = getRandomTokenId(placeholderCollection);
-
-          const placeholder: CollageNFT = {
-            id: `placeholder-${index}`,
-            imageUrl: `data:image/svg+xml;base64,${btoa(`
-            <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-              <rect width="512" height="512" fill="#f0f0f0"/>
-              <text x="256" y="256" text-anchor="middle" dy="0.35em" font-family="Arial" font-size="24" fill="#666">
-                NFT #${placeholderTokenId}
-              </text>
-              <text x="256" y="300" text-anchor="middle" dy="0.35em" font-family="Arial" font-size="16" fill="#999">
-                ${placeholderCollection.name}
-              </text>
-            </svg>
-          `)}`,
-            contract: placeholderCollection.contract,
-            tokenId: placeholderTokenId,
-            collectionName: placeholderCollection.name,
-          };
-
-          nfts[index] = placeholder;
-          if (onProgress) {
-            onProgress(placeholder, index);
-          }
-        }
-      },
-    );
-
-    batches.push(...batch);
+  for (let i = 0; i < count; i++) {
+    let nft: CollageNFT | null = null;
+    let attempts = 0;
+    while (
+      !nft &&
+      attempts < maxAttemptsPerSlot &&
+      totalAttempts < maxTotalAttempts
+    ) {
+      nft = await fetchSingleNFTWithRetry(
+        availableCollections,
+        usedNFTs,
+        1, // Only one attempt per call, but we loop
+        abortSignal,
+      );
+      attempts++;
+      totalAttempts++;
+    }
+    if (nft) {
+      nfts[i] = nft;
+      if (onProgress) onProgress(nft, i);
+    } else {
+      // Create placeholder if all retries failed
+      console.warn(
+        `Could not find NFT for slot ${i} after ${attempts} attempts, adding placeholder`,
+      );
+      const placeholderCollection = availableCollections[0];
+      const placeholderTokenId = getRandomTokenId(placeholderCollection);
+      const placeholder: CollageNFT = {
+        id: `placeholder-${i}`,
+        imageUrl: `data:image/svg+xml;base64,${btoa(`
+        <svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" fill="#f0f0f0"/>
+          <text x="256" y="256" text-anchor="middle" dy="0.35em" font-family="Arial" font-size="24" fill="#666">
+            NFT #${placeholderTokenId}
+          </text>
+          <text x="256" y="300" text-anchor="middle" dy="0.35em" font-family="Arial" font-size="16" fill="#999">
+            ${placeholderCollection.name}
+          </text>
+        </svg>
+      `)}`,
+        contract: placeholderCollection.contract,
+        tokenId: placeholderTokenId,
+        collectionName: placeholderCollection.name,
+      };
+      nfts[i] = placeholder;
+      if (onProgress) onProgress(placeholder, i);
+    }
   }
 
-  // Wait for all batches to complete
-  await Promise.allSettled(batches);
-
-  // Filter out undefined entries and return
-  return nfts.filter((nft) => nft !== undefined);
+  return nfts;
 }
 
 /**
