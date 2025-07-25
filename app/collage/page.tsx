@@ -34,6 +34,8 @@ import {
 } from "../editor/utils/collageUtils";
 import { CollageNFT } from "../editor/types";
 import { debounce } from "lodash";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 interface CollageSettings {
   dimensions: number; // Combined rows and columns (square)
@@ -45,6 +47,7 @@ function CollagePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const abortControllerRef = useRef<AbortController | null>(null);
+  const ffmpegRef = useRef<FFmpeg | null>(null);
 
   // Settings
   const [settings, setSettings] = useState<CollageSettings>({
@@ -67,6 +70,8 @@ function CollagePageContent() {
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [replacingIndex, setReplacingIndex] = useState<number | null>(null);
   const [usedNFTsSet, setUsedNFTsSet] = useState<Set<string>>(new Set());
+  const [ffmpegReady, setFfmpegReady] = useState(false);
+  const [ffmpegLoading, setFfmpegLoading] = useState(false);
 
   // Available collections for the dropdown
   const collectionOptions = useMemo(() => {
@@ -92,6 +97,50 @@ function CollagePageContent() {
     );
     return selectedCollection?.name || "Unknown Collection";
   }, [settings.collections]);
+
+  // Initialize FFmpeg
+  useEffect(() => {
+    const loadFfmpeg = async () => {
+      if (typeof window === "undefined") return;
+      if (ffmpegLoading) return;
+
+      setFfmpegLoading(true);
+      try {
+        if (!ffmpegRef.current) {
+          ffmpegRef.current = new FFmpeg();
+          console.log("FFmpeg instance created for collage");
+        }
+
+        const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+        const ffmpeg = ffmpegRef.current;
+
+        ffmpeg.on("log", ({ message }) => {
+          console.log("FFmpeg:", message);
+        });
+
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            "text/javascript",
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            "application/wasm",
+          ),
+        });
+
+        setFfmpegReady(true);
+        console.log("FFmpeg loaded for collage generation");
+      } catch (error) {
+        console.error("Failed to load FFmpeg:", error);
+        setError("Failed to load video processing library");
+      } finally {
+        setFfmpegLoading(false);
+      }
+    };
+
+    loadFfmpeg();
+  }, []);
 
   // Parse URL parameters
   const parseUrlParams = useCallback(() => {
@@ -154,6 +203,241 @@ function CollagePageContent() {
     setError("Generation cancelled");
   }, []);
 
+  // Generate final collage using FFmpeg or Canvas
+  const generateFinalCollage = useCallback(
+    async (nftList: CollageNFT[]) => {
+      if (nftList.length === 0) return;
+
+      setGenerating(true);
+      setError(null);
+
+      try {
+        const cellSize = 512;
+        const totalSize = settings.dimensions * cellSize;
+
+        if (settings.format === "gif" && ffmpegReady && ffmpegRef.current) {
+          // Use FFmpeg for GIF generation
+          console.log("Generating GIF using FFmpeg...");
+
+          // Create individual frames using canvas
+          const frameCount = 8;
+          const frameDuration = 0.5; // 500ms per frame
+
+          for (let frame = 0; frame < frameCount; frame++) {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            if (!ctx) continue;
+
+            canvas.width = totalSize;
+            canvas.height = totalSize;
+
+            // Draw all NFTs for this frame
+            await Promise.all(
+              nftList.map(async (nft, index) => {
+                if (!nft) return;
+
+                const row = Math.floor(index / settings.dimensions);
+                const col = index % settings.dimensions;
+                const baseX = col * cellSize;
+                const baseY = row * cellSize;
+
+                // Animation: slight scale and rotation
+                const animationProgress = (frame / frameCount) * Math.PI * 2;
+                const scale =
+                  1 + Math.sin(animationProgress + index * 0.5) * 0.05;
+                const rotation =
+                  Math.sin(animationProgress + index * 0.3) * 0.02;
+
+                const scaledSize = cellSize * scale;
+                const x = baseX + (cellSize - scaledSize) / 2;
+                const y = baseY + (cellSize - scaledSize) / 2;
+
+                try {
+                  const img = new Image();
+                  img.crossOrigin = "anonymous";
+
+                  await new Promise<void>((resolve, reject) => {
+                    img.onload = () => {
+                      ctx.save();
+                      ctx.translate(baseX + cellSize / 2, baseY + cellSize / 2);
+                      ctx.rotate(rotation);
+                      ctx.drawImage(
+                        img,
+                        -scaledSize / 2,
+                        -scaledSize / 2,
+                        scaledSize,
+                        scaledSize,
+                      );
+                      ctx.restore();
+                      resolve();
+                    };
+                    img.onerror = () =>
+                      reject(
+                        new Error(`Failed to load image: ${nft.imageUrl}`),
+                      );
+                    img.src = nft.imageUrl;
+                  });
+                } catch (error) {
+                  console.warn(
+                    `Failed to load NFT image: ${nft.imageUrl}`,
+                    error,
+                  );
+                  ctx.fillStyle = "#f5f5f5";
+                  ctx.fillRect(x, y, scaledSize, scaledSize);
+                  ctx.fillStyle = "#999";
+                  ctx.font = "24px Arial";
+                  ctx.textAlign = "center";
+                  ctx.fillText(
+                    "Failed to load",
+                    x + scaledSize / 2,
+                    y + scaledSize / 2,
+                  );
+                }
+              }),
+            );
+
+            // Convert canvas to blob and write to FFmpeg
+            const frameBlob = await new Promise<Blob>((resolve) => {
+              canvas.toBlob((blob) => resolve(blob!), "image/png");
+            });
+
+            const frameData = await fetchFile(URL.createObjectURL(frameBlob));
+            await ffmpegRef.current.writeFile(
+              `frame_${frame.toString().padStart(3, "0")}.png`,
+              frameData,
+            );
+          }
+
+          // Generate GIF using FFmpeg
+          const ffmpegArgs = [
+            "-r",
+            `${1 / frameDuration}`, // Frame rate
+            "-i",
+            "frame_%03d.png",
+            "-vf",
+            "palettegen=reserve_transparent=0",
+            "palette.png",
+          ];
+
+          await ffmpegRef.current.exec(ffmpegArgs);
+
+          const gifArgs = [
+            "-r",
+            `${1 / frameDuration}`,
+            "-i",
+            "frame_%03d.png",
+            "-i",
+            "palette.png",
+            "-filter_complex",
+            "[0:v][1:v]paletteuse=dither=bayer",
+            "-loop",
+            "0",
+            "output.gif",
+          ];
+
+          await ffmpegRef.current.exec(gifArgs);
+
+          const data = await ffmpegRef.current.readFile("output.gif");
+          const url = URL.createObjectURL(
+            new Blob([data], { type: "image/gif" }),
+          );
+          setFinalImageUrl(url);
+        } else {
+          // Use Canvas for PNG generation
+          console.log("Generating PNG using Canvas...");
+
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("Failed to get canvas context");
+
+          canvas.width = totalSize;
+          canvas.height = totalSize;
+
+          await Promise.all(
+            nftList.map(async (nft, index) => {
+              if (!nft) return;
+
+              const row = Math.floor(index / settings.dimensions);
+              const col = index % settings.dimensions;
+              const x = col * cellSize;
+              const y = row * cellSize;
+
+              try {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+
+                await new Promise<void>((resolve, reject) => {
+                  img.onload = () => {
+                    ctx.drawImage(img, x, y, cellSize, cellSize);
+                    resolve();
+                  };
+                  img.onerror = () =>
+                    reject(new Error(`Failed to load image: ${nft.imageUrl}`));
+                  img.src = nft.imageUrl;
+                });
+              } catch (error) {
+                console.warn(
+                  `Failed to load NFT image: ${nft.imageUrl}`,
+                  error,
+                );
+                ctx.fillStyle = "#f5f5f5";
+                ctx.fillRect(x, y, cellSize, cellSize);
+                ctx.fillStyle = "#999";
+                ctx.font = "24px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(
+                  "Failed to load",
+                  x + cellSize / 2,
+                  y + cellSize / 2,
+                );
+              }
+            }),
+          );
+
+          // Add watermark
+          const watermarkImg = new Image();
+          watermarkImg.crossOrigin = "anonymous";
+
+          await new Promise<void>((resolve) => {
+            watermarkImg.onload = () => {
+              const watermarkScale = 0.3;
+              const watermarkWidth = watermarkImg.width * watermarkScale;
+              const watermarkHeight = watermarkImg.height * watermarkScale;
+              const watermarkX = canvas.width - watermarkWidth - 20;
+              const watermarkY = canvas.height - watermarkHeight - 20;
+
+              ctx.globalAlpha = 0.8;
+              ctx.drawImage(
+                watermarkImg,
+                watermarkX,
+                watermarkY,
+                watermarkWidth,
+                watermarkHeight,
+              );
+              ctx.globalAlpha = 1.0;
+              resolve();
+            };
+            watermarkImg.onerror = () => resolve();
+            watermarkImg.src = "/chimp.png";
+          });
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              setFinalImageUrl(url);
+            }
+          }, "image/png");
+        }
+      } catch (error) {
+        console.error("Error generating final collage:", error);
+        setError("Failed to generate final collage");
+      } finally {
+        setGenerating(false);
+      }
+    },
+    [settings, ffmpegReady],
+  );
+
   // Generate collage
   const generateCollage = useCallback(async () => {
     // Cancel any existing generation
@@ -196,194 +480,7 @@ function CollagePageContent() {
 
       // Auto-generate the final image after all NFTs are loaded
       if (randomNFTs.length === requiredNFTCount) {
-        setGenerating(true);
-        try {
-          if (settings.format === "gif") {
-            // Generate GIF inline
-            const GIF = (await import("gif.js")).default;
-            const gif = new GIF({
-              workers: 2,
-              quality: 10,
-              width: settings.dimensions * 512,
-              height: settings.dimensions * 512,
-              workerScript: "/gif.worker.js",
-            });
-
-            const cellSize = 512;
-            const frameCount = 8;
-            const frameDuration = 500;
-
-            for (let frame = 0; frame < frameCount; frame++) {
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
-              if (!ctx) continue;
-
-              canvas.width = settings.dimensions * cellSize;
-              canvas.height = settings.dimensions * cellSize;
-
-              await Promise.all(
-                randomNFTs.map(async (nft, index) => {
-                  if (!nft) return;
-
-                  const row = Math.floor(index / settings.dimensions);
-                  const col = index % settings.dimensions;
-                  const baseX = col * cellSize;
-                  const baseY = row * cellSize;
-
-                  const animationProgress = (frame / frameCount) * Math.PI * 2;
-                  const scale =
-                    1 + Math.sin(animationProgress + index * 0.5) * 0.05;
-                  const scaledSize = cellSize * scale;
-                  const x = baseX + (cellSize - scaledSize) / 2;
-                  const y = baseY + (cellSize - scaledSize) / 2;
-
-                  try {
-                    const img = new Image();
-                    img.crossOrigin = "anonymous";
-
-                    await new Promise<void>((resolve, reject) => {
-                      img.onload = () => {
-                        ctx.drawImage(img, x, y, scaledSize, scaledSize);
-                        resolve();
-                      };
-                      img.onerror = () =>
-                        reject(
-                          new Error(`Failed to load image: ${nft.imageUrl}`),
-                        );
-                      img.src = nft.imageUrl;
-                    });
-                  } catch (error) {
-                    console.warn(
-                      `Failed to load NFT image: ${nft.imageUrl}`,
-                      error,
-                    );
-                    ctx.fillStyle = "#f5f5f5";
-                    ctx.fillRect(x, y, scaledSize, scaledSize);
-                    ctx.fillStyle = "#999";
-                    ctx.font = "24px Arial";
-                    ctx.textAlign = "center";
-                    ctx.fillText(
-                      "Failed to load",
-                      x + scaledSize / 2,
-                      y + scaledSize / 2,
-                    );
-                  }
-                }),
-              );
-
-              gif.addFrame(ctx, { copy: true, delay: frameDuration });
-            }
-
-            await new Promise<void>((resolve, reject) => {
-              gif.on("finished", (blob: Blob) => {
-                const url = URL.createObjectURL(blob);
-                setFinalImageUrl(url);
-                resolve();
-              });
-
-              try {
-                gif.render();
-              } catch (error) {
-                reject(error);
-              }
-
-              setTimeout(() => {
-                reject(new Error("GIF generation timed out"));
-              }, 30000);
-            });
-          } else {
-            // Generate PNG inline
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            if (!ctx) throw new Error("Failed to get canvas context");
-
-            const cellSize = 512;
-            canvas.width = settings.dimensions * cellSize;
-            canvas.height = settings.dimensions * cellSize;
-
-            await Promise.all(
-              randomNFTs.map(async (nft, index) => {
-                if (!nft) return;
-
-                const row = Math.floor(index / settings.dimensions);
-                const col = index % settings.dimensions;
-                const x = col * cellSize;
-                const y = row * cellSize;
-
-                try {
-                  const img = new Image();
-                  img.crossOrigin = "anonymous";
-
-                  await new Promise<void>((resolve, reject) => {
-                    img.onload = () => {
-                      ctx.drawImage(img, x, y, cellSize, cellSize);
-                      resolve();
-                    };
-                    img.onerror = () =>
-                      reject(
-                        new Error(`Failed to load image: ${nft.imageUrl}`),
-                      );
-                    img.src = nft.imageUrl;
-                  });
-                } catch (error) {
-                  console.warn(
-                    `Failed to load NFT image: ${nft.imageUrl}`,
-                    error,
-                  );
-                  ctx.fillStyle = "#f5f5f5";
-                  ctx.fillRect(x, y, cellSize, cellSize);
-                  ctx.fillStyle = "#999";
-                  ctx.font = "24px Arial";
-                  ctx.textAlign = "center";
-                  ctx.fillText(
-                    "Failed to load",
-                    x + cellSize / 2,
-                    y + cellSize / 2,
-                  );
-                }
-              }),
-            );
-
-            // Add watermark
-            const watermarkImg = new Image();
-            watermarkImg.crossOrigin = "anonymous";
-
-            await new Promise<void>((resolve) => {
-              watermarkImg.onload = () => {
-                const watermarkScale = 0.3;
-                const watermarkWidth = watermarkImg.width * watermarkScale;
-                const watermarkHeight = watermarkImg.height * watermarkScale;
-                const watermarkX = canvas.width - watermarkWidth - 20;
-                const watermarkY = canvas.height - watermarkHeight - 20;
-
-                ctx.globalAlpha = 0.8;
-                ctx.drawImage(
-                  watermarkImg,
-                  watermarkX,
-                  watermarkY,
-                  watermarkWidth,
-                  watermarkHeight,
-                );
-                ctx.globalAlpha = 1.0;
-                resolve();
-              };
-              watermarkImg.onerror = () => resolve();
-              watermarkImg.src = "/chimp.png";
-            });
-
-            canvas.toBlob((blob) => {
-              if (blob) {
-                const url = URL.createObjectURL(blob);
-                setFinalImageUrl(url);
-              }
-            }, "image/png");
-          }
-        } catch (error) {
-          console.error("Error generating final image:", error);
-          setError("Failed to generate final image");
-        } finally {
-          setGenerating(false);
-        }
+        await generateFinalCollage(randomNFTs);
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") {
@@ -396,10 +493,9 @@ function CollagePageContent() {
       );
     } finally {
       setLoading(false);
-      setGenerating(false);
       abortControllerRef.current = null;
     }
-  }, [settings, handleNFTProgress]);
+  }, [settings, handleNFTProgress, generateFinalCollage]);
 
   // Download collage
   const handleDownload = useCallback(() => {
@@ -453,18 +549,18 @@ function CollagePageContent() {
 
         if (replacementNFT) {
           // Update the NFT array
-          setProgressiveNfts((prev) => {
-            const newNfts = [...prev];
-            newNfts[index] = replacementNFT;
-            return newNfts;
-          });
+          const newNfts = [...progressiveNfts];
+          newNfts[index] = replacementNFT;
+          setProgressiveNfts(newNfts);
+          setNfts(newNfts);
 
           // Update used NFTs set
           newUsedNFTsSet.add(replacementNFT.id);
           setUsedNFTsSet(newUsedNFTsSet);
 
-          // Clear the final image to force regeneration
+          // Clear the final image and regenerate
           setFinalImageUrl(null);
+          await generateFinalCollage(newNfts);
         } else {
           setError("Failed to find a replacement NFT");
         }
@@ -475,7 +571,13 @@ function CollagePageContent() {
         setReplacingIndex(null);
       }
     },
-    [replacingIndex, progressiveNfts, settings.collections, usedNFTsSet],
+    [
+      replacingIndex,
+      progressiveNfts,
+      settings.collections,
+      usedNFTsSet,
+      generateFinalCollage,
+    ],
   );
 
   // Parse URL params on mount
@@ -768,15 +870,23 @@ function CollagePageContent() {
           <div className="flex gap-2">
             <Button
               onClick={generateCollage}
-              disabled={loading || generating}
+              disabled={
+                loading ||
+                generating ||
+                (settings.format === "gif" && !ffmpegReady)
+              }
               className="flex-1"
               size="lg"
             >
-              {loading
-                ? "Fetching NFTs..."
-                : generating
-                  ? `Generating ${settings.format.toUpperCase()}...`
-                  : "Generate Collage"}
+              {ffmpegLoading
+                ? "Loading video processor..."
+                : loading
+                  ? "Fetching NFTs..."
+                  : generating
+                    ? `Generating ${settings.format.toUpperCase()}...`
+                    : settings.format === "gif" && !ffmpegReady
+                      ? "Video processor not ready"
+                      : "Generate Collage"}
             </Button>
 
             {(loading || generating) && (
@@ -796,6 +906,30 @@ function CollagePageContent() {
             </div>
           )}
         </div>
+
+        {/* FFmpeg Status */}
+        {settings.format === "gif" && (
+          <div className="text-center text-sm text-muted-foreground mt-4 p-3 bg-muted/30 rounded-md">
+            <p className="flex items-center justify-center gap-2">
+              {ffmpegLoading ? (
+                <>
+                  <Spinner className="w-4 h-4" />
+                  Loading video processor for GIF generation...
+                </>
+              ) : ffmpegReady ? (
+                <>
+                  <span className="text-green-600">✓</span>
+                  Video processor ready for GIF generation
+                </>
+              ) : (
+                <>
+                  <span className="text-red-600">✗</span>
+                  Video processor failed to load
+                </>
+              )}
+            </p>
+          </div>
+        )}
 
         {/* Info */}
         {(nfts.length > 0 || progressiveNfts.length > 0) && (
