@@ -33,8 +33,9 @@ export default function ChimperSimulationPage() {
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneRef = useRef<ChimperSimulationScene | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [chimperCount, setChimperCount] = useState(10);
+  const [chimperCount, setChimperCount] = useState(1);
   const [actualChimperCount, setActualChimperCount] = useState(0);
+  const [showMessage, setShowMessage] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -98,6 +99,10 @@ export default function ChimperSimulationPage() {
               pointer.downElement.tagName === "CANVAS"
             ) {
               this.spawnChimper(pointer.worldX, pointer.worldY);
+              // Hide the message on first click
+              if (showMessage) {
+                setShowMessage(false);
+              }
             }
           });
 
@@ -437,7 +442,7 @@ export default function ChimperSimulationPage() {
         resizeObserver.disconnect();
       };
     });
-  }, [mounted, chimperCount]);
+  }, [mounted, chimperCount, showMessage]);
 
   const spawnChimper = () => {
     if (sceneRef.current) {
@@ -482,81 +487,28 @@ export default function ChimperSimulationPage() {
   if (!mounted) return null;
 
   return (
-    <main className="w-screen h-screen bg-[#87CEEB] flex flex-col">
-      {/* Header */}
-      <div className="bg-[#f8fbff] border-b-2 border-[#8DC7FF] p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
-        <div className="flex items-center gap-4">
-          <Link href="/">
-            <Button
-              variant="outline"
-              className="bg-[#8DC7FF] hover:bg-[#5bb0f7] border-[#5bb0f7]"
-            >
-              ← Back to Home
-            </Button>
-          </Link>
-          <h1 className="text-2xl font-bold text-[#222]">
-            !CHIMP Life Simulation
-          </h1>
-        </div>
+    <main className="w-screen h-screen bg-[#87CEEB] flex flex-col overflow-hidden">
+      {/* Title Overlay */}
+      <h1
+        className="absolute top-8 left-1/2 transform -translate-x-1/2 z-30 text-2xl sm:text-3xl font-extrabold uppercase text-[#222] text-center drop-shadow-lg px-4 py-1 bg-transparent pointer-events-none select-none"
+        style={{ WebkitTextStroke: "1px white" }}
+      >
+        !CHIMP Simulation
+      </h1>
 
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-[#222]">
-              Chimpers: {actualChimperCount}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 min-w-[200px]">
-            <span className="text-sm font-medium text-[#222]">
-              Spawn Count:
-            </span>
-            <Slider
-              value={[chimperCount]}
-              onValueChange={(value) => updateChimperCount(value[0])}
-              max={50}
-              min={0}
-              step={1}
-              className="flex-1"
-            />
-            <span className="text-sm font-medium text-[#222] min-w-[2ch]">
-              {chimperCount}
-            </span>
-          </div>
-
-          <Button
-            onClick={spawnChimper}
-            className="bg-[#8DC7FF] hover:bg-[#5bb0f7] text-white"
-          >
-            Spawn Chimper
-          </Button>
-
-          <Button
-            onClick={clearAll}
-            variant="outline"
-            className="border-red-500 text-red-500 hover:bg-red-50"
-          >
-            Clear All
-          </Button>
-        </div>
-      </div>
-
-      {/* Instructions */}
-      <div className="bg-yellow-100 border-b border-yellow-300 p-2 text-center">
-        <p className="text-sm text-yellow-800">
-          🎮 <strong>Click anywhere</strong> on the screen to spawn a chimper!
-          Watch them explore, rest, and live their own little lives. Each
-          chimper has its own personality: <strong>Explorer</strong>,{" "}
-          <strong>Homebody</strong>, <strong>Social</strong>, or{" "}
-          <strong>Wanderer</strong>!
-        </p>
-      </div>
-
-      {/* Simulation Container */}
+      {/* Simulation Container - Fullscreen */}
       <div
         id="simulation-container"
-        className="flex-1 w-full relative cursor-crosshair"
-        style={{ minHeight: "calc(100vh - 140px)" }}
-      />
+        className="flex-1 w-full h-full relative cursor-crosshair"
+        style={{ minHeight: "0", minWidth: "0" }}
+      >
+        {/* Temporal Message */}
+        {showMessage && (
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-yellow-100 border border-yellow-300 rounded px-6 py-3 shadow-lg z-20 text-center animate-fadeIn text-yellow-800 text-base sm:text-lg font-semibold pointer-events-none select-none">
+            🎮 Click on the screen
+          </div>
+        )}
+      </div>
     </main>
   );
 }
