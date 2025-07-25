@@ -17,6 +17,10 @@ export function CollagePreview({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<
+    Map<string, HTMLImageElement>
+  >(new Map());
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   // Debug logging
   useEffect(() => {
@@ -28,10 +32,72 @@ export function CollagePreview({
     });
   }, [settings, watermarkEnabled, watermarkScale, nfts.length]);
 
-  const generateCollage = useCallback(async () => {
-    if (!canvasRef.current || nfts.length === 0) return;
+  // Load individual image with retry logic
+  const loadImageWithRetry = useCallback(
+    async (nft: any, maxRetries = 3): Promise<HTMLImageElement | null> => {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
 
-    setIsGenerating(true);
+          const loadPromise = new Promise<HTMLImageElement>(
+            (resolve, reject) => {
+              img.onload = () => resolve(img);
+              img.onerror = () =>
+                reject(new Error(`Failed to load image: ${nft.imageUrl}`));
+              img.src = nft.imageUrl;
+            },
+          );
+
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => reject(new Error("Image load timeout")), 10000); // 10 second timeout
+          });
+
+          return await Promise.race([loadPromise, timeoutPromise]);
+        } catch (error) {
+          console.warn(
+            `Attempt ${attempt + 1} failed for image ${nft.id}:`,
+            error,
+          );
+          if (attempt === maxRetries - 1) {
+            setFailedImages((prev) => new Set([...prev, nft.id]));
+            return null;
+          }
+          // Wait a bit before retrying
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000 * (attempt + 1)),
+          );
+        }
+      }
+      return null;
+    },
+    [],
+  );
+
+  // Progressive image loading
+  useEffect(() => {
+    if (nfts.length === 0) return;
+
+    const loadImagesProgressively = async () => {
+      setLoadedImages(new Map());
+      setFailedImages(new Set());
+
+      // Load images one by one for progressive rendering
+      for (const nft of nfts) {
+        const img = await loadImageWithRetry(nft);
+        if (img) {
+          setLoadedImages((prev) => new Map([...prev, [nft.id, img]]));
+        }
+      }
+    };
+
+    loadImagesProgressively();
+  }, [nfts, loadImageWithRetry]);
+
+  // Redraw canvas when images are loaded
+  const redrawCanvas = useCallback(() => {
+    if (!canvasRef.current || loadedImages.size === 0) return;
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -51,64 +117,76 @@ export function CollagePreview({
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    try {
-      // Load all NFT images
-      const imagePromises = nfts.slice(0, rows * columns).map((nft) => {
-        return new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => resolve(img);
-          img.onerror = () => {
-            // Create a placeholder if image fails to load
-            const placeholder = new Image();
-            placeholder.width = cellWidth;
-            placeholder.height = cellHeight;
-            resolve(placeholder);
-          };
-          img.src = nft.imageUrl;
-        });
-      });
+    // Draw NFT images in grid
+    nfts.slice(0, rows * columns).forEach((nft, index) => {
+      const row = Math.floor(index / columns);
+      const col = index % columns;
+      const x = col * (cellWidth + spacing);
+      const y = row * (cellHeight + spacing);
 
-      const images = await Promise.all(imagePromises);
-
-      // Draw NFT images in grid
-      images.forEach((img, index) => {
-        const row = Math.floor(index / columns);
-        const col = index % columns;
-        const x = col * (cellWidth + spacing);
-        const y = row * (cellHeight + spacing);
-
-        if (borderRadius > 0) {
-          // Draw rounded rectangle
-          ctx.save();
-          ctx.beginPath();
-          // Use roundRect if available, otherwise fall back to regular rect
-          if (typeof ctx.roundRect === "function") {
-            ctx.roundRect(x, y, cellWidth, cellHeight, borderRadius);
-          } else {
-            // Fallback for browsers that don't support roundRect
-            ctx.rect(x, y, cellWidth, cellHeight);
-          }
-          ctx.clip();
-        }
-
-        // Draw the image
-        if (img.src) {
-          ctx.drawImage(img, x, y, cellWidth, cellHeight);
+      if (borderRadius > 0) {
+        // Draw rounded rectangle
+        ctx.save();
+        ctx.beginPath();
+        // Use roundRect if available, otherwise fall back to regular rect
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(x, y, cellWidth, cellHeight, borderRadius);
         } else {
-          // Draw placeholder
-          ctx.fillStyle = "#f0f0f0";
-          ctx.fillRect(x, y, cellWidth, cellHeight);
-          ctx.fillStyle = "#999";
-          ctx.font = "14px Arial";
-          ctx.textAlign = "center";
-          ctx.fillText("No Image", x + cellWidth / 2, y + cellHeight / 2);
+          // Fallback for browsers that don't support roundRect
+          ctx.rect(x, y, cellWidth, cellHeight);
         }
+        ctx.clip();
+      }
 
-        if (borderRadius > 0) {
-          ctx.restore();
-        }
-      });
+      const img = loadedImages.get(nft.id);
+      if (img) {
+        // Draw the loaded image
+        ctx.drawImage(img, x, y, cellWidth, cellHeight);
+      } else if (failedImages.has(nft.id)) {
+        // Draw error placeholder
+        ctx.fillStyle = "#ffebee";
+        ctx.fillRect(x, y, cellWidth, cellHeight);
+        ctx.fillStyle = "#f44336";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "Failed to load",
+          x + cellWidth / 2,
+          y + cellHeight / 2 - 5,
+        );
+        ctx.fillText("Retrying...", x + cellWidth / 2, y + cellHeight / 2 + 15);
+      } else {
+        // Draw loading placeholder
+        ctx.fillStyle = "#f5f5f5";
+        ctx.fillRect(x, y, cellWidth, cellHeight);
+        ctx.fillStyle = "#999";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Loading...", x + cellWidth / 2, y + cellHeight / 2);
+      }
+
+      if (borderRadius > 0) {
+        ctx.restore();
+      }
+    });
+  }, [loadedImages, failedImages, nfts, settings]);
+
+  // Redraw canvas when images change
+  useEffect(() => {
+    redrawCanvas();
+  }, [redrawCanvas]);
+
+  const generateCollage = useCallback(async () => {
+    if (!canvasRef.current || loadedImages.size === 0) return;
+
+    setIsGenerating(true);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    try {
+      // Redraw the canvas with current state
+      redrawCanvas();
 
       // Add watermark if enabled
       if (watermarkEnabled) {
@@ -128,9 +206,10 @@ export function CollagePreview({
               finalWidth: watermarkWidth,
               finalHeight: watermarkHeight,
             });
-            const watermarkX = canvasWidth - watermarkWidth - watermarkPaddingX;
+            const watermarkX =
+              canvas.width - watermarkWidth - watermarkPaddingX;
             const watermarkY =
-              canvasHeight - watermarkHeight - watermarkPaddingY;
+              canvas.height - watermarkHeight - watermarkPaddingY;
 
             ctx.globalAlpha = 0.8;
             ctx.drawImage(
@@ -161,21 +240,22 @@ export function CollagePreview({
       setIsGenerating(false);
     }
   }, [
-    nfts,
+    loadedImages,
     settings,
     watermarkEnabled,
     watermarkStyle,
     watermarkScale,
     watermarkPaddingX,
     watermarkPaddingY,
+    redrawCanvas,
   ]);
 
-  // Generate collage when dependencies change
+  // Generate collage when images are loaded
   useEffect(() => {
-    if (nfts.length > 0 && !loading) {
+    if (loadedImages.size > 0 && !loading) {
       generateCollage();
     }
-  }, [generateCollage, nfts.length, loading]);
+  }, [generateCollage, loadedImages.size, loading]);
 
   // Cleanup blob URL on unmount
   useEffect(() => {
@@ -186,7 +266,7 @@ export function CollagePreview({
     };
   }, [finalImageUrl]);
 
-  if (loading || isGenerating) {
+  if (loading || (isGenerating && loadedImages.size === 0)) {
     return (
       <div className="relative w-full max-w-md aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
         <Skeleton className="w-full h-full rounded-lg" />
@@ -204,6 +284,13 @@ export function CollagePreview({
           className="object-contain w-full h-full rounded-lg"
           style={{ background: "transparent" }}
         />
+      ) : loadedImages.size > 0 ? (
+        <div className="text-center p-4">
+          <span className="text-muted-foreground">
+            Rendering collage... ({loadedImages.size}/{nfts.length} images
+            loaded)
+          </span>
+        </div>
       ) : (
         <span className="text-muted-foreground">
           Generate collage to preview

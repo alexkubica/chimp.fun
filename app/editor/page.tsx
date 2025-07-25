@@ -1423,6 +1423,25 @@ function EditorPage() {
     }
   }, []);
 
+  // Debounced wallet input validation
+  const debouncedWalletValidation = useMemo(
+    () =>
+      debounce((input: string) => {
+        // Add wallet input validation logic here if needed
+        console.log("Validating wallet input:", input);
+      }, 300),
+    [],
+  );
+
+  // Handle wallet input changes with debouncing
+  const handleWalletInputChange = useCallback(
+    (value: string) => {
+      setWalletInput(value);
+      debouncedWalletValidation(value);
+    },
+    [debouncedWalletValidation],
+  );
+
   // Clear gallery and load new wallet
   const loadWallet = useCallback(() => {
     if (walletInput.trim()) {
@@ -1431,6 +1450,13 @@ function EditorPage() {
       fetchWalletNFTs(walletInput.trim());
     }
   }, [walletInput, fetchWalletNFTs]);
+
+  // Cleanup debounced function on unmount
+  useEffect(() => {
+    return () => {
+      debouncedWalletValidation.cancel();
+    };
+  }, [debouncedWalletValidation]);
 
   // Load all NFTs from external wallet
   const loadAllFromExternalWallet = useCallback(() => {
@@ -2733,7 +2759,7 @@ function EditorPage() {
                       id="walletInput"
                       placeholder="0x... or vitalik.eth"
                       value={walletInput}
-                      onChange={(e) => setWalletInput(e.target.value)}
+                      onChange={(e) => handleWalletInputChange(e.target.value)}
                       className="flex-1 min-w-0 font-mono text-sm"
                       onKeyDown={handleWalletInputKeyDown}
                     />

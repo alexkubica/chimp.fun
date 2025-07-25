@@ -22,6 +22,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchRandomNFTs } from "../editor/utils/collageUtils";
 import { CollageNFT } from "../editor/types";
+import { debounce } from "lodash";
 
 interface CollageSettings {
   dimensions: number; // Combined rows and columns (square)
@@ -40,6 +41,11 @@ function CollagePageContent() {
 
   // State
   const [nfts, setNfts] = useState<CollageNFT[]>([]);
+  const [progressiveNfts, setProgressiveNfts] = useState<CollageNFT[]>([]);
+  const [loadingProgress, setLoadingProgress] = useState<{
+    loaded: number;
+    total: number;
+  }>({ loaded: 0, total: 0 });
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,15 +68,19 @@ function CollagePageContent() {
     }
   }, []);
 
-  // Update URL parameters
-  const updateUrlParams = useCallback(() => {
-    const params = new URLSearchParams();
-    params.set("dimensions", settings.dimensions.toString());
-    params.set("collections", settings.collections.join(","));
+  // Update URL parameters (debounced)
+  const debouncedUpdateUrlParams = useMemo(
+    () =>
+      debounce(() => {
+        const params = new URLSearchParams();
+        params.set("dimensions", settings.dimensions.toString());
+        params.set("collections", settings.collections.join(","));
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState(null, "", newUrl);
-  }, [settings]);
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.replaceState(null, "", newUrl);
+      }, 500),
+    [settings],
+  );
 
   // Copy URL to clipboard
   const copyUrlToClipboard = useCallback(async () => {
@@ -86,25 +96,39 @@ function CollagePageContent() {
     }
   }, []);
 
+  // Progress callback for incremental rendering
+  const handleNFTProgress = useCallback((nft: CollageNFT, index: number) => {
+    setProgressiveNfts((prev) => {
+      const newArray = [...prev];
+      newArray[index] = nft;
+      return newArray;
+    });
+    setLoadingProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
+  }, []);
+
   // Generate collage
   const generateCollage = useCallback(async () => {
     setLoading(true);
     setGenerating(true);
     setError(null);
+    setProgressiveNfts([]);
 
     try {
       const requiredNFTCount = settings.dimensions * settings.dimensions;
+      setLoadingProgress({ loaded: 0, total: requiredNFTCount });
       console.log(`Fetching ${requiredNFTCount} random NFTs...`);
 
       const collectionContracts = settings.collections.includes("all")
         ? undefined
         : settings.collections;
+
       const randomNFTs = await fetchRandomNFTs(
         requiredNFTCount,
         collectionContracts,
+        handleNFTProgress,
       );
-      setNfts(randomNFTs);
 
+      setNfts(randomNFTs);
       console.log(`Successfully fetched ${randomNFTs.length} NFTs`);
     } catch (err) {
       console.error("Error generating collage:", err);
@@ -115,11 +139,12 @@ function CollagePageContent() {
       setLoading(false);
       setGenerating(false);
     }
-  }, [settings]);
+  }, [settings, handleNFTProgress]);
 
   // Generate collage with watermarks
   const generateCollageWithWatermarks = useCallback(async () => {
-    if (nfts.length === 0) return;
+    const activeNfts = progressiveNfts.filter((nft) => nft !== undefined);
+    if (activeNfts.length === 0) return;
 
     setGenerating(true);
 
@@ -143,7 +168,7 @@ function CollagePageContent() {
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
       // Load all NFT images and add watermarks
-      const imagePromises = nfts
+      const imagePromises = activeNfts
         .slice(0, dimensions * dimensions)
         .map(async (nft, index) => {
           return new Promise<void>(async (resolve) => {
@@ -174,7 +199,7 @@ function CollagePageContent() {
                 ctx.fillStyle = "#999";
                 ctx.font = "16px Arial";
                 ctx.textAlign = "center";
-                ctx.fillText("No Image", x + cellSize / 2, y + cellSize / 2);
+                ctx.fillText("Loading...", x + cellSize / 2, y + cellSize / 2);
               }
 
               resolve();
@@ -233,7 +258,7 @@ function CollagePageContent() {
     } finally {
       setGenerating(false);
     }
-  }, [nfts, settings]);
+  }, [progressiveNfts, settings]);
 
   // Download collage
   const handleDownload = useCallback(() => {
@@ -252,22 +277,34 @@ function CollagePageContent() {
     parseUrlParams();
   }, [parseUrlParams]);
 
-  // Update URL when settings change
+  // Update URL when settings change (debounced)
   useEffect(() => {
-    updateUrlParams();
-  }, [updateUrlParams]);
+    debouncedUpdateUrlParams();
+  }, [debouncedUpdateUrlParams]);
 
-  // Generate collage on page load and when settings change
-  useEffect(() => {
-    generateCollage();
-  }, [generateCollage]);
+  // Debounced generate collage function
+  const debouncedGenerateCollage = useMemo(
+    () => debounce(generateCollage, 1000),
+    [generateCollage],
+  );
 
-  // Generate watermarked collage when NFTs are loaded
+  // Generate collage on page load and when settings change (debounced)
   useEffect(() => {
-    if (nfts.length > 0 && !loading) {
+    debouncedGenerateCollage();
+
+    // Cleanup function to cancel debounced call
+    return () => {
+      debouncedGenerateCollage.cancel();
+    };
+  }, [debouncedGenerateCollage]);
+
+  // Generate watermarked collage when progressive NFTs are updated
+  useEffect(() => {
+    const activeNfts = progressiveNfts.filter((nft) => nft !== undefined);
+    if (activeNfts.length > 0 && !loading) {
       generateCollageWithWatermarks();
     }
-  }, [nfts, loading, generateCollageWithWatermarks]);
+  }, [progressiveNfts, loading, generateCollageWithWatermarks]);
 
   // Collection options
   const collectionOptions = useMemo(() => {
@@ -299,6 +336,45 @@ function CollagePageContent() {
     return `${selectedCollectionNames.slice(0, 2).join(", ")} +${selectedCollectionNames.length - 2} more`;
   }, [selectedCollectionNames]);
 
+  // Render loading grid with progressive loading indicators
+  const renderProgressiveGrid = () => {
+    const total = settings.dimensions * settings.dimensions;
+    const cells = Array.from({ length: total }).map((_, index) => {
+      const nft = progressiveNfts[index];
+
+      return (
+        <div
+          key={index}
+          className="aspect-square rounded border bg-muted flex items-center justify-center"
+        >
+          {nft ? (
+            <img
+              src={nft.imageUrl}
+              alt={`NFT ${index + 1}`}
+              className="w-full h-full object-cover rounded"
+            />
+          ) : (
+            <div className="text-xs text-muted-foreground">
+              {loading ? "Loading..." : "Empty"}
+            </div>
+          )}
+        </div>
+      );
+    });
+
+    return (
+      <div
+        className="grid gap-1 w-full h-full p-2"
+        style={{
+          gridTemplateColumns: `repeat(${settings.dimensions}, 1fr)`,
+          gridTemplateRows: `repeat(${settings.dimensions}, 1fr)`,
+        }}
+      >
+        {cells}
+      </div>
+    );
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center px-2 py-4">
       <div className="w-full max-w-2xl mx-auto">
@@ -317,23 +393,19 @@ function CollagePageContent() {
           <div className="relative w-full max-w-md aspect-square rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
             {generating || loading ? (
               <div className="relative w-full h-full">
-                {/* Skeleton grid matching the dimensions */}
-                <div
-                  className="grid gap-1 w-full h-full p-2"
-                  style={{
-                    gridTemplateColumns: `repeat(${settings.dimensions}, 1fr)`,
-                    gridTemplateRows: `repeat(${settings.dimensions}, 1fr)`,
-                  }}
-                >
-                  {Array.from({
-                    length: settings.dimensions * settings.dimensions,
-                  }).map((_, i) => (
-                    <Skeleton key={i} className="w-full h-full rounded" />
-                  ))}
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Spinner />
-                </div>
+                {/* Progressive loading grid */}
+                {renderProgressiveGrid()}
+                {loading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                    <div className="bg-white/90 rounded-lg p-4 text-center">
+                      <Spinner />
+                      <div className="text-sm mt-2">
+                        Loading {loadingProgress.loaded}/{loadingProgress.total}{" "}
+                        images
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : finalImageUrl ? (
               <img
@@ -456,13 +528,20 @@ function CollagePageContent() {
         </div>
 
         {/* Info */}
-        {nfts.length > 0 && (
+        {(nfts.length > 0 || progressiveNfts.length > 0) && (
           <div className="text-center text-sm text-muted-foreground mt-4 p-3 bg-muted/30 rounded-md">
             <p>
               Generated: {settings.dimensions}×{settings.dimensions} grid with{" "}
-              {nfts.length} NFTs
+              {Math.max(nfts.length, progressiveNfts.filter((n) => n).length)}{" "}
+              NFTs
             </p>
             <p>Collections: {selectedCollectionDisplayName}</p>
+            {loading && (
+              <p>
+                Progress: {loadingProgress.loaded}/{loadingProgress.total}{" "}
+                images loaded
+              </p>
+            )}
           </div>
         )}
       </div>

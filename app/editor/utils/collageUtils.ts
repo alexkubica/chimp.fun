@@ -13,11 +13,84 @@ function getRandomTokenId(collection: any): string {
 }
 
 /**
+ * Attempts to fetch a single NFT with retry logic
+ */
+async function fetchSingleNFTWithRetry(
+  availableCollections: any[],
+  usedNFTs: Set<string>,
+  maxAttempts: number = 10,
+): Promise<CollageNFT | null> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const randomCollection =
+      availableCollections[
+        Math.floor(Math.random() * availableCollections.length)
+      ];
+
+    const tokenId = getRandomTokenId(randomCollection);
+    const nftKey = `${randomCollection.contract}-${tokenId}`;
+
+    // Skip if we already have this NFT
+    if (usedNFTs.has(nftKey)) {
+      continue;
+    }
+
+    try {
+      let imageUrl: string;
+
+      // Check if collection has a custom gif override
+      if (randomCollection.gifOverride) {
+        imageUrl = randomCollection.gifOverride(tokenId);
+      } else {
+        // Use the NFT image fetching API
+        const response = await fetch(
+          `/fetchNFTImage?contract=${randomCollection.contract}&tokenId=${tokenId}&chain=${randomCollection.chain || "ethereum"}`,
+        );
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data = await response.json();
+        if (!data.imageUrl) {
+          continue;
+        }
+
+        imageUrl = data.imageUrl;
+      }
+
+      // Validate that the image actually loads
+      const imageValid = await validateImageUrl(imageUrl);
+      if (!imageValid) {
+        continue;
+      }
+
+      const collageNFT: CollageNFT = {
+        id: nftKey,
+        imageUrl,
+        contract: randomCollection.contract,
+        tokenId,
+        collectionName: randomCollection.name,
+      };
+
+      usedNFTs.add(nftKey);
+      return collageNFT;
+    } catch (error) {
+      console.error(`Error fetching NFT ${nftKey}:`, error);
+      continue;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Fetches a random selection of NFTs from various collections or a specific collection
+ * with progressive loading and retry logic
  */
 export async function fetchRandomNFTs(
   count: number,
   collectionContracts?: string[],
+  onProgress?: (nft: CollageNFT, index: number) => void,
 ): Promise<CollageNFT[]> {
   const nfts: CollageNFT[] = [];
   const usedNFTs = new Set<string>(); // Track used NFTs to avoid duplicates
@@ -58,84 +131,35 @@ export async function fetchRandomNFTs(
     throw new Error("No available collections found");
   }
 
+  // Fetch NFTs progressively with sequential requests for better user experience
   for (let i = 0; i < count; i++) {
-    let attempts = 0;
-    const maxAttempts = 50; // Prevent infinite loops
+    const nft = await fetchSingleNFTWithRetry(availableCollections, usedNFTs);
 
-    while (attempts < maxAttempts) {
-      // Pick a random collection from available collections
-      const randomCollection =
-        availableCollections[
-          Math.floor(Math.random() * availableCollections.length)
-        ];
-
-      const tokenId = getRandomTokenId(randomCollection);
-      const nftKey = `${randomCollection.contract}-${tokenId}`;
-
-      // Skip if we already have this NFT
-      if (usedNFTs.has(nftKey)) {
-        attempts++;
-        continue;
+    if (nft) {
+      nfts.push(nft);
+      // Call progress callback if provided
+      if (onProgress) {
+        onProgress(nft, i);
       }
-
-      try {
-        let imageUrl: string;
-
-        // Check if collection has a custom gif override
-        if (randomCollection.gifOverride) {
-          imageUrl = randomCollection.gifOverride(tokenId);
-        } else {
-          // Use the NFT image fetching API
-          const response = await fetch(
-            `/fetchNFTImage?contract=${randomCollection.contract}&tokenId=${tokenId}&chain=${randomCollection.chain || "ethereum"}`,
-          );
-
-          if (!response.ok) {
-            attempts++;
-            continue;
-          }
-
-          const data = await response.json();
-          if (!data.imageUrl) {
-            attempts++;
-            continue;
-          }
-
-          imageUrl = data.imageUrl;
-        }
-
-        const collageNFT: CollageNFT = {
-          id: nftKey,
-          imageUrl,
-          contract: randomCollection.contract,
-          tokenId,
-          collectionName: randomCollection.name,
-        };
-
-        nfts.push(collageNFT);
-        usedNFTs.add(nftKey);
-        break; // Successfully added an NFT, move to next
-      } catch (error) {
-        console.error(`Error fetching NFT ${nftKey}:`, error);
-        attempts++;
-      }
-    }
-
-    // If we couldn't find a unique NFT after max attempts, just add a placeholder
-    if (attempts >= maxAttempts) {
-      console.warn(
-        `Could not find unique NFT for slot ${i}, adding placeholder`,
-      );
+    } else {
+      // Create placeholder if all retries failed
+      console.warn(`Could not find NFT for slot ${i}, adding placeholder`);
       const placeholderCollection = availableCollections[0];
       const placeholderTokenId = getRandomTokenId(placeholderCollection);
 
-      nfts.push({
+      const placeholder: CollageNFT = {
         id: `placeholder-${i}`,
-        imageUrl: `/api/placeholder?text=NFT+${i + 1}`, // This could be a placeholder image endpoint
+        imageUrl: `/api/placeholder?text=NFT+${i + 1}`,
         contract: placeholderCollection.contract,
         tokenId: placeholderTokenId,
         collectionName: placeholderCollection.name,
-      });
+      };
+
+      nfts.push(placeholder);
+
+      if (onProgress) {
+        onProgress(placeholder, i);
+      }
     }
   }
 
@@ -148,7 +172,8 @@ export async function fetchRandomNFTs(
 export async function validateImageUrl(url: string): Promise<boolean> {
   try {
     const response = await fetch(url, { method: "HEAD" });
-    return response.ok;
+    const contentType = response.headers.get("content-type");
+    return response.ok && (contentType?.startsWith("image/") || false);
   } catch {
     return false;
   }
