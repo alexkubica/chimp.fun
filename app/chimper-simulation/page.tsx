@@ -53,10 +53,45 @@ export default function ChimperSimulationPage() {
         chimpers: ChimperSprite[] = [];
         nextChimperId = 1;
         loadedChimpers = new Set<number>();
+        chimperQueue: number[] = [];
+        maxChimperId = 5555;
+        queueSize = 20;
         bg: Phaser.GameObjects.TileSprite | null = null;
 
         constructor() {
           super({ key: "ChimperSimulationScene" });
+        }
+
+        getRandomUnusedChimperId() {
+          let id;
+          let attempts = 0;
+          do {
+            id = Math.floor(Math.random() * this.maxChimperId) + 1;
+            attempts++;
+          } while (
+            (this.loadedChimpers.has(id) || this.chimperQueue.includes(id)) &&
+            attempts < 20
+          );
+          return id;
+        }
+
+        refillChimperQueue() {
+          while (this.chimperQueue.length < this.queueSize) {
+            const id = this.getRandomUnusedChimperId();
+            if (
+              !this.loadedChimpers.has(id) &&
+              !this.chimperQueue.includes(id)
+            ) {
+              this.chimperQueue.push(id);
+              const key = `chimp_${id}`;
+              const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${id}.png?v6`;
+              this.load.spritesheet(key, url, {
+                frameWidth: 96,
+                frameHeight: 96,
+              });
+              this.loadedChimpers.add(id);
+            }
+          }
         }
 
         preload() {
@@ -66,18 +101,8 @@ export default function ChimperSimulationPage() {
             frameHeight: 64,
           });
 
-          // Preload a few random chimpers
-          for (let i = 0; i < 20; i++) {
-            const randomId = Math.floor(Math.random() * 5555) + 1;
-            const key = `chimp_${randomId}`;
-            const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${randomId}.png?v6`;
-
-            this.load.spritesheet(key, url, {
-              frameWidth: 96,
-              frameHeight: 96,
-            });
-            this.loadedChimpers.add(randomId);
-          }
+          // Preload the first 10 random chimpers
+          this.refillChimperQueue();
         }
 
         create() {
@@ -140,25 +165,31 @@ export default function ChimperSimulationPage() {
         }
 
         spawnChimper(x?: number, y?: number) {
-          // Get random chimper ID that we've loaded
-          const loadedChimperIds = Array.from(this.loadedChimpers);
-          const randomChimperId =
-            Phaser.Utils.Array.GetRandom(loadedChimperIds);
-          const key = `chimp_${randomChimperId}`;
+          // Use a random chimper from the queue
+          if (this.chimperQueue.length === 0) {
+            this.refillChimperQueue();
+          }
+          const randomIndex = Math.floor(
+            Math.random() * this.chimperQueue.length,
+          );
+          const chimperId = this.chimperQueue.splice(randomIndex, 1)[0];
+          const key = `chimp_${chimperId}`;
 
           if (!this.textures.exists(key)) {
             // If texture doesn't exist, load it
-            const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${randomChimperId}.png?v6`;
+            const url = `https://d31ss916pli4td.cloudfront.net/game/avatars/chimpers/full/${chimperId}.png?v6`;
             this.load.spritesheet(key, url, {
               frameWidth: 96,
               frameHeight: 96,
             });
             this.load.once("complete", () => {
-              this.createChimperSprite(key, randomChimperId, x, y);
+              this.createChimperSprite(key, chimperId, x, y);
+              this.refillChimperQueue();
             });
             this.load.start();
           } else {
-            this.createChimperSprite(key, randomChimperId, x, y);
+            this.createChimperSprite(key, chimperId, x, y);
+            this.refillChimperQueue();
           }
         }
 
