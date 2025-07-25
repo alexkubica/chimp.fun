@@ -19,63 +19,50 @@ async function fetchSingleNFTWithRetry(
   availableCollections: any[],
   usedNFTs: Set<string>,
   maxAttempts: number = 10,
+  abortSignal?: AbortSignal,
 ): Promise<CollageNFT | null> {
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Check if operation was cancelled
+    if (abortSignal?.aborted) {
+      throw new Error("Operation cancelled");
+    }
+
     const randomCollection =
       availableCollections[
         Math.floor(Math.random() * availableCollections.length)
       ];
 
+    if (!randomCollection.contract) continue;
+
     const tokenId = getRandomTokenId(randomCollection);
     const nftKey = `${randomCollection.contract}-${tokenId}`;
 
-    // Skip if we already have this NFT
-    if (usedNFTs.has(nftKey)) {
-      continue;
-    }
+    // Skip if already used
+    if (usedNFTs.has(nftKey)) continue;
 
     try {
-      let imageUrl: string;
+      // Add to used set immediately to prevent duplicates
+      usedNFTs.add(nftKey);
 
-      // Check if collection has a custom gif override
-      if (randomCollection.gifOverride) {
-        imageUrl = randomCollection.gifOverride(tokenId);
-      } else {
-        // Use the NFT image fetching API
-        const response = await fetch(
-          `/fetchNFTImage?contract=${randomCollection.contract}&tokenId=${tokenId}&chain=${randomCollection.chain || "ethereum"}`,
-        );
+      const imageUrl = `/api/fetchNFTImage?contract=${randomCollection.contract}&tokenId=${tokenId}`;
 
-        if (!response.ok) {
-          continue;
-        }
-
-        const data = await response.json();
-        if (!data.imageUrl) {
-          continue;
-        }
-
-        imageUrl = data.imageUrl;
-      }
-
-      // Validate that the image actually loads
-      const imageValid = await validateImageUrl(imageUrl);
-      if (!imageValid) {
+      // Validate image URL
+      const isValid = await validateImageUrl(imageUrl, abortSignal);
+      if (!isValid) {
+        usedNFTs.delete(nftKey); // Remove from used set if invalid
         continue;
       }
 
-      const collageNFT: CollageNFT = {
+      return {
         id: nftKey,
         imageUrl,
         contract: randomCollection.contract,
         tokenId,
         collectionName: randomCollection.name,
       };
-
-      usedNFTs.add(nftKey);
-      return collageNFT;
     } catch (error) {
-      console.error(`Error fetching NFT ${nftKey}:`, error);
+      usedNFTs.delete(nftKey); // Remove from used set on error
+      console.warn(`Attempt ${attempt + 1} failed for ${nftKey}:`, error);
       continue;
     }
   }
@@ -91,6 +78,7 @@ export async function fetchRandomNFTs(
   count: number,
   collectionContracts?: string[],
   onProgress?: (nft: CollageNFT, index: number) => void,
+  abortSignal?: AbortSignal,
 ): Promise<CollageNFT[]> {
   const nfts: CollageNFT[] = [];
   const usedNFTs = new Set<string>(); // Track used NFTs to avoid duplicates
@@ -133,7 +121,17 @@ export async function fetchRandomNFTs(
 
   // Fetch NFTs progressively with sequential requests for better user experience
   for (let i = 0; i < count; i++) {
-    const nft = await fetchSingleNFTWithRetry(availableCollections, usedNFTs);
+    // Check if operation was cancelled
+    if (abortSignal?.aborted) {
+      throw new Error("Operation cancelled");
+    }
+
+    const nft = await fetchSingleNFTWithRetry(
+      availableCollections,
+      usedNFTs,
+      10,
+      abortSignal,
+    );
 
     if (nft) {
       nfts.push(nft);
@@ -169,12 +167,21 @@ export async function fetchRandomNFTs(
 /**
  * Validates if an image URL is accessible
  */
-export async function validateImageUrl(url: string): Promise<boolean> {
+export async function validateImageUrl(
+  url: string,
+  abortSignal?: AbortSignal,
+): Promise<boolean> {
   try {
-    const response = await fetch(url, { method: "HEAD" });
+    const response = await fetch(url, {
+      method: "HEAD",
+      signal: abortSignal,
+    });
     const contentType = response.headers.get("content-type");
     return response.ok && (contentType?.startsWith("image/") || false);
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw error; // Re-throw abort errors
+    }
     return false;
   }
 }
