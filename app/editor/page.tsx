@@ -1622,16 +1622,16 @@ function EditorPage() {
 
       if (collectionMetadata.gifOverride) {
         const gifUrl = collectionMetadata.gifOverride(tokenID.toString());
-        setImageUrl(`/proxy?url=${encodeURIComponent(gifUrl)}`);
+        setImageUrl(`/api/proxy?url=${encodeURIComponent(gifUrl)}`);
         console.log(
           "Set imageUrl:",
-          `/proxy?url=${encodeURIComponent(gifUrl)}`,
+          `/api/proxy?url=${encodeURIComponent(gifUrl)}`,
         );
         return;
       }
 
       const response = await fetch(
-        `/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
+        `/api/fetchNFTImage?tokenId=${tokenID}&contract=${collectionMetadata.contract}`,
       );
       if (!response.ok) {
         throw new Error(
@@ -1642,7 +1642,7 @@ function EditorPage() {
       if (imageUrl.includes("ipfs")) {
         setImageUrl(imageUrl);
       } else {
-        setImageUrl(`/proxy?url=${imageUrl}`);
+        setImageUrl(`/api/proxy?url=${imageUrl}`);
       }
       console.log("Set imageUrl:", imageUrl);
     })();
