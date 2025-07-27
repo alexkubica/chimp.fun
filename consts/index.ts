@@ -47,7 +47,7 @@ const originalCollections: CollectionMetadata[] = [
     contract: "0x6ff0c1e1b674138de7f5dd4131bf76665c0ff54a",
     chain: "ethereum",
   },
-{
+  {
     name: "Secret Society of Whales (SSOW)",
     total: 9997,
     contract: "0x88091012eedf8dba59d08e27ed7b22008f5d6fe5",
@@ -505,6 +505,53 @@ export const reactionsMap: ReactionMetadata[] = [
     x: 400,
     y: 60,
     filename: "CHIMPERS JUST REACHED 1M FOLLOWERS IN TIKTOK!.png",
+  },
+  {
+    title: "DO IT.",
+    scale: 0.5,
+    x: 500,
+    y: 60,
+    filename: "DO IT.png",
+  },
+
+  {
+    title: "!IKZ",
+    scale: 0.5,
+    x: 500,
+    y: 60,
+    filename: "!IKZ.png",
+  },
+
+  {
+    title: "Welcome to\nthe garden!",
+    scale: 0.8,
+    x: 500,
+    y: 60,
+    filename: "Welcome to the garden!.png",
+  },
+
+  {
+    title: "!CHIMPKUZO",
+    scale: 0.6,
+    x: 500,
+    y: 60,
+    filename: "!CHIMPKUZO.png",
+  },
+
+  {
+    title: "!LFC",
+    scale: 0.6,
+    x: 500,
+    y: 60,
+    filename: "!LFC.png",
+  },
+
+  {
+    title: "!LFCHIMP",
+    scale: 0.6,
+    x: 500,
+    y: 60,
+    filename: "!LFCHIMP.png",
   },
 ];
 

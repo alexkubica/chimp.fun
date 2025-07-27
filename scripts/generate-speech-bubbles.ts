@@ -3,7 +3,14 @@ import fs from "fs";
 import path from "path";
 
 // List of strings to convert to speech bubbles
-const speechTexts = ["CHIMPERS JUST REACHED\n1M FOLLOWERS IN TIKTOK!"];
+const speechTexts = [
+  "DO IT.",
+  "!IKZ",
+  "Welcome to\nthe garden!",
+  "!CHIMPKUZO",
+  "!LFC",
+  "!LFCHIMP",
+];
 
 // Helper function to create safe filename from text
 function createFilename(text: string): string {
