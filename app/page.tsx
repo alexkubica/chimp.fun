@@ -24,10 +24,10 @@ export const metadata = {
     siteName: "CHIMP.FUN",
     images: [
       {
-        url: "/Chimpers-2956-!CHIMP.gif",
+        url: "/icon.png",
         width: 512,
         height: 512,
-        alt: "Chimpers PFP",
+        alt: "CHIMP.FUN Logo",
       },
     ],
     locale: "en_US",
@@ -38,7 +38,7 @@ export const metadata = {
     title: "CHIMP.FUN",
     description:
       "NFT tools, banner maker, and game for Chimpers and web3 communities.",
-    images: ["/Chimpers-2956-!CHIMP.gif"],
+    images: ["/icon.png"],
   },
 };
 
@@ -54,8 +54,8 @@ export default function Home() {
         <div className="bg-[#8DC7FF] rounded-2xl shadow-lg flex items-center justify-center">
           <Avatar className="w-64 h-64 rounded-xl">
             <AvatarImage
-              src="/Chimpers-2956-!CHIMP.gif"
-              alt="Chimpers PFP"
+              src="/icon.png"
+              alt="CHIMP.FUN Logo"
               className="rounded-xl m-0 p-0"
             />
           </Avatar>
