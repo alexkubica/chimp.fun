@@ -298,7 +298,7 @@ function CollagePageContent() {
             watermarkImg.crossOrigin = "anonymous";
             await new Promise<void>((resolve) => {
               watermarkImg.onload = () => {
-                const watermarkScale = 0.3;
+                const watermarkScale = 0.5;
                 const watermarkWidth = watermarkImg.width * watermarkScale;
                 const watermarkHeight = watermarkImg.height * watermarkScale;
                 const watermarkX = canvas.width - watermarkWidth - 20;
@@ -315,7 +315,7 @@ function CollagePageContent() {
                 resolve();
               };
               watermarkImg.onerror = () => resolve();
-              watermarkImg.src = "/chimp.png";
+              watermarkImg.src = "/credit.png";
             });
 
             gif.addFrame(ctx, { copy: true, delay: frameDuration });
@@ -381,7 +381,7 @@ function CollagePageContent() {
           watermarkImg.crossOrigin = "anonymous";
           await new Promise<void>((resolve) => {
             watermarkImg.onload = () => {
-              const watermarkScale = 0.3;
+              const watermarkScale = 0.5;
               const watermarkWidth = watermarkImg.width * watermarkScale;
               const watermarkHeight = watermarkImg.height * watermarkScale;
               const watermarkX = canvas.width - watermarkWidth - 20;
@@ -398,7 +398,7 @@ function CollagePageContent() {
               resolve();
             };
             watermarkImg.onerror = () => resolve();
-            watermarkImg.src = "/chimp.png";
+            watermarkImg.src = "/credit.png";
           });
           canvas.toBlob((blob) => {
             if (blob) {
