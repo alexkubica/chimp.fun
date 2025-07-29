@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { MultiSearchableSelect } from "@/components/ui/MultiSearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
 import { collectionsMetadata, reactionsMap } from "@/consts";
 import {
   useCallback,
@@ -298,11 +297,11 @@ function CollagePageContent() {
             watermarkImg.crossOrigin = "anonymous";
             await new Promise<void>((resolve) => {
               watermarkImg.onload = () => {
-                const watermarkScale = 1.5;
+                const watermarkScale = 2.0;
                 const watermarkWidth = watermarkImg.width * watermarkScale;
                 const watermarkHeight = watermarkImg.height * watermarkScale;
-                const watermarkX = canvas.width - watermarkWidth - 20;
-                const watermarkY = canvas.height - watermarkHeight - 20;
+                const watermarkX = canvas.width - watermarkWidth - 10;
+                const watermarkY = canvas.height - watermarkHeight - 10;
                 ctx.globalAlpha = 0.8;
                 ctx.drawImage(
                   watermarkImg,
@@ -381,11 +380,11 @@ function CollagePageContent() {
           watermarkImg.crossOrigin = "anonymous";
           await new Promise<void>((resolve) => {
             watermarkImg.onload = () => {
-              const watermarkScale = 1.5;
+              const watermarkScale = 2.0;
               const watermarkWidth = watermarkImg.width * watermarkScale;
               const watermarkHeight = watermarkImg.height * watermarkScale;
-              const watermarkX = canvas.width - watermarkWidth - 20;
-              const watermarkY = canvas.height - watermarkHeight - 20;
+              const watermarkX = canvas.width - watermarkWidth - 10;
+              const watermarkY = canvas.height - watermarkHeight - 10;
               ctx.globalAlpha = 0.8;
               ctx.drawImage(
                 watermarkImg,
@@ -775,26 +774,32 @@ function CollagePageContent() {
             </Select>
           </div>
 
-          {/* Dimensions Input */}
+          {/* Dimensions Dropdown */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="dimensions">
-              Dimensions: {settings.dimensions}x{settings.dimensions}
-            </Label>
-            <Input
-              id="dimensions"
-              type="number"
-              value={settings.dimensions}
-              onChange={function handleInputChange(e) {
-                const value = parseInt(e.target.value);
-                if (value >= 1 && value <= 10) {
-                  debouncedSetDimensions(value);
-                }
+            <Label htmlFor="dimensions">Grid Size</Label>
+            <Select
+              value={`${settings.dimensions}x${settings.dimensions}`}
+              onValueChange={function handleSelectChange(value) {
+                const dimension = parseInt(value.split("x")[0]);
+                debouncedSetDimensions(dimension);
               }}
-              min={1}
-              max={10}
-              className="w-full"
-              placeholder="Enter grid size (1-10)"
-            />
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select grid size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1x1">1x1</SelectItem>
+                <SelectItem value="2x2">2x2</SelectItem>
+                <SelectItem value="3x3">3x3</SelectItem>
+                <SelectItem value="4x4">4x4</SelectItem>
+                <SelectItem value="5x5">5x5</SelectItem>
+                <SelectItem value="6x6">6x6</SelectItem>
+                <SelectItem value="7x7">7x7</SelectItem>
+                <SelectItem value="8x8">8x8</SelectItem>
+                <SelectItem value="9x9">9x9</SelectItem>
+                <SelectItem value="10x10">10x10</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Collections */}
