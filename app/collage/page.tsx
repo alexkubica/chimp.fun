@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { MultiSearchableSelect } from "@/components/ui/MultiSearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import { collectionsMetadata, reactionsMap } from "@/consts";
 import {
   useCallback,
@@ -298,7 +298,7 @@ function CollagePageContent() {
             watermarkImg.crossOrigin = "anonymous";
             await new Promise<void>((resolve) => {
               watermarkImg.onload = () => {
-                const watermarkScale = 0.5;
+                const watermarkScale = 1.5;
                 const watermarkWidth = watermarkImg.width * watermarkScale;
                 const watermarkHeight = watermarkImg.height * watermarkScale;
                 const watermarkX = canvas.width - watermarkWidth - 20;
@@ -381,7 +381,7 @@ function CollagePageContent() {
           watermarkImg.crossOrigin = "anonymous";
           await new Promise<void>((resolve) => {
             watermarkImg.onload = () => {
-              const watermarkScale = 0.5;
+              const watermarkScale = 1.5;
               const watermarkWidth = watermarkImg.width * watermarkScale;
               const watermarkHeight = watermarkImg.height * watermarkScale;
               const watermarkX = canvas.width - watermarkWidth - 20;
@@ -588,10 +588,14 @@ function CollagePageContent() {
             <div className="flex flex-col items-center gap-4">
               {/* Progressive NFT Grid */}
               <div
-                className="grid gap-2 p-4 bg-white rounded-lg shadow-lg"
+                className="grid gap-2 p-4 bg-white rounded-lg shadow-lg max-w-full overflow-x-auto"
                 style={{
-                  gridTemplateColumns: `repeat(${settings.dimensions}, 1fr)`,
+                  gridTemplateColumns: `repeat(${settings.dimensions}, minmax(0, 1fr))`,
                   width: "fit-content",
+                  maxWidth:
+                    settings.dimensions > 4
+                      ? "calc(100vw - 2rem)"
+                      : "fit-content",
                 }}
               >
                 {Array.from({
@@ -604,7 +608,8 @@ function CollagePageContent() {
                     <div
                       key={index}
                       className={`
-                        w-24 h-24 border border-gray-200 rounded-md overflow-hidden 
+                        ${settings.dimensions > 4 ? "w-16 h-16 sm:w-20 sm:h-20" : "w-24 h-24"} 
+                        border border-gray-200 rounded-md overflow-hidden 
                         cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md
                         ${isReplacing ? "opacity-50 animate-pulse" : ""}
                       `}
@@ -770,21 +775,25 @@ function CollagePageContent() {
             </Select>
           </div>
 
-          {/* Dimensions Slider */}
+          {/* Dimensions Input */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="dimensions">
               Dimensions: {settings.dimensions}x{settings.dimensions}
             </Label>
-            <Slider
+            <Input
               id="dimensions"
-              value={[settings.dimensions]}
-              onValueChange={function handleSliderChange(value) {
-                debouncedSetDimensions(value[0]);
+              type="number"
+              value={settings.dimensions}
+              onChange={function handleInputChange(e) {
+                const value = parseInt(e.target.value);
+                if (value >= 1 && value <= 10) {
+                  debouncedSetDimensions(value);
+                }
               }}
               min={1}
               max={10}
-              step={1}
               className="w-full"
+              placeholder="Enter grid size (1-10)"
             />
           </div>
 
