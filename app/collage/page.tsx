@@ -138,7 +138,7 @@ function CollagePageContent() {
 
     if (dimensionsParam) {
       const dimensions = parseInt(dimensionsParam, 10);
-      if (dimensions >= 1 && dimensions <= 5) {
+      if (dimensions >= 1 && dimensions <= 10) {
         setSettings((prev) => ({ ...prev, dimensions }));
       }
     }
@@ -292,6 +292,32 @@ function CollagePageContent() {
                 }
               }),
             );
+
+            // Add watermark to each frame
+            const watermarkImg = new Image();
+            watermarkImg.crossOrigin = "anonymous";
+            await new Promise<void>((resolve) => {
+              watermarkImg.onload = () => {
+                const watermarkScale = 0.3;
+                const watermarkWidth = watermarkImg.width * watermarkScale;
+                const watermarkHeight = watermarkImg.height * watermarkScale;
+                const watermarkX = canvas.width - watermarkWidth - 20;
+                const watermarkY = canvas.height - watermarkHeight - 20;
+                ctx.globalAlpha = 0.8;
+                ctx.drawImage(
+                  watermarkImg,
+                  watermarkX,
+                  watermarkY,
+                  watermarkWidth,
+                  watermarkHeight,
+                );
+                ctx.globalAlpha = 1.0;
+                resolve();
+              };
+              watermarkImg.onerror = () => resolve();
+              watermarkImg.src = "/chimp.png";
+            });
+
             gif.addFrame(ctx, { copy: true, delay: frameDuration });
           }
           await new Promise<void>((resolve, reject) => {
@@ -756,7 +782,7 @@ function CollagePageContent() {
                 debouncedSetDimensions(value[0]);
               }}
               min={1}
-              max={5}
+              max={10}
               step={1}
               className="w-full"
             />
