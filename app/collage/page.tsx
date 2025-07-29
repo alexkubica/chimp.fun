@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { MultiSearchableSelect } from "@/components/ui/MultiSearchableSelect";
 import { Skeleton, Spinner } from "@/components/ui/skeleton";
-import { Slider } from "@/components/ui/slider";
 import { collectionsMetadata, reactionsMap } from "@/consts";
 import {
   useCallback,
@@ -138,7 +137,7 @@ function CollagePageContent() {
 
     if (dimensionsParam) {
       const dimensions = parseInt(dimensionsParam, 10);
-      if (dimensions >= 1 && dimensions <= 5) {
+      if (dimensions >= 1 && dimensions <= 10) {
         setSettings((prev) => ({ ...prev, dimensions }));
       }
     }
@@ -292,6 +291,32 @@ function CollagePageContent() {
                 }
               }),
             );
+
+            // Add watermark to each frame
+            const watermarkImg = new Image();
+            watermarkImg.crossOrigin = "anonymous";
+            await new Promise<void>((resolve) => {
+              watermarkImg.onload = () => {
+                const watermarkScale = 2.0;
+                const watermarkWidth = watermarkImg.width * watermarkScale;
+                const watermarkHeight = watermarkImg.height * watermarkScale;
+                const watermarkX = canvas.width - watermarkWidth - 10;
+                const watermarkY = canvas.height - watermarkHeight - 10;
+                ctx.globalAlpha = 0.8;
+                ctx.drawImage(
+                  watermarkImg,
+                  watermarkX,
+                  watermarkY,
+                  watermarkWidth,
+                  watermarkHeight,
+                );
+                ctx.globalAlpha = 1.0;
+                resolve();
+              };
+              watermarkImg.onerror = () => resolve();
+              watermarkImg.src = "/credit.png";
+            });
+
             gif.addFrame(ctx, { copy: true, delay: frameDuration });
           }
           await new Promise<void>((resolve, reject) => {
@@ -355,11 +380,11 @@ function CollagePageContent() {
           watermarkImg.crossOrigin = "anonymous";
           await new Promise<void>((resolve) => {
             watermarkImg.onload = () => {
-              const watermarkScale = 0.3;
+              const watermarkScale = 2.0;
               const watermarkWidth = watermarkImg.width * watermarkScale;
               const watermarkHeight = watermarkImg.height * watermarkScale;
-              const watermarkX = canvas.width - watermarkWidth - 20;
-              const watermarkY = canvas.height - watermarkHeight - 20;
+              const watermarkX = canvas.width - watermarkWidth - 10;
+              const watermarkY = canvas.height - watermarkHeight - 10;
               ctx.globalAlpha = 0.8;
               ctx.drawImage(
                 watermarkImg,
@@ -372,7 +397,7 @@ function CollagePageContent() {
               resolve();
             };
             watermarkImg.onerror = () => resolve();
-            watermarkImg.src = "/chimp.png";
+            watermarkImg.src = "/credit.png";
           });
           canvas.toBlob((blob) => {
             if (blob) {
@@ -562,10 +587,14 @@ function CollagePageContent() {
             <div className="flex flex-col items-center gap-4">
               {/* Progressive NFT Grid */}
               <div
-                className="grid gap-2 p-4 bg-white rounded-lg shadow-lg"
+                className="grid gap-2 p-4 bg-white rounded-lg shadow-lg max-w-full overflow-x-auto"
                 style={{
-                  gridTemplateColumns: `repeat(${settings.dimensions}, 1fr)`,
+                  gridTemplateColumns: `repeat(${settings.dimensions}, minmax(0, 1fr))`,
                   width: "fit-content",
+                  maxWidth:
+                    settings.dimensions > 4
+                      ? "calc(100vw - 2rem)"
+                      : "fit-content",
                 }}
               >
                 {Array.from({
@@ -578,7 +607,8 @@ function CollagePageContent() {
                     <div
                       key={index}
                       className={`
-                        w-24 h-24 border border-gray-200 rounded-md overflow-hidden 
+                        ${settings.dimensions > 4 ? "w-16 h-16 sm:w-20 sm:h-20" : "w-24 h-24"} 
+                        border border-gray-200 rounded-md overflow-hidden 
                         cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md
                         ${isReplacing ? "opacity-50 animate-pulse" : ""}
                       `}
@@ -744,22 +774,32 @@ function CollagePageContent() {
             </Select>
           </div>
 
-          {/* Dimensions Slider */}
+          {/* Dimensions Dropdown */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="dimensions">
-              Dimensions: {settings.dimensions}x{settings.dimensions}
-            </Label>
-            <Slider
-              id="dimensions"
-              value={[settings.dimensions]}
-              onValueChange={function handleSliderChange(value) {
-                debouncedSetDimensions(value[0]);
+            <Label htmlFor="dimensions">Grid Size</Label>
+            <Select
+              value={`${settings.dimensions}x${settings.dimensions}`}
+              onValueChange={function handleSelectChange(value) {
+                const dimension = parseInt(value.split("x")[0]);
+                debouncedSetDimensions(dimension);
               }}
-              min={1}
-              max={5}
-              step={1}
-              className="w-full"
-            />
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select grid size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1x1">1x1</SelectItem>
+                <SelectItem value="2x2">2x2</SelectItem>
+                <SelectItem value="3x3">3x3</SelectItem>
+                <SelectItem value="4x4">4x4</SelectItem>
+                <SelectItem value="5x5">5x5</SelectItem>
+                <SelectItem value="6x6">6x6</SelectItem>
+                <SelectItem value="7x7">7x7</SelectItem>
+                <SelectItem value="8x8">8x8</SelectItem>
+                <SelectItem value="9x9">9x9</SelectItem>
+                <SelectItem value="10x10">10x10</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Collections */}
