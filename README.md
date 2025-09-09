@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## CHIMP.FUN — Open Source
 
-## Getting Started
+Welcome! This is the source code for CHIMP.FUN, an NFT tools playground (editor, banner maker, collage generator, and mini game). The project is now open source. Contributions are welcome—see `CONTRIBUTING.md`.
 
-First, run the development server:
+Repository: `https://github.com/your-org-or-user/chimp.fun`
+
+## Quick Start
+
+- macOS, Windows, Linux are supported.
+- You will install Node.js and a code editor, clone the repo, install dependencies, create a `.env.local`, and run the dev server.
+
+### 1) Install Required Software
+
+- Node.js LTS (20+ recommended):
+  - macOS: Install via `https://nodejs.org` (pkg) or Homebrew: `brew install node`
+  - Windows: Installer from `https://nodejs.org` (choose LTS)
+  - Linux: Use your package manager or `nvm`:
+    - Install nvm: `https://github.com/nvm-sh/nvm`
+    - Then: `nvm install --lts && nvm use --lts`
+- Git: `https://git-scm.com/downloads`
+- Editor (optional but recommended):
+  - Cursor: `https://cursor.sh` (AI-powered editor)
+  - or VS Code: `https://code.visualstudio.com`
+
+### 2) Clone the Repository
+
+```bash
+git clone https://github.com/your-org-or-user/chimp.fun.git
+cd chimp.fun
+```
+
+### 3) Install Dependencies
+
+```bash
+npm install
+# or: pnpm install / yarn install / bun install
+```
+
+### 4) Configure Environment Variables
+
+Create `.env.local` in the project root. Use `.env.example` as a template.
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` and provide values if you have API keys. The app can run without keys using public RPCs, but certain features (like wallet NFT fetching) work best with keys.
+
+Common variables:
+
+- `ALCHEMY_API_KEY` (optional, for NFT fetching)
+- `MORALIS_API_KEY` (optional)
+- `OPENSEA_API_KEY` (optional)
+- `ETHEREUM_RPC_URL` (optional; defaults to `https://eth.llamarpc.com`)
+- `POLYGON_RPC_URL` (optional; defaults to `https://polygon-rpc.com`)
+- `APESCAN_API_KEY` (optional; only if you use ApeChain provider)
+
+### 5) Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 6) Build for Production (optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `app/` — Next.js App Router pages and API routes
+- `app/editor/` — NFT editor UI and logic
+- `app/api/` — serverless routes for NFT fetching and proxying
+- `public/` — static assets and cached metadata
+- `scripts/` — utilities to cache metadata and generate speech bubbles
+- `consts/`, `utils/`, `types/` — shared code
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables and Privacy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+No secrets are committed to this repository. See `.env.example` for all keys the app can read. If you fork this repo or deploy, configure your own keys as needed.
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Please read `CONTRIBUTING.md` for guidelines on branching, code style, and pull requests.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## License
+
+MIT (proposed). If the license file is missing, consider adding one before broader distribution.

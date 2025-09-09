@@ -20,6 +20,18 @@ const Footer = () => {
   return (
     <footer className="w-full mt-8 flex flex-col items-center">
       <div className="w-full max-w-md px-6 pb-4 pt-2 text-xs text-muted-foreground text-center flex flex-col items-center">
+        <div className="mb-2">
+          This project is open source —
+          <a
+            href="https://github.com/your-org-or-user/chimp.fun"
+            className="underline text-primary ml-1"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            view on GitHub
+          </a>
+          .
+        </div>
         <div className="mb-2">Buy me a coffee ☕️</div>
         <div className="flex flex-col gap-2 w-full">
           {addresses.map((addr) => (
